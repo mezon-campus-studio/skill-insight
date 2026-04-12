@@ -1,0 +1,28 @@
+# Node.js dependencies
+node_modules/
+
+# Angular cache
+.angular/cache/
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Vite cache
+.vite/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Coverage reports
+coverage/

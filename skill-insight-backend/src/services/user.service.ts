@@ -1,0 +1,30 @@
+import * as userRepository from '../repositories/user.repositories';
+import { AppError } from '../utils/appError';
+
+interface User {
+  user_id?: number;
+  full_name: string;
+  email: string;
+  password: string;
+  role?: string;
+  created_at?: Date;
+}
+
+export const getAllUsers = async (): Promise<User[]> => {
+  const users = await userRepository.findAll();
+  return users;
+};
+
+export const getUserById = async (id: number): Promise<Omit<User, 'password'>> => {
+  const user = await userRepository.findById(id);
+  if (!user) {
+    throw new AppError('Không tìm thấy người dùng với ID này', 404);
+  }
+  // Loại bỏ password khỏi kết quả trả về
+  const { password, ...userWithoutPassword } = user;
+  return userWithoutPassword;
+};
+
+export const getUserProfile = async (id: number): Promise<Omit<User, 'password'>> => {
+  return await getUserById(id);
+};
