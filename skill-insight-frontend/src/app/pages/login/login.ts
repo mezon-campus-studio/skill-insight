@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-
+import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-login',
   imports: [],
@@ -7,5 +7,8 @@ import { Component } from '@angular/core';
   styleUrl: './login.css',
 })
 export class Login {
-
+  constructor(private auth: AuthService) {}
+  login() {
+    this.auth.loginWithMezon();
+  }
 }
