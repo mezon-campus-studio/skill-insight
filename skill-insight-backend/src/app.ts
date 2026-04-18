@@ -1,16 +1,16 @@
-import express, { Request, Response, NextFunction } from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import dotenv from 'dotenv';
-
-import userRoutes from './routes/user.routes';
-import { errorHandler } from './middlewares/error.middleware';
+import express, { Request, Response, NextFunction } from "express";
+import cors from "cors";
+import helmet from "helmet";
+import dotenv from "dotenv";
+import authRoute from "./routes/auth.routes";
+import userRoutes from "./routes/user.routes";
+import { errorHandler } from "./middlewares/error.middleware";
 
 dotenv.config();
 
 const app = express();
 
-// 1. Security Headers
+//Security Headers
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -19,35 +19,37 @@ app.use(
         "connect-src": ["'self'", "http://localhost:3000"],
       },
     },
-  })
+  }),
 );
 
-// 2. CORS config
+//CORS config
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:4200',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: process.env.FRONTEND_URL || "http://localhost:4200",
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
-  })
+  }),
 );
 
-// 3. Body Parsers
+//Body Parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 4. Health Check
-app.get('/health', (req: Request, res: Response, next: NextFunction) => {
+//Health Check
+app.get("/health", (req: Request, res: Response, next: NextFunction) => {
   res.status(200).json({
-    status: 'OK',
+    status: "OK",
     uptime: process.uptime(),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
-// 5. Routes
-app.use('/api/users', userRoutes);
-
-// 6. Error Middleware
+//Routes
+app.use("/api/users", userRoutes);
+app.use("/auth", authRoute);
+app.use(cors());
+app.use(express.json());
+// Error Middleware
 app.use(errorHandler);
 
 export default app;

@@ -1,1 +1,14 @@
 <p>home works!</p>
+<p>home works!</p>
+<p>home works!</p>
+<p>home works!</p>
+<div *ngIf="user">
+  <h2>Xin chào {{ user.email }}</h2>
+  <p>ID: {{ user.id }}</p>
+  <p>Mezon ID: {{ user.mezonId }}</p>
+  <p>Role: {{ user.role }}</p>
+</div>
+
+<div *ngIf="!user">
+  <p>Bạn chưa đăng nhập.</p>
+</div>

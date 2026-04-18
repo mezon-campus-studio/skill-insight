@@ -4,7 +4,7 @@ import { CallbackComponent } from './pages/callback/callback';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterModule, CallbackComponent],
+  imports: [RouterOutlet, RouterModule],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

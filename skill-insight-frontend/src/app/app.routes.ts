@@ -8,11 +8,12 @@ import { Teacher } from './pages/teacher/teacher';
 import { Admin } from './pages/admin/admin';
 import { CallbackComponent } from './pages/callback/callback';
 export const routes: Routes = [
-  { path: '', component: Home },
+  { path: '', component: Login },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
   { path: 'student', component: Student },
   { path: 'teacher', component: Teacher },
   { path: 'admin', component: Admin },
   { path: 'callback', component: CallbackComponent },
+  { path: 'home', component: Home },
 ];
