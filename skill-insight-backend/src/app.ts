@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 
 import userRoutes from './routes/user.routes';
+import { authRoutes } from './routes/auth.routes';
 import { errorHandler } from './middlewares/error.middleware';
 
 dotenv.config();
@@ -46,6 +47,7 @@ app.get('/health', (req: Request, res: Response, next: NextFunction) => {
 
 // 5. Routes
 app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes);
 
 // 6. Error Middleware
 app.use(errorHandler);
