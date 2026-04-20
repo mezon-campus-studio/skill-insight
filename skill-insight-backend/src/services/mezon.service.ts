@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const getAccessToken = async (code: string, state: string) => {
-  console.log("[21] CALL TOKEN API");
+  //console.log("[21] CALL TOKEN API");
 
   const data = {
     grant_type: "authorization_code",
@@ -12,7 +12,7 @@ export const getAccessToken = async (code: string, state: string) => {
     redirect_uri: process.env.MEZON_REDIRECT_URI,
   };
 
-  console.log("[22] PARAMS:", data);
+  //console.log("[22] PARAMS:", data);
 
   const response = await axios.post(
     "https://oauth2.mezon.ai/oauth2/token",
@@ -24,19 +24,19 @@ export const getAccessToken = async (code: string, state: string) => {
     },
   );
 
-  console.log("[23] TOKEN RESPONSE:", response.data);
+  //console.log("[23] TOKEN RESPONSE:", response.data);
 
   return response.data.access_token;
 };
 
 export const getUserInfo = async (accessToken: string) => {
-  console.log("[24] CALL USERINFO API");
+  //console.log("[24] CALL USERINFO API");
 
   const response = await axios.get("https://oauth2.mezon.ai/userinfo", {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-  console.log("[25] USERINFO RESPONSE:", response.data);
+  //console.log("[25] USERINFO RESPONSE:", response.data);
   return response.data;
 };

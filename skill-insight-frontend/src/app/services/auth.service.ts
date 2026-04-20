@@ -18,7 +18,7 @@ export class AuthService {
     });
 
     const url = `https://oauth2.mezon.ai/oauth2/auth?${params.toString()}`;
-    alert('AUTHORIZE URL:' + url);
+    //alert('AUTHORIZE URL:' + url);
     window.location.href = url;
   }
 }
