@@ -1,32 +1,48 @@
 import app from "./app";
-import { pool } from "./config/database";
+import { prisma } from "./config/prisma";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
 async function startServer(): Promise<void> {
   try {
-    // 1. MySQL
-    const connection = await pool.getConnection();
-    console.log("Kết nối MySQL thành công!");
-    connection.release();
+    //Connect Prisma
+    await prisma.$connect();
+    console.log("Kết nối MySQL (Prisma) thành công!");
 
-    // 2. Express Server
+    //Start server
     const server = app.listen(PORT, () => {
       console.log(`Server đang chạy tại: http://localhost:${PORT}`);
       console.log(`Health check: http://localhost:${PORT}/health`);
     });
 
-    // 3. Graceful Shutdown
+    //Graceful shutdown
+    const shutdown = async () => {
+      console.log("Stopping server...");
+      server.close(async () => {
+        await prisma.$disconnect();
+        console.log("Disconnected Prisma.");
+        process.exit(0);
+      });
+    };
+
+    process.on("SIGTERM", shutdown);
+    process.on("SIGINT", shutdown);
+
+    //lỗi async không catch
     process.on("unhandledRejection", (err: any) => {
-      console.error("LỖI NGHIÊM TRỌNG (Unhandled Rejection):", err.message);
-      server.close(() => {
+      console.error("LỖI NGHIÊM TRỌNG:", err.message);
+      server.close(async () => {
+        await prisma.$disconnect();
         process.exit(1);
       });
     });
   } catch (error) {
     console.error("Lỗi khởi động Server:", error);
+
+    await prisma.$disconnect();
     process.exit(1);
   }
 }

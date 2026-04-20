@@ -1,40 +1,24 @@
-import { pool } from '../config/database';
+import { prisma } from "../config/prisma";
 
-interface User {
-  user_id?: number;
-  full_name: string;
-  email: string;
-  password: string;
-  role?: string;
-  created_at?: Date;
-}
-
-export const findAll = async (): Promise<User[]> => {
-  const [rows] = await pool.execute(
-    'SELECT user_id, full_name, email, role, created_at FROM users'
-  );
-  return rows as User[];
+export const findAll = async () => {
+  return await prisma.user.findMany();
 };
 
-export const findById = async (id: number): Promise<User | null> => {
-  const [rows] = await pool.execute('SELECT * FROM users WHERE user_id = ?', [id]);
-  const result = rows as User[];
-  return result.length > 0 ? result[0] : null;
+export const findById = async (id: number) => {
+  return await prisma.user.findUnique({
+    where: { user_id: id },
+  });
 };
 
-export const findByEmail = async (email: string): Promise<User | null> => {
-  const [rows] = await pool.execute('SELECT * FROM users WHERE email = ?', [email]);
-  const result = rows as User[];
-  return result.length > 0 ? result[0] : null;
+export const findByEmail = async (email: string) => {
+  return await prisma.user.findUnique({
+    where: { email },
+  });
 };
 
-export const create = async (userData: User): Promise<number> => {
-  const { full_name, email, password } = userData;
-  const [result] = await pool.execute(
-    'INSERT INTO users (full_name, email, password) VALUES (?, ?, ?)',
-    [full_name, email, password]
-  );
-  // mysql2/promise trả về OkPacket khi INSERT
-  const insertResult = result as any;
-  return insertResult.insertId;
+export const create = async (userData: any) => {
+  const user = await prisma.user.create({
+    data: userData,
+  });
+  return user.user_id;
 };

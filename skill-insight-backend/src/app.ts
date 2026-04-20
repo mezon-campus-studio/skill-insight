@@ -2,8 +2,9 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
-import authRoute from "./routes/auth.routes";
+
 import userRoutes from "./routes/user.routes";
+import authRoutes from "./routes/auth.routes";
 import { errorHandler } from "./middlewares/error.middleware";
 
 dotenv.config();
@@ -15,8 +16,8 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        "default-src": ["'self'"],
-        "connect-src": ["'self'", "http://localhost:3000"],
+        defaultSrc: ["'self'"],
+        connectSrc: ["'self'", "http://localhost:3000"],
       },
     },
   }),
@@ -31,12 +32,12 @@ app.use(
   }),
 );
 
-//Body Parsers
+// Body Parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-//Health Check
-app.get("/health", (req: Request, res: Response, next: NextFunction) => {
+// Health Check
+app.get("/health", (req: Request, res: Response) => {
   res.status(200).json({
     status: "OK",
     uptime: process.uptime(),
@@ -44,11 +45,10 @@ app.get("/health", (req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-//Routes
+// Routes
 app.use("/api/users", userRoutes);
-app.use("/auth", authRoute);
-app.use(cors());
-app.use(express.json());
+app.use("/api/auth", authRoutes);
+
 // Error Middleware
 app.use(errorHandler);
 

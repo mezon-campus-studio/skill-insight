@@ -7,13 +7,4 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home implements OnInit {
-  user: any = null;
-  ngOnInit(): void {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      this.user = JSON.parse(userData);
-      console.log('User info:', this.user);
-    }
-  }
-}
+export class Home {}

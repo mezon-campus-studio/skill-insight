@@ -31,7 +31,7 @@ export class CallbackComponent implements OnInit {
       console.error('Không có code');
       return;
     }
-    // Gọi backend
+    // call backend
     this.http
       .post(`${environment.apiUrl}/mezon/callback`, {
         code: code,
@@ -40,8 +40,7 @@ export class CallbackComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           localStorage.setItem('user', JSON.stringify(res.user));
-
-          // chuyển trang
+          // turn page
           this.router.navigate(['/home']);
         },
         error: (err) => {
