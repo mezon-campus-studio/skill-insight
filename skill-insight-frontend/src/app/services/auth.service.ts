@@ -14,7 +14,6 @@ export class AuthService {
       response_type: 'code',
       scope: 'openid offline',
       state: state,
-      prompt: 'login',
     });
 
     const url = `${environment.Oauth2_URL}?${params.toString()}`;

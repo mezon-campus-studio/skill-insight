@@ -2,10 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
-Router;
+
 @Component({
   selector: 'app-callback',
-  imports: [],
   templateUrl: './callback.html',
   styleUrl: './callback.css',
 })
@@ -20,27 +19,34 @@ export class CallbackComponent implements OnInit {
     const code = params.get('code');
     const state = params.get('state');
     const savedState = sessionStorage.getItem('oauth_state');
-    //check state
+
+    // check state
     if (!state || state !== savedState) {
       console.error('invalid state');
+      this.router.navigate(['/login']);
       return;
     }
-    //remove state
+
     sessionStorage.removeItem('oauth_state');
+
     if (!code) {
       console.error('Không có code');
+      this.router.navigate(['/login']);
       return;
     }
-    // call backend
+
     this.http
       .post(`${environment.apiUrl}/mezon/callback`, {
-        code: code,
-        state: state,
+        code,
+        state,
       })
       .subscribe({
         next: (res: any) => {
+          // save user + token
           localStorage.setItem('user', JSON.stringify(res.user));
-          // turn page
+          localStorage.setItem('token', res.token);
+          // clear URL
+          window.history.replaceState({}, document.title, '/callback');
           this.router.navigate(['/home']);
         },
         error: (err) => {
