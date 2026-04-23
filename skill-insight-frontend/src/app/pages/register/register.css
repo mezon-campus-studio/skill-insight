@@ -1,0 +1,214 @@
+/* ===== RESET ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== WRAPPER ===== */
+.register-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at top, #f8fafc, #e2e8f0);
+  padding: 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* ===== CARD ===== */
+.register-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 36px 30px;
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08);
+  animation: fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ===== TITLE ===== */
+.register-card h2 {
+  text-align: center;
+  color: #2563eb;
+  margin-bottom: 28px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* ===== INPUT ===== */
+.input-group {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 40px 14px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  outline: none;
+  font-size: 14px;
+  background: #fff;
+  transition: 0.25s;
+}
+
+.input-group input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+/* FLOAT LABEL */
+.input-group label {
+  position: absolute;
+  top: 14px;
+  left: 12px;
+  font-size: 14px;
+  color: #9ca3af;
+  background: #fff;
+  padding: 0 4px;
+  transition: 0.25s;
+  pointer-events: none;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+  top: -9px;
+  left: 10px;
+  font-size: 12px;
+  color: #2563eb;
+}
+
+/* ===== PASSWORD ===== */
+.password-group {
+  margin-bottom: 18px;
+}
+
+.eye {
+  position: absolute;
+  right: 12px;
+  top: 14px;
+  cursor: pointer;
+}
+
+.eye svg {
+  width: 20px;
+  height: 20px;
+  stroke: #374151;
+  fill: none;
+  stroke-width: 2;
+}
+
+/* RULE TEXT */
+.password-rule {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* ===== ERROR ===== */
+.error {
+  color: #dc2626;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+/* ===== TERMS ===== */
+.terms {
+  margin: 18px 0;
+  font-size: 14px;
+}
+
+.terms-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.terms input[type="checkbox"] {
+  margin-top: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* TEXT FIX KHÔNG BỊ GÃY */
+.terms-text {
+  flex: 1;
+  color: #374151;
+  line-height: 1.7;
+}
+
+/* LINK */
+.link-text {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link-text:hover {
+  text-decoration: underline;
+}
+
+/* ===== BUTTON ===== */
+button {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ===== LOGIN LINK ===== */
+.login-link {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.login-link a {
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 4px;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 400px) {
+  .register-card {
+    padding: 26px 20px;
+  }
+}

@@ -1,55 +1,65 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
 import dotenv from 'dotenv';
 
+import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
-import { authRoutes } from './routes/auth.routes';
 import { errorHandler } from './middlewares/error.middleware';
 
 dotenv.config();
 
 const app = express();
 
-// 1. Security Headers
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        "default-src": ["'self'"],
-        "connect-src": ["'self'", "http://localhost:3000"],
-      },
-    },
-  })
-);
-
-// 2. CORS config
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:4200',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
-  })
-);
-
-// 3. Body Parsers
+// ======================
+// MIDDLEWARE
+// ======================
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 
-// 4. Health Check
-app.get('/health', (req: Request, res: Response, next: NextFunction) => {
+// ======================
+// HEALTH CHECK
+// ======================
+app.get('/health', (req, res) => {
   res.status(200).json({
-    status: 'OK',
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString()
+    success: true,
+    message: 'OK',
   });
 });
 
-// 5. Routes
-app.use('/api/users', userRoutes);
-app.use('/api/auth', authRoutes);
+// ======================
+// ROOT TEST API
+// ======================
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Skill Insight Backend Running...',
+  });
+});
 
-// 6. Error Middleware
+// ======================
+// ROUTES
+// ======================
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+
+// ======================
+// 404 HANDLE
+// ======================
+app.use('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'API route not found',
+  });
+});
+
+// ======================
+// ERROR HANDLER
+// ======================
 app.use(errorHandler);
 
 export default app;

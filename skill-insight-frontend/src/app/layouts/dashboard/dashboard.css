@@ -1,0 +1,136 @@
+.dashboard {
+  display: flex;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  background: #1e293b;
+  color: #fff;
+  padding: 20px;
+  transition: 0.3s;
+}
+
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* ROLE SWITCH */
+.role-switch {
+  margin-bottom: 20px;
+}
+
+.role-switch button {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 8px;
+  border: none;
+  background: #334155;
+  color: white;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.role-switch button.active {
+  background: #3b82f6;
+}
+
+/* MENU */
+nav a {
+  display: block;
+  padding: 10px;
+  color: #cbd5f5;
+  text-decoration: none;
+  border-radius: 6px;
+  margin-bottom: 5px;
+}
+
+nav a:hover {
+  background: #334155;
+}
+
+nav a.active {
+  background: #3b82f6;
+  color: white;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOPBAR */
+.topbar {
+  height: 60px;
+  background: #f8fafc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+/* USER MENU */
+.user-menu {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.avatar {
+  width: 35px;
+  height: 35px;
+  background: #3b82f6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.name {
+  margin-right: 5px;
+}
+
+/* DROPDOWN */
+.dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: white;
+  color: black;
+  width: 200px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.dropdown .item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdown .item:hover {
+  background: #f1f5f9;
+}
+
+.dropdown .logout {
+  color: red;
+}
+
+/* CONTENT */
+.content {
+  flex: 1;
+  padding: 20px;
+  background: #f1f5f9;
+}

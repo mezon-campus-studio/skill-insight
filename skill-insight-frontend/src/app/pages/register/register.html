@@ -1,1 +1,153 @@
-<p>register works!</p>
+<div class="register-wrapper">
+  <div class="register-card">
+    <h2>ĐĂNG KÝ</h2>
+
+    <!-- Full Name -->
+    <div class="input-group">
+      <input
+        type="text"
+        [(ngModel)]="full_name"
+        placeholder=" "
+      />
+      <label>Họ và tên</label>
+      <span class="line"></span>
+    </div>
+
+    <!-- Email -->
+    <div class="input-group">
+      <input
+        type="email"
+        [(ngModel)]="email"
+        placeholder=" "
+      />
+      <label>Email</label>
+      <span class="line"></span>
+    </div>
+
+    <!-- Password -->
+    <div class="input-group password-group">
+      <input
+        [type]="showPassword ? 'text' : 'password'"
+        [(ngModel)]="password"
+        placeholder=" "
+      />
+      <label>Mật khẩu</label>
+      <span class="line"></span>
+
+      <span
+        class="eye"
+        (click)="togglePassword()"
+      >
+        <!-- Eye Slash -->
+        <svg *ngIf="!showPassword" viewBox="0 0 24 24">
+          <path
+            d="M3 3L21 21M10.58 10.58A2 2 0 0013.42 13.42M9.88 5.09A9.77 9.77 0 0112 5c5 0 9.27 3.11 11 7-0.55 1.24-1.38 2.37-2.41 3.31M6.71 6.72C4.68 8.07 3.16 9.94 2 12c1.73 3.89 6 7 10 7 1.61 0 3.14-.35 4.53-.98"
+          />
+        </svg>
+
+        <!-- Eye -->
+        <svg *ngIf="showPassword" viewBox="0 0 24 24">
+          <path
+            d="M2 12S5.5 5 12 5s10 7 10 7-3.5 7-10 7S2 12 2 12z"
+          />
+          <circle
+            cx="12"
+            cy="12"
+            r="3"
+          ></circle>
+        </svg>
+      </span>
+
+      <small class="password-rule">
+        Mật khẩu tối thiểu 8 ký tự,
+        1 ký tự viết hoa,
+        có số và 1 ký tự đặc biệt
+      </small>
+    </div>
+
+    <div class="input-group password-group">
+      <input
+        [type]="showConfirmPassword ? 'text' : 'password'"
+        [(ngModel)]="confirmPassword"
+        placeholder=" "
+      />
+      <label>Nhập lại mật khẩu</label>
+      <span class="line"></span>
+
+      <span
+        class="eye"
+        (click)="toggleConfirmPassword()"
+      >
+
+        <svg *ngIf="!showConfirmPassword" viewBox="0 0 24 24">
+          <path
+            d="M3 3L21 21M10.58 10.58A2 2 0 0013.42 13.42M9.88 5.09A9.77 9.77 0 0112 5c5 0 9.27 3.11 11 7-0.55 1.24-1.38 2.37-2.41 3.31M6.71 6.72C4.68 8.07 3.16 9.94 2 12c1.73 3.89 6 7 10 7 1.61 0 3.14-.35 4.53-.98"
+          />
+        </svg>
+
+        <svg *ngIf="showConfirmPassword" viewBox="0 0 24 24">
+          <path
+            d="M2 12S5.5 5 12 5s10 7 10 7-3.5 7-10 7S2 12 2 12z"
+          />
+          <circle
+            cx="12"
+            cy="12"
+            r="3"
+          ></circle>
+        </svg>
+      </span>
+    </div>
+
+    <p
+      class="error"
+      *ngIf="error"
+    >
+      {{ error }}
+    </p>
+
+    <div class="terms">
+  <label class="terms-label">
+    <input
+      type="checkbox"
+      [(ngModel)]="acceptTerms"
+    />
+
+    <span class="normal-text">
+      Tôi đồng ý với
+    </span>
+
+    <a
+      routerLink="/dieu-khoan-su-dung"
+      class="link-text"
+    >
+      Điều khoản sử dụng
+    </a>
+
+    <span class="normal-text">
+      và
+    </span>
+
+    <a
+      routerLink="/chinh-sach-bao-mat"
+      class="link-text"
+    >
+      Chính sách bảo mật
+    </a>
+  </label>
+</div>
+
+    <button
+      [disabled]="loading || !acceptTerms"
+      (click)="onRegister()"
+    >
+      {{ loading ? 'Đang đăng ký...' : 'Đăng ký' }}
+    </button>
+
+    <div class="login-link">
+      Bạn đã có tài khoản?
+      <a (click)="goLogin()">
+        Đăng nhập
+      </a>
+    </div>
+  </div>
+</div>

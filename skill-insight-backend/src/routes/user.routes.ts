@@ -1,9 +1,57 @@
-import { Router } from 'express';
-import * as userController from '../controllers/user.controller';
+import express from "express";
+import {
+  getUsers,
+  updateRole
+} from "../controllers/user.controller";
 
-const router = Router();
+import {
+  verifyToken,
+  requireRole
+} from "../middlewares/auth.middleware";
 
-router.get('/', userController.getUsers);
-router.get('/:id', userController.getUser);
+const router = express.Router();
+
+// ======================
+// GET USERS (ADMIN ONLY)
+// ======================
+router.get(
+  "/",
+  verifyToken,
+  requireRole("admin"),
+  getUsers
+);
+
+// ======================
+// UPDATE ROLE
+// ======================
+router.put(
+  "/update-role",
+  verifyToken,
+  updateRole
+);
+
+// ======================
+// ADMIN DASHBOARD
+// ======================
+router.get(
+  "/admin",
+  verifyToken,
+  requireRole("admin"),
+  getUsers
+);
+
+// ======================
+// USER PROFILE
+// ======================
+router.get(
+  "/profile",
+  verifyToken,
+  (req: any, res) => {
+    res.json({
+      success: true,
+      data: req.user
+    });
+  }
+);
 
 export default router;

@@ -1,0 +1,176 @@
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" [class.collapsed]="isCollapsed">
+
+    <!-- LOGO -->
+    <div class="logo">
+      ⚡ <span *ngIf="!isCollapsed">Skill Insight</span>
+    </div>
+
+    <!-- ROLE SWITCH (ẨN ADMIN) -->
+    <div class="role-switch" *ngIf="user?.role !== 'admin'">
+
+      <button
+        [class.active]="user?.role === 'student'"
+        (click)="switchRole('student')"
+      >
+        👨‍🎓
+        <span *ngIf="!isCollapsed">Student</span>
+      </button>
+
+      <button
+        [class.active]="user?.role === 'teacher'"
+        (click)="switchRole('teacher')"
+      >
+        👨‍🏫
+        <span *ngIf="!isCollapsed">Teacher</span>
+      </button>
+
+    </div>
+
+    <!-- MENU -->
+    <nav>
+
+      <!-- DASHBOARD -->
+      <a
+        (click)="goDashboard()"
+        [class.active]="router.url === '/dashboard'"
+      >
+        🏠 <span *ngIf="!isCollapsed">Dashboard</span>
+      </a>
+
+      <!-- STUDENT -->
+      <ng-container *ngIf="user?.role === 'student'">
+
+        <a
+          (click)="goCourses()"
+          [class.active]="router.url.includes('/dashboard/courses')"
+        >
+          📚 <span *ngIf="!isCollapsed">Khóa học</span>
+        </a>
+
+        <a
+          (click)="goAssignments()"
+          [class.active]="router.url.includes('/dashboard/assignments')"
+        >
+          📝 <span *ngIf="!isCollapsed">Bài luyện</span>
+        </a>
+
+      </ng-container>
+
+      <!-- TEACHER -->
+      <ng-container *ngIf="user?.role === 'teacher'">
+
+        <a
+          (click)="goCourses()"
+          [class.active]="router.url.includes('/dashboard/courses')"
+        >
+          👨‍🏫 <span *ngIf="!isCollapsed">Lớp học</span>
+        </a>
+
+        <a
+          (click)="goAssignments()"
+          [class.active]="router.url.includes('/dashboard/assignments')"
+        >
+          📊 <span *ngIf="!isCollapsed">Thống kê</span>
+        </a>
+
+      </ng-container>
+
+      <!-- ADMIN -->
+      <ng-container *ngIf="user?.role === 'admin'">
+
+        <a
+          (click)="goUsers()"
+          [class.active]="router.url.includes('/dashboard/users')"
+        >
+          👥 <span *ngIf="!isCollapsed">Users</span>
+        </a>
+
+        <!-- UI ONLY -->
+        <a href="javascript:void(0)">
+          📈 <span *ngIf="!isCollapsed">Analytics</span>
+        </a>
+
+        <a href="javascript:void(0)">
+          ⚙️ <span *ngIf="!isCollapsed">System Settings</span>
+        </a>
+
+        <a href="javascript:void(0)">
+          📦 <span *ngIf="!isCollapsed">Course Manager</span>
+        </a>
+
+        <a href="javascript:void(0)">
+          📢 <span *ngIf="!isCollapsed">Notifications</span>
+        </a>
+
+      </ng-container>
+
+    </nav>
+
+    <!-- COLLAPSE -->
+    <button class="collapse-btn" (click)="toggleSidebar()">☰</button>
+
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+
+      <div class="left">
+        <button (click)="toggleSidebar()">☰</button>
+      </div>
+
+      <div class="right">
+
+        <!-- USER MENU -->
+        <div class="user-menu" (click)="toggleMenu($event)">
+
+          <div class="avatar">
+            {{ user?.full_name?.charAt(0) }}
+          </div>
+
+          <span class="name">
+            Xin chào, {{ user?.full_name }}
+          </span>
+
+          <span class="arrow">▼</span>
+
+          <!-- DROPDOWN -->
+          <div class="dropdown" *ngIf="showMenu">
+
+            <div class="item" (click)="goProfile()">
+              👤 Thông tin cá nhân
+            </div>
+
+            <div class="item">
+              🔒 Đổi mật khẩu (UI)
+            </div>
+
+            <div class="item">
+              ⚙️ Cài đặt tài khoản
+            </div>
+
+            <div class="item logout" (click)="logout()">
+              🚪 Đăng xuất
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+
+  </div>
+
+</div>

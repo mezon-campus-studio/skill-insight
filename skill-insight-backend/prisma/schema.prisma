@@ -3,6 +3,7 @@ generator client {
 }
 
 datasource db {
+<<<<<<< HEAD
   provider = "mysql" 
   url      = env("DATABASE_URL")
 }
@@ -12,11 +13,14 @@ generator client {
 }
 
 datasource db {
+=======
+>>>>>>> 1e64f62 (Add login and register API)
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model User {
+<<<<<<< HEAD
   id        Int      @id @default(autoincrement()) @map("user_id")
   fullName  String?  @map("full_name") @db.VarChar(100)
   email     String?  @unique @db.VarChar(100)
@@ -27,4 +31,21 @@ model User {
   createdAt DateTime? @default(now()) @map("created_at") @db.DateTime(0)
 
   @@map("users")
+=======
+  user_id     Int      @id @default(autoincrement())
+  full_name   String
+  email       String   @unique
+  password    String
+  role        Role?
+  provider_id String   @default("local")
+  status      Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+}
+
+enum Role {
+  teacher
+  student
+  admin
+>>>>>>> 1e64f62 (Add login and register API)
 }

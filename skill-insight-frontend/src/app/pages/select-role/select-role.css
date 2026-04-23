@@ -1,0 +1,34 @@
+.role-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: #f5f7fb;
+}
+
+.role-wrapper h2 {
+  margin-bottom: 40px;
+  font-size: 28px;
+}
+
+.roles {
+  display: flex;
+  gap: 30px;
+}
+
+.card {
+  width: 220px;
+  padding: 25px;
+  border-radius: 12px;
+  background: #ffffff;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.25s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}

@@ -1,45 +1,62 @@
-import { PrismaClient } from '@prisma/client';
-import dotenv from 'dotenv';
-import app from './app';
+import { PrismaClient } from "@prisma/client";
+import dotenv from "dotenv";
+import app from "./app";
 
 dotenv.config();
+
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
 
 async function startServer(): Promise<void> {
-  try {
-    // 1. MySQL
-    await prisma.$connect();
-    console.log('✅ Kết nối MySQL thành công!');
+  let server: any;
 
-    // 2. Express Server
-    const server = app.listen(PORT, () => {
+  try {
+    // ======================
+    // DATABASE CONNECTION
+    // ======================
+    await prisma.$connect();
+    console.log("✅ Kết nối MySQL thành công!");
+
+    // ======================
+    // EXPRESS SERVER
+    // ======================
+    server = app.listen(PORT, () => {
       console.log(`🚀 Server đang chạy tại: http://localhost:${PORT}`);
       console.log(`📡 Health check: http://localhost:${PORT}/health`);
     });
 
-    // 3. Graceful Shutdown
+    // ======================
+    // GRACEFUL SHUTDOWN
+    // ======================
     const shutdown = async () => {
-      console.log('Stopping server...');
+      console.log("🛑 Stopping server...");
+
       server.close(async () => {
         await prisma.$disconnect();
-        console.log('Disconnected Prisma.');
+        console.log("✅ Prisma disconnected.");
         process.exit(0);
       });
     };
-    process.on('SIGTERM', shutdown);
-    process.on('SIGINT', shutdown);
 
-    process.on('unhandledRejection', (err: any) => {
-      console.error('💥 LỖI NGHIÊM TRỌNG:', err.message);
-      server.close(() => process.exit(1));
-    });
+    process.on("SIGTERM", shutdown);
+    process.on("SIGINT", shutdown);
 
   } catch (error) {
-    console.error('❌ Lỗi khởi động Server:', error);
+    console.error("❌ Lỗi khởi động Server:", error);
     await prisma.$disconnect();
     process.exit(1);
   }
+
+  // ======================
+  // UNHANDLED REJECTION
+  // ======================
+  process.on("unhandledRejection", (err: any) => {
+    console.error("💥 Unhandled Rejection:", err.message);
+
+    if (server) {
+      server.close(() => process.exit(1));
+    }
+  });
 }
 
 startServer();

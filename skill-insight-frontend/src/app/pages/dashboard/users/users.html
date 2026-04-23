@@ -1,0 +1,104 @@
+<div class="users-page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <h2>Quản lý người dùng</h2>
+    <p>Danh sách người dùng trong hệ thống</p>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrapper">
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="loading">
+      ⏳ Đang tải dữ liệu...
+    </div>
+
+    <!-- TABLE -->
+    <table *ngIf="!loading">
+
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Họ và tên</th>
+          <th>Email</th>
+          <th>Vai trò hiện tại</th>
+          <th>Cấp quyền</th>
+          <th>Lưu</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr *ngFor="let user of users">
+
+          <td>{{ user.user_id }}</td>
+          <td>{{ user.full_name }}</td>
+          <td>{{ user.email }}</td>
+
+          <!-- ROLE BADGE -->
+          <td>
+            <span
+              class="role-badge"
+              [ngClass]="user.role"
+            >
+              {{ user.role }}
+            </span>
+          </td>
+
+          <!-- SELECT ROLE -->
+          <td>
+            <select [(ngModel)]="user.role">
+              <option value="student">Student</option>
+              <option value="teacher">Teacher</option>
+              <option value="admin">Admin</option>
+            </select>
+          </td>
+
+          <!-- SAVE -->
+          <td>
+            <button
+              class="save-btn"
+              (click)="saveRole(user)"
+              [disabled]="isSaving(user.user_id)"
+            >
+              <span *ngIf="!isSaving(user.user_id)">💾 Lưu</span>
+              <span *ngIf="isSaving(user.user_id)">⏳...</span>
+            </button>
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <!-- PAGINATION -->
+  <div class="pagination" *ngIf="totalPages > 1">
+
+    <!-- PREV -->
+    <button
+      *ngIf="currentPage > 1"
+      (click)="prevPage()"
+    >
+      ⬅ Trang trước
+    </button>
+
+    <!-- CURRENT -->
+    <span class="page-info">
+      Trang {{ currentPage }} / {{ totalPages }}
+    </span>
+
+    <!-- NEXT -->
+    <button
+      *ngIf="currentPage < totalPages"
+      (click)="nextPage()"
+    >
+      Trang sau ➡
+    </button>
+
+  </div>
+
+</div>

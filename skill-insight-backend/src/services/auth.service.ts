@@ -1,43 +1,78 @@
-const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+import { PrismaClient } from "@prisma/client";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET;
 
-const authService = {
+// ======================
+// REGISTER
+// ======================
+export const registerService = async (data: any) => {
+  const { email, password, full_name } = data;
 
-  login: async (email: any, password: any) => {
-
-    const user = await prisma.user.findUnique({
-      where: { email: email }
-    });
-
-    if (!user) {
-      throw new Error('Email không tồn tại trong hệ thống.');
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      throw new Error('Mật khẩu không chính xác.');
-    }
-
-    const token = jwt.sign(
-      { userId: user.id, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '1d' }
-    );
-
-    return {
-      token,
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        email: user.email,
-        role: user.role
-      }
-    };
+  if (!email || !password || !full_name) {
+    throw new Error("Thiếu thông tin");
   }
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (existingUser) {
+    throw new Error("Email đã tồn tại");
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const user = await prisma.user.create({
+    data: {
+      email,
+      password: hashedPassword,
+      full_name,
+      role: null,
+    },
+  });
+
+  return user;
 };
 
-module.exports = authService;
+// ======================
+// LOGIN
+// ======================
+export const loginService = async (data: any) => {
+  const { email, password } = data;
+
+  if (!email || !password) {
+    throw new Error("Thiếu email hoặc mật khẩu");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    throw new Error("Không tìm thấy user");
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+
+  if (!isMatch) {
+    throw new Error("Sai mật khẩu");
+  }
+
+  const token = jwt.sign(
+    {
+      user_id: user.user_id,
+      role: user.role,
+    },
+    process.env.JWT_SECRET || "secret",
+    {
+      expiresIn: "1d",
+    }
+  );
+
+  return {
+    token,
+    user,
+  };
+};
