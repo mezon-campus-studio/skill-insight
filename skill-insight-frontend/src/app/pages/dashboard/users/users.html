@@ -1,0 +1,175 @@
+<div class="users-page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <h2>Quản lý người dùng</h2>
+    <p>Danh sách người dùng trong hệ thống</p>
+  </div>
+
+  <!-- ======================
+       CREATE USER
+  ====================== -->
+  <div class="create-user-box">
+
+    <h3>➕ Thêm người dùng</h3>
+
+    <input
+      type="text"
+      placeholder="Họ và tên"
+      [(ngModel)]="newUser.full_name"
+    />
+
+    <input
+      type="email"
+      placeholder="Email"
+      [(ngModel)]="newUser.email"
+    />
+
+    <input
+      type="password"
+      placeholder="Mật khẩu"
+      [(ngModel)]="newUser.password"
+    />
+
+    <select [(ngModel)]="newUser.role">
+      <option value="student">Student</option>
+      <option value="teacher">Teacher</option>
+      <option value="admin">Admin</option>
+    </select>
+
+    <button
+      (click)="createUser()"
+      [disabled]="creating"
+    >
+      {{ creating ? 'Đang tạo...' : 'Tạo user' }}
+    </button>
+
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrapper">
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="loading">
+      ⏳ Đang tải dữ liệu...
+    </div>
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="🔍 Tìm theo email hoặc tên..."
+        [(ngModel)]="searchKeyword"
+        (keyup.enter)="onSearch()"
+      />
+
+      <button (click)="onSearch()">
+        Tìm
+      </button>
+    </div>
+
+    <!-- TABLE LUÔN HIỆN -->
+    <table>
+
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Họ và tên</th>
+          <th>Email</th>
+          <th>Vai trò hiện tại</th>
+          <th>Cấp quyền</th>
+          <th>Lưu</th>
+          <th>Xóa</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <!-- EMPTY -->
+        <tr *ngIf="!loading && users.length === 0">
+          <td colspan="7" class="empty-data">
+            Không có dữ liệu người dùng
+          </td>
+        </tr>
+
+        <!-- LIST -->
+        <tr *ngFor="let user of users; let i = index">
+
+          <td>
+            {{ (currentPage - 1) * limit + i + 1 }}
+          </td>
+
+          <td>{{ user.full_name }}</td>
+          <td>{{ user.email }}</td>
+
+          <td>
+            <span class="role-badge" [ngClass]="user.role">
+              {{ user.role }}
+            </span>
+          </td>
+
+          <td>
+            <select [(ngModel)]="user.role">
+              <option value="student">Student</option>
+              <option value="teacher">Teacher</option>
+              <option value="admin">Admin</option>
+            </select>
+          </td>
+
+          <td>
+            <button
+              class="save-btn"
+              (click)="saveRole(user)"
+              [disabled]="isSaving(user.user_id)"
+            >
+              <span *ngIf="!isSaving(user.user_id)">💾 Lưu</span>
+              <span *ngIf="isSaving(user.user_id)">⏳...</span>
+            </button>
+          </td>
+
+          <td>
+            <button
+              class="delete-btn"
+              (click)="deleteUser(user)"
+            >
+              ❌ Xóa
+            </button>
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <!-- PAGINATION -->
+  <div class="pagination" *ngIf="totalPages > 1">
+
+    <button
+      class="nav-btn"
+      (click)="prevPage()"
+      [disabled]="currentPage === 1"
+    >
+      ⬅ Trang trước
+    </button>
+
+    <button
+      *ngFor="let page of pages"
+      class="page-btn"
+      [class.active]="page === currentPage"
+      (click)="changePage(page)"
+    >
+      {{ page }}
+    </button>
+
+    <button
+      class="nav-btn"
+      (click)="nextPage()"
+      [disabled]="currentPage === totalPages"
+    >
+      Trang sau ➡
+    </button>
+
+  </div>
+
+</div>

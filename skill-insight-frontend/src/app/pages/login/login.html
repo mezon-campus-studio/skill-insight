@@ -1,1 +1,102 @@
-<p>login works!</p>
+<div class="login-wrapper">
+  <div class="login-card">
+
+    <h2>ĐĂNG NHẬP</h2>
+
+    <form (ngSubmit)="onLogin()">
+
+      <!-- EMAIL -->
+      <div class="input-group">
+        <input
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          required
+          placeholder=" "
+          autocomplete="username"
+        />
+        <label>Email</label>
+        <span class="line"></span>
+      </div>
+
+      <!-- PASSWORD -->
+      <div class="input-group">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          [(ngModel)]="password"
+          name="password"
+          required
+          placeholder=" "
+          autocomplete="current-password"
+        />
+        <label>Mật khẩu</label>
+
+        <!-- 👁 ICON -->
+        <span class="eye" (click)="showPassword = !showPassword">
+
+          <!-- OPEN -->
+          <svg viewBox="0 0 24 24" [class.hidden]="showPassword">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+
+          <!-- CLOSED -->
+          <svg viewBox="0 0 24 24" [class.hidden]="!showPassword">
+            <line x1="1" y1="1" x2="23" y2="23"/>
+            <path d="M17.94 17.94A10.94 10.94 0 0112 20c-7 0-11-8-11-8"/>
+          </svg>
+
+        </span>
+
+        <span class="line"></span>
+      </div>
+
+      <!-- OPTIONS -->
+      <div class="options">
+        <label>
+          <input type="checkbox" [(ngModel)]="remember" name="remember" />
+          Nhớ mật khẩu
+        </label>
+
+        <a (click)="goForgot()">Quên mật khẩu?</a>
+      </div>
+
+      <!-- ERROR -->
+      <p class="error" *ngIf="error">{{ error }}</p>
+
+      <!-- BUTTON -->
+      <button type="submit" [disabled]="loading">
+        <span *ngIf="!loading">Đăng nhập</span>
+        <span *ngIf="loading" class="spinner"></span>
+      </button>
+
+    </form>
+
+    <!-- DIVIDER -->
+    <div class="divider">
+      <span>hoặc</span>
+    </div>
+
+    <!-- SOCIAL -->
+    <div class="social">
+      <button type="button" class="google" title="Google">
+        <img src="https://cdn-icons-png.flaticon.com/512/281/281764.png">
+      </button>
+
+      <button type="button" class="mezon" title="Mezon">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTceAsfR0guuay5t_wFtrxEhHP6AGrDfR4b9ZqtalMsgQ&s">
+      </button>
+
+      <button type="button" class="facebook" title="Facebook">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png">
+      </button>
+    </div>
+
+    <!-- REGISTER -->
+    <p class="register">
+      Chưa có tài khoản?
+      <a (click)="goRegister()">Đăng ký</a>
+    </p>
+
+  </div>
+</div>
