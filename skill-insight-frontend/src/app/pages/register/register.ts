@@ -1,11 +1,24 @@
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+
 
 @Component({
   selector: 'app-register',
-  imports: [],
+  imports: [RouterLink, FormsModule],
   templateUrl: './register.html',
-  styleUrl: './register.css',
+  styleUrls: [
+    '../../../assets/form.css',
+    './register.css'
+  ],
 })
 export class Register {
-
+  user = {
+    fullname: '',
+    email: '',
+    password: ''
+  };
+  
+  onSubmit(form: any) {
+  }
 }

@@ -1,1 +1,50 @@
-<p>register works!</p>
+<div id="wrapper">
+    <div class="container">
+        <form #f="ngForm" id="form-register" (ngSubmit)="onSubmit(f)">
+            <h1>Sign up</h1>
+            <div class="input-box">
+                <label for="fullname">Full Name</label>
+                <input type="text" id="fullname" name="fullname" [(ngModel)]="user.fullname" placeholder="John Snow"
+                    required>
+                <i class='bx bx-user'></i>
+            </div>
+            <div class="input-box">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" [(ngModel)]="user.email" placeholder="you@example.com"
+                    required>
+                <i class='bx bx-envelope'></i>
+            </div>
+            <div class="input-box">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" [(ngModel)]="user.password" placeholder="••••••••"
+                    required>
+                <i class='bx bx-lock-alt'></i>
+            </div>
+            <div class="terms-agreement">
+                <label>
+                    <input type="checkbox" name="tos">I agree to the<a href="#">Terms of Service</a>
+                </label>
+            </div>
+            <button type="submit" class="btn" name="btn_register" value="register">Create Account</button>
+            <div class="login-redirect">
+                <p>Already have an account? <a routerLink="/login">Sign In</a></p>
+            </div>
+            <div class="divider">
+                <div class="line-left"></div>
+                <span>or</span>
+                <div class="line-right"></div>
+            </div>
+            <div class="social-login">
+                <button type="button" class="gmail">
+                    <img src="/google.png" alt="">
+                </button>
+                <button type="button" class="mezon">
+                    <img src="/mezon.png" alt="">
+                </button>
+            </div>
+            <div class="notice">
+                <p>By continuing, you agree to our <a href="#">Privacy Policy</a></p>
+            </div>
+        </form>
+    </div>
+</div>

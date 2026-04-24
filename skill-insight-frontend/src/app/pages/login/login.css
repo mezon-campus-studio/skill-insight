@@ -1,0 +1,43 @@
+.container .remember-forgot {
+    margin: 10px 0 20px 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14.5px;
+}
+
+.remember-forgot label {
+    display: flex;
+    cursor: pointer;
+}
+
+.remember-forgot label input {
+    margin-right: 5px;
+    accent-color: #fff;
+    cursor: pointer;
+}
+
+.remember-forgot label input[type="checkbox"] {
+    accent-color: #8a2be2;
+}
+
+.remember-forgot a {
+    color: #8a2be2;
+    text-decoration: none;
+}
+
+.remember-forgot a:hover {
+    text-decoration: underline;
+}
+
+
+.container .register-link {
+    text-align: center;
+    font-size: 14.5px;
+    margin: 20px 0 15px;
+}
+
+.register-link p a {
+    color: #8a2be2;
+    text-decoration: none;
+    font-weight: 600;
+}
