@@ -1,15 +1,17 @@
 <div id="wrapper">
     <div class="container">
-        <form action="" id="form-login" method="POST">
+        <form #f="ngForm" id="form-login" (ngSubmit)="onSubmit(f)">
             <h1>Sign in</h1>
             <div class="input-box">
                 <label for="email">Email Address</label>
-                <input type="text" id="email" name="email" placeholder="you@example.com" required>
+                <input type="email" id="email" name="email" [(ngModel)]="user.email" placeholder="you@example.com"
+                    required>
                 <i class='bx bx-envelope'></i>
             </div>
             <div class="input-box">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="••••••••" required>
+                <input type="password" id="password" name="password" [(ngModel)]="user.password" placeholder="••••••••"
+                    required>
                 <i class='bx bx-lock-alt'></i>
             </div>
             <div class="remember-forgot">
@@ -26,10 +28,10 @@
                 <div class="line-right"></div>
             </div>
             <div class="social-login">
-                <button type="submit" class="gmail">
+                <button type="button" class="gmail">
                     <img src="/google.png" alt="">
                 </button>
-                <button type="submit" class="mezon">
+                <button type="button" class="mezon">
                     <img src="/mezon.png" alt="">
                 </button>
             </div>

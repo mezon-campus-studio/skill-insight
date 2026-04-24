@@ -1,0 +1,157 @@
+#wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(90deg, #e2e2e2, #c9d6ff);
+}
+
+.container {
+    width: 420px;
+    padding: 30px 40px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+    border-radius: 10px;
+    background: #fff;
+}
+
+.container h1 {
+    margin-bottom: 30px;
+    font-size: 36px;
+    text-align: center;
+    background: linear-gradient(90deg, #1e90ff, #8a2be2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.container .input-box {
+    position: relative;
+    width: 100%;
+    height: 75px;
+    margin: 15px 0;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 20px 20px 20px 45px;
+    height: 50px;
+    background: transparent;
+    color: #333;
+    border: none;
+    outline: none;
+    border-radius: 15px;
+    border: 2px solid #999;
+    font-size: 15px;
+    transition: all 0.3s;
+}
+
+.input-box input::placeholder {
+    color: #999;
+}
+
+.input-box input:focus {
+    border-color: #8a2be2;
+    box-shadow: 0 0 5px rgba(155, 89, 182, 0.5);
+}
+
+.input-box i {
+    position: absolute;
+    left: 17px;
+    top: 50%;
+    font-size: 20px;
+    color: #999;
+}
+
+.input-box input:focus~i,
+.input-box input:valid~i {
+    color: #8a2be2;
+}
+
+.container .btn {
+    width: 100%;
+    height: 45px;
+    border: none;
+    outline: none;
+    border-radius: 15px;
+    background: linear-gradient(90deg, #6fb1fc, #a16ae8);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.container .btn:hover {
+    transform: scale(1.05);
+    filter: brightness(0.97)
+}
+
+.container .divider {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    color: #aaa;
+    margin: 20px 0;
+}
+
+.divider .line-left {
+    width: 45%;
+    border: 0.5px solid #aaa;
+}
+
+.divider .line-right {
+    width: 45%;
+    border: 0.5px solid #aaa;
+}
+
+.container .social-login {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.social-login button {
+    width: 48%;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    text-align: center;
+    outline: none;
+    border: none;
+    border-radius: 10px;
+    background: none;
+    transition: all 0.3s;
+}
+
+.social-login button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}
+
+.social-login button:hover img {
+    filter: none;
+    transition: filter 0.3s ease;
+}
+
+.social-login button.mezon:hover {
+    background: #8a2be2;
+}
+
+.social-login button img {
+    width: 25px;
+    filter: brightness(0) saturate(100%);
+}
+
+.notice {
+    font-size: 12px;
+    text-align: center;
+    color: #999;
+}
+
+.notice a {
+    color: #8a2be2;
+}
