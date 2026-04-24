@@ -1,0 +1,121 @@
+.users-page {
+  padding: 24px;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 6px;
+}
+
+.page-header p {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.table-wrapper {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #f8fafc;
+}
+
+th {
+  text-align: left;
+  padding: 14px;
+  font-size: 14px;
+  color: #334155;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+td {
+  padding: 14px;
+  font-size: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.role-badge.admin {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.role-badge.teacher {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.role-badge.student {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+select {
+  padding: 8px 12px;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  background: white;
+}
+
+.pagination {
+  margin-top: 24px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pagination button {
+  min-width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 10px;
+  background: #f1f5f9;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.pagination button:hover {
+  transform: translateY(-1px);
+}
+
+.pagination button.active {
+  background: #2563eb;
+  color: white;
+}
+.delete-btn {
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.delete-btn:hover {
+  background: #d9363e;
+}
