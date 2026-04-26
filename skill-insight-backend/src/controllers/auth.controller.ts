@@ -8,7 +8,9 @@ export const mezonCallback = async (req: Request, res: Response) => {
     if (!code) {
       return res.status(400).json({ message: "Missing code" });
     }
-
+    if (!state) {
+      return res.status(400).json({ message: "Invalid state" });
+    }
     const result = await authService.handleMezonLogin(code, state);
 
     return res.json(result);

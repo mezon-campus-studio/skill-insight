@@ -9,6 +9,7 @@ export const getAccessToken = async (code: string, state: string) => {
     client_secret: process.env.MEZON_CLIENT_SECRET,
     redirect_uri: process.env.MEZON_REDIRECT_URI,
   };
+
   const response = await axios.post(
     "https://oauth2.mezon.ai/oauth2/token",
     data,

@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Callback } from './callback';
+import { CallbackComponent } from './callback';
 
 describe('Callback', () => {
-  let component: Callback;
-  let fixture: ComponentFixture<Callback>;
+  let component: CallbackComponent;
+  let fixture: ComponentFixture<CallbackComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Callback]
-    })
-    .compileComponents();
+      imports: [CallbackComponent],
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(Callback);
+    fixture = TestBed.createComponent(CallbackComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

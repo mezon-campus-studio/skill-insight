@@ -25,6 +25,7 @@ const buildAuthResponse = (user: User) => {
 
 export const authService = {
   handleMezonLogin: async (code: string, state: string) => {
+    if (!code) throw new Error("Missing code");
     const accessToken = await getAccessToken(code, state);
 
     if (!accessToken) {

@@ -8,12 +8,12 @@ import { Teacher } from './pages/teacher/teacher';
 import { Admin } from './pages/admin/admin';
 import { CallbackComponent } from './pages/callback/callback';
 export const routes: Routes = [
-  { path: '', component: Login, canActivate: [authGuard] },
+  { path: '', component: Login },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
-  { path: 'student', component: Student, canActivate: [authGuard], data: { role: 'student' } },
-  { path: 'teacher', component: Teacher, canActivate: [authGuard], data: { role: 'teacher' } },
-  { path: 'admin', component: Admin, canActivate: [authGuard], data: { role: 'admin' } },
+  { path: 'student', component: Student, canActivate: [authGuard], data: { roles: ['student'] } },
+  { path: 'teacher', component: Teacher, canActivate: [authGuard], data: { roles: ['teacher'] } },
+  { path: 'admin', component: Admin, canActivate: [authGuard], data: { roles: ['admin'] } },
   { path: 'callback', component: CallbackComponent },
   {
     path: 'home',
