@@ -6,8 +6,8 @@ header {
 
 .nav {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
 .logo {
@@ -15,22 +15,14 @@ header {
   font-size: 20px;
 }
 
+.menu {
+  position: absolute;
+  left: 45%;
+  right: auto;
+}
+
 .menu a {
   color: white;
-  margin-right: 20px;
+  margin: 0 15px;
   text-decoration: none;
-}
-
-.auth .login {
-  border: 1px solid white;
-  padding: 5px 10px;
-  margin-right: 5px;
-  border-radius: 6px;
-}
-
-.auth .register {
-  background: white;
-  color: #2563eb;
-  padding: 5px 10px;
-  border-radius: 6px;
 }

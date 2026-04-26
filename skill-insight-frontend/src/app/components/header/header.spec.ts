@@ -2,14 +2,14 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Header } from './header';
 import { provideRouter } from '@angular/router';
 import { routes } from '../../app.routes';
-
+import { CommonModule } from '@angular/common';
 describe('Header', () => {
   let component: Header;
   let fixture: ComponentFixture<Header>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Header],
+      imports: [Header, CommonModule],
       providers: [provideRouter(routes)]
     })
     .compileComponents();
