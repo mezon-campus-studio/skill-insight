@@ -1,0 +1,16 @@
+<header>
+  <div class="nav">
+    <div class="logo">Skill Insight ⚡</div>
+
+    <nav class="menu">
+      <a routerLink="/">Trang chủ</a>
+      <a href="#">Liên hệ</a>
+    </nav>
+
+    <div class="auth" *ngIf="!user">
+      <a routerLink="/login" class="login">Đăng nhập</a>
+      <a routerLink="/register" class="register">Đăng ký</a>
+    </div>
+
+  </div>
+</header>
