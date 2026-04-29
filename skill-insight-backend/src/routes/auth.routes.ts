@@ -1,33 +1,8 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import { AuthService } from '../services/auth.service';
+import express from "express";
+import { mezonCallback, login } from "../controllers/auth.controller";
 
-const router = Router();
+const router = express.Router();
 
-interface LoginBody {
-  email?: string;
-  password?: string;
-}
-
-router.post('/login', async (req: Request<{}, {}, LoginBody>, res: Response, next: NextFunction) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ 
-        message: "Vui lòng nhập đầy đủ email và mật khẩu." 
-      });
-    }
-
-    const result = await AuthService.login(email, password);
-    
-    return res.status(200).json({
-      message: "Đăng nhập thành công!",
-      data: result
-    });
-  } catch (error: any) {
-
-    next(error); 
-  }
-});
-
+router.get("/mezon/callback", mezonCallback);
+router.get("/mezon/login", login);
 export default router;

@@ -1,42 +1,52 @@
-import { PrismaClient } from '@prisma/client';
-import dotenv from 'dotenv';
-import app from './app';
+import app from "./app";
+import prisma from "./config/prisma";
+import dotenv from "dotenv";
 
 dotenv.config();
-const prisma = new PrismaClient();
+
 const PORT = process.env.PORT || 3000;
 
 async function startServer(): Promise<void> {
   try {
-    // 1. MySQL
+    //Connect Prisma
     await prisma.$connect();
-    console.log('✅ Kết nối MySQL thành công!');
+    console.log("Connected to MySQL (Prisma) successfully!");
 
-    // 2. Express Server
+    //Start server
     const server = app.listen(PORT, () => {
-      console.log(`🚀 Server đang chạy tại: http://localhost:${PORT}`);
-      console.log(`📡 Health check: http://localhost:${PORT}/health`);
+      console.log(`Server is running at: http://localhost:${PORT}`);
+      console.log(`Health check: http://localhost:${PORT}/health`);
     });
 
-    // 3. Graceful Shutdown
+    //Graceful shutdown
     const shutdown = async () => {
-      console.log('Stopping server...');
+      console.log("Stopping server...");
       server.close(async () => {
         await prisma.$disconnect();
-        console.log('Disconnected Prisma.');
+        console.log("Disconnected Prisma.");
         process.exit(0);
       });
     };
-    process.on('SIGTERM', shutdown);
-    process.on('SIGINT', shutdown);
+    // Handle system signals
+    process.on("SIGTERM", shutdown);
+    process.on("SIGINT", shutdown);
 
-    process.on('unhandledRejection', (err: any) => {
-      console.error('💥 LỖI NGHIÊM TRỌNG:', err.message);
-      server.close(() => process.exit(1));
+    // Handle unhandled promise rejections
+    process.on("unhandledRejection", (err: any) => {
+      console.error("CRITICAL ERROR:", err.message);
+      server.close(async () => {
+        await prisma.$disconnect();
+        process.exit(1);
+      });
     });
-
+    // Handle uncaught exceptions (recommended)
+    process.on("uncaughtException", (err: any) => {
+      console.error("UNCAUGHT EXCEPTION:", err.message);
+      process.exit(1);
+    });
   } catch (error) {
-    console.error('❌ Lỗi khởi động Server:', error);
+    console.error("Server startup error::", error);
+
     await prisma.$disconnect();
     process.exit(1);
   }
