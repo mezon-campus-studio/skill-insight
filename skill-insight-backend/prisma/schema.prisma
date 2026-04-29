@@ -5,91 +5,205 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  //url      = env("DATABASE_URL")
 }
 
-model answers {
-  answer_id      Int       @id @default(autoincrement())
-  question_id    Int
-  answer_content String    @db.Text
-  is_correct     Boolean?  @default(false)
-  questions      questions @relation(fields: [question_id], references: [question_id], onDelete: Cascade, onUpdate: NoAction, map: "answers_ibfk_1")
+// --- Enums ---
 
-  @@index([question_id], map: "question_id")
+enum UserRole {
+  ADMIN
+  TEACHER
+  STUDENT
 }
 
-model exams {
-  exam_id    Int       @id @default(autoincrement())
-  teacher_id Int
-  title      String    @db.VarChar(255)
-  duration   Int
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+// --- Models ---
+
+model User {
+  user_id    Int       @id @default(autoincrement())
+  full_name  String    @db.VarChar(255)
+  email      String    @unique @db.VarChar(255)
+  password   String    @db.VarChar(255)
+  role       UserRole  @default(STUDENT)
+  status     Boolean?  @default(true)
   created_at DateTime? @default(now()) @db.Timestamp(0)
-  users      users     @relation(fields: [teacher_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "exams_ibfk_1")
-  results    results[]
+  updated_at DateTime  @updatedAt
 
-  @@index([teacher_id], map: "teacher_id")
+  // Relations
+  exams           Exam[]           @relation("TeacherExams")
+  results         Result[]
+  managed_classes Class[]          @relation("TeacherManaged")
+  enrollments     ClassEnrollment[]
+  student_answers StudentAnswer[]
+
+  @@map("users")
 }
 
-model questions {
-  question_id Int              @id @default(autoincrement())
-  topic_id    Int
-  content     String           @db.Text
-  level       questions_level? @default(de)
-  created_at  DateTime?        @default(now()) @db.Timestamp(0)
-  answers     answers[]
-  topics      topics           @relation(fields: [topic_id], references: [topic_id], onDelete: Cascade, onUpdate: NoAction, map: "questions_ibfk_1")
-
-  @@index([topic_id], map: "topic_id")
-}
-
-model results {
-  result_id  Int       @id @default(autoincrement())
-  student_id Int
-  exam_id    Int
-  score      Decimal?  @db.Decimal(5, 2)
-  created_at DateTime? @default(now()) @db.Timestamp(0)
-  users      users     @relation(fields: [student_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "results_ibfk_1")
-  exams      exams     @relation(fields: [exam_id], references: [exam_id], onDelete: Cascade, onUpdate: NoAction, map: "results_ibfk_2")
-
-  @@index([exam_id], map: "exam_id")
-  @@index([student_id], map: "student_id")
-}
-
-model subjects {
+model Subject {
   subject_id   Int      @id @default(autoincrement())
   subject_name String   @db.VarChar(255)
-  topics       topics[]
+  description  String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  // Relations
+  topics Topic[]
+  exams  Exam[]
+
+  @@map("subjects")
 }
 
-model topics {
-  topic_id   Int         @id @default(autoincrement())
+model Topic {
+  topic_id   Int      @id @default(autoincrement())
   subject_id Int
-  topic_name String      @db.VarChar(255)
-  questions  questions[]
-  subjects   subjects    @relation(fields: [subject_id], references: [subject_id], onDelete: Cascade, onUpdate: NoAction, map: "topics_ibfk_1")
+  topic_name String   @db.VarChar(255)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
-  @@index([subject_id], map: "subject_id")
+  // Relations
+  subject   Subject    @relation(fields: [subject_id], references: [subject_id], onDelete: Cascade)
+  questions Question[]
+
+  @@map("topics")
 }
 
-model users {
-  user_id    Int        @id @default(autoincrement())
-  full_name  String     @db.VarChar(255)
-  email      String     @unique(map: "email") @db.VarChar(255)
-  password   String     @db.VarChar(255)
-  role       users_role
-  status     Boolean?   @default(true)
-  created_at DateTime?  @default(now()) @db.Timestamp(0)
-  exams      exams[]
-  results    results[]
+model Question {
+  question_id Int        @id @default(autoincrement())
+  topic_id    Int
+  content     String     @db.Text
+  level       Difficulty @default(MEDIUM)
+  created_at  DateTime?  @default(now()) @db.Timestamp(0)
+
+  // Relations
+  topic           Topic           @relation(fields: [topic_id], references: [topic_id], onDelete: Cascade)
+  answers         Answer[]
+  exam_questions  ExamQuestion[]
+  student_answers StudentAnswer[]
+
+  @@map("questions")
 }
 
-enum questions_level {
-  de
-  trung_binh
-  kho
+model Answer {
+  answer_id      Int      @id @default(autoincrement())
+  question_id    Int
+  answer_content String   @db.Text
+  is_correct     Boolean? @default(false)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  // Relations
+  question        Question        @relation(fields: [question_id], references: [question_id], onDelete: Cascade)
+  student_answers StudentAnswer[]
+
+  @@map("answers")
 }
 
-enum users_role {
-  admin
-  teacher
-  student
+model Exam {
+  exam_id    Int       @id @default(autoincrement())
+  teacher_id Int
+  subject_id Int
+  title      String    @db.VarChar(255)
+  duration   Int // Phút
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+
+  // Relations
+  teacher        User             @relation("TeacherExams", fields: [teacher_id], references: [user_id], onDelete: Cascade)
+  subject        Subject          @relation(fields: [subject_id], references: [subject_id])
+  results        Result[]
+  exam_questions ExamQuestion[]
+  assignments    ExamAssignment[]
+
+  @@map("exams")
+}
+
+model ExamQuestion {
+  exam_id     Int
+  question_id Int
+  order_index Int @default(0)
+
+  // Relations
+  exam     Exam     @relation(fields: [exam_id], references: [exam_id], onDelete: Cascade)
+  question Question @relation(fields: [question_id], references: [question_id], onDelete: Cascade)
+
+  @@id([exam_id, question_id])
+  @@map("exam_questions")
+}
+
+model Result {
+  result_id  Int      @id @default(autoincrement())
+  student_id Int
+  exam_id    Int
+  score      Decimal? @db.Decimal(5, 2)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+
+  // Relations
+  student         User            @relation(fields: [student_id], references: [user_id], onDelete: Cascade)
+  exam            Exam            @relation(fields: [exam_id], references: [exam_id], onDelete: Cascade)
+  student_answers StudentAnswer[]
+
+  @@map("results")
+}
+
+model StudentAnswer {
+  student_answer_id Int @id @default(autoincrement())
+  result_id         Int
+  question_id       Int
+  answer_id         Int
+  student_id        Int
+  is_correct        Boolean @default(false)
+
+  // Relations
+  result   Result   @relation(fields: [result_id], references: [result_id], onDelete: Cascade)
+  question Question @relation(fields: [question_id], references: [question_id])
+  answer   Answer   @relation(fields: [answer_id], references: [answer_id])
+  student  User     @relation(fields: [student_id], references: [user_id])
+
+  @@map("student_answers")
+}
+
+model Class {
+  class_id    Int      @id @default(autoincrement())
+  class_name  String   @db.VarChar(255)
+  class_code  String   @unique @db.VarChar(50)
+  teacher_id  Int
+  created_at  DateTime @default(now())
+
+  // Relations
+  teacher     User             @relation("TeacherManaged", fields: [teacher_id], references: [user_id])
+  enrollments ClassEnrollment[]
+  assignments ExamAssignment[]
+
+  @@map("classes")
+}
+
+model ClassEnrollment {
+  enrollment_id Int      @id @default(autoincrement())
+  class_id      Int
+  student_id    Int
+  enrolled_at   DateTime @default(now())
+
+  // Relations
+  class   Class @relation(fields: [class_id], references: [class_id])
+  student User  @relation(fields: [student_id], references: [user_id])
+
+  @@map("class_enrollments")
+}
+
+model ExamAssignment {
+  assignment_id Int      @id @default(autoincrement())
+  exam_id       Int
+  class_id      Int
+  start_time    DateTime
+  end_time      DateTime
+
+  // Relations
+  exam  Exam  @relation(fields: [exam_id], references: [exam_id])
+  class Class @relation(fields: [class_id], references: [class_id])
+
+  @@map("exam_assignments")
 }

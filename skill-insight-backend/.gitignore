@@ -21,5 +21,6 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 /src/generated/prisma
-
+/prisma/migrationss
 /src/generated/prisma
+/skill-insight-backend/.gitignore
