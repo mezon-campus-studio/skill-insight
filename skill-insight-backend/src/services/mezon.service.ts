@@ -9,20 +9,17 @@ export const getAccessToken = async (code: string, state: string) => {
     client_secret: process.env.MEZON_CLIENT_SECRET,
     redirect_uri: process.env.MEZON_REDIRECT_URI,
   };
-  const response = await axios.post(
-    "https://oauth2.mezon.ai/oauth2/token",
-    data,
-    {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+
+  const response = await axios.post(`${process.env.Token_URL}`, data, {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
     },
-  );
+  });
   return response.data.access_token;
 };
 
 export const getUserInfo = async (accessToken: string) => {
-  const response = await axios.get("https://oauth2.mezon.ai/userinfo", {
+  const response = await axios.get(`${process.env.User_URL}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

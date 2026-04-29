@@ -2,7 +2,7 @@ import { User } from "@prisma/client";
 import prisma from "../config/prisma";
 import { generateToken } from "../utils/jwt";
 import { getAccessToken, getUserInfo } from "./mezon.service";
-
+import { saveState, verifyState } from "../utils/stateStore";
 interface AuthPayload {
   userId: number;
   email: string;
@@ -25,6 +25,10 @@ const buildAuthResponse = (user: User) => {
 
 export const authService = {
   handleMezonLogin: async (code: string, state: string) => {
+    if (!verifyState(state)) {
+      throw new Error("Invalid state");
+    }
+    if (!code) throw new Error("Missing code");
     const accessToken = await getAccessToken(code, state);
 
     if (!accessToken) {
@@ -76,5 +80,17 @@ export const authService = {
     }
 
     return buildAuthResponse(user);
+  },
+  getAuthUrl: async () => {
+    const state = Math.random().toString(36).substring(2, 13);
+    saveState(state);
+    const params = new URLSearchParams({
+      client_id: `${process.env.MEZON_CLIENT_ID}`,
+      redirect_uri: `${process.env.MEZON_REDIRECT_URI}`,
+      response_type: "code",
+      scope: "openid offline",
+      state: state,
+    });
+    return `${process.env.Oauth2_URL}?${params.toString()}`;
   },
 };

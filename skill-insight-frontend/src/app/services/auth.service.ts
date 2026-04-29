@@ -5,18 +5,8 @@ import { environment } from '../../environments/environment';
 })
 export class AuthService {
   loginWithMezon() {
-    const state = Math.random().toString(36).substring(2, 13);
-    sessionStorage.setItem('oauth_state', state);
-
-    const params = new URLSearchParams({
-      client_id: environment.clientId,
-      redirect_uri: environment.redirectUri,
-      response_type: 'code',
-      scope: 'openid offline',
-      state: state,
-    });
-
-    const url = `${environment.Oauth2_URL}?${params.toString()}`;
+    // sessionStorage.setItem('oauth_state', state);
+    const url = `${environment.Auth_Mezon}`;
     window.location.href = url;
   }
 }

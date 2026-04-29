@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
-
+import subjectRoutes from "./routes/subject.routes";
 import userRoutes from "./routes/user.routes";
 import authRoutes from "./routes/auth.routes";
 import { errorHandler } from "./middlewares/error.middleware";
@@ -48,7 +48,8 @@ app.get("/health", (req: Request, res: Response) => {
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
-
+app.use("/auth", authRoutes);
+app.use("/api/subjects", subjectRoutes);
 // Error Middleware
 app.use(errorHandler);
 

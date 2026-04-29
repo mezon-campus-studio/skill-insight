@@ -10,11 +10,11 @@ async function startServer(): Promise<void> {
   try {
     //Connect Prisma
     await prisma.$connect();
-    console.log("Kết nối MySQL (Prisma) thành công!");
+    console.log("Connected to MySQL (Prisma) successfully!");
 
     //Start server
     const server = app.listen(PORT, () => {
-      console.log(`Server đang chạy tại: http://localhost:${PORT}`);
+      console.log(`Server is running at: http://localhost:${PORT}`);
       console.log(`Health check: http://localhost:${PORT}/health`);
     });
 
@@ -27,20 +27,25 @@ async function startServer(): Promise<void> {
         process.exit(0);
       });
     };
-
+    // Handle system signals
     process.on("SIGTERM", shutdown);
     process.on("SIGINT", shutdown);
 
-    //lỗi async không catch
+    // Handle unhandled promise rejections
     process.on("unhandledRejection", (err: any) => {
-      console.error("LỖI NGHIÊM TRỌNG:", err.message);
+      console.error("CRITICAL ERROR:", err.message);
       server.close(async () => {
         await prisma.$disconnect();
         process.exit(1);
       });
     });
+    // Handle uncaught exceptions (recommended)
+    process.on("uncaughtException", (err: any) => {
+      console.error("UNCAUGHT EXCEPTION:", err.message);
+      process.exit(1);
+    });
   } catch (error) {
-    console.error("Lỗi khởi động Server:", error);
+    console.error("Server startup error::", error);
 
     await prisma.$disconnect();
     process.exit(1);

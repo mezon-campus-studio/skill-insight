@@ -21,14 +21,11 @@ model User {
 
   @@map("users")
 }
-
 model Subject {
   subject_id   Int      @id @default(autoincrement())
-  subject_name String
-  description  String?
-
+  subject_name String   @db.VarChar(255)
+  description  String?  @db.Text
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
-
   @@map("subjects")
 }

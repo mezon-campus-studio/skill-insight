@@ -8,7 +8,9 @@ const envConfigFile = `export const environment = {
   apiUrl: '${process.env.apiUrl}',
   clientId: '${process.env.clientId}',
   redirectUri: '${process.env.redirectUri}',
-  Oauth2_URL: '${process.env.Oauth2_URL}'
+  Oauth2_URL: '${process.env.Oauth2_URL}',
+  Auth_Mezon: '${process.env.Auth_Mezon}',
+  API_SUBJECT:'${process.env.apiSubject}'
 };
 `;
 fs.writeFileSync('src/environments/environment.ts', envConfigFile);

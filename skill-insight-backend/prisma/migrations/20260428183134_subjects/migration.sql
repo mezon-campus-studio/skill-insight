@@ -1,8 +1,8 @@
 -- CreateTable
 CREATE TABLE `subjects` (
     `subject_id` INTEGER NOT NULL AUTO_INCREMENT,
-    `subject_name` VARCHAR(191) NOT NULL,
-    `description` VARCHAR(191) NULL,
+    `subject_name` VARCHAR(255) NOT NULL,
+    `description` TEXT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 

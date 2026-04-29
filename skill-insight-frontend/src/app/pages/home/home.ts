@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <h2>🏠 Home</h2>
+    <h2>Home</h2>
 
     <div *ngIf="user; else noUser">
       <p><b>Email:</b> {{ user.email }}</p>

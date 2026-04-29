@@ -1,0 +1,10 @@
+export const environment = {
+  BACKEND_API_URL: '',
+  production: '',
+  apiUrl: '',
+  clientId: '',
+  redirectUri: '',
+  Oauth2_URL: '',
+  Auth_Mezon: '',
+  API_SUBJECT: '',
+};
