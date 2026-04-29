@@ -9,6 +9,9 @@
     "start": "node dist/server.js",
     "postinstall": "prisma generate"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "dependencies": {
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.6",
