@@ -20,6 +20,7 @@ model User {
   updated_at DateTime @updatedAt
 
   @@map("users")
+
 }
 model Subject {
   subject_id   Int      @id @default(autoincrement())
@@ -28,4 +29,5 @@ model Subject {
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
   @@map("subjects")
+
 }
