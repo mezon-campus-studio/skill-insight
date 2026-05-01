@@ -1,5 +1,11 @@
-import { Component, signal } from '@angular/core';
-import { Router, NavigationEnd, RouterOutlet, RouterModule } from '@angular/router';
+
+import { Component, signal, OnInit } from '@angular/core';
+import {
+  Router,
+  NavigationEnd,
+  RouterOutlet,
+  RouterModule
+} from '@angular/router';
 import { Header } from './components/header/header';
 import { Footer } from './components/footer/footer';
 import { CommonModule } from '@angular/common';
@@ -18,16 +24,18 @@ import { filter } from 'rxjs/operators';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
+export class App implements OnInit {
 
   protected readonly title = signal('skill-insight-frontend');
   isDashboard = false;
 
-  constructor(private router: Router) {
+  constructor(private router: Router) {}
+
+  ngOnInit(): void {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
-        this.isDashboard = event.url.startsWith('/dashboard');
+        this.isDashboard = event.urlAfterRedirects.startsWith('/dashboard');
       });
   }
 }

@@ -1,64 +1,47 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { AppError } from "../utils/appError";
 
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
-// ======================
-// VERIFY TOKEN
-// ======================
-export const verifyToken = (req: any, res: Response, next: NextFunction) => {
+export interface AuthRequest extends Request {
+  user?: {
+    userId: number;
+    role: string;
+  };
+}
+
+export const verifyToken = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const authHeader = req.headers["authorization"];
-
-    console.log("🔑 AUTH HEADER:", authHeader);
-
-    if (!authHeader) {
-      return res.status(401).json({
-        success: false,
-        message: "No token provided",
-      });
-    }
-
-    const token = authHeader.split(" ")[1];
+    const token = req.cookies?.token;
 
     if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid token format",
-      });
+      throw new AppError("Chưa đăng nhập", 401);
     }
 
-    const decoded: any = jwt.verify(token, JWT_SECRET);
-
-    console.log("👤 USER:", decoded);
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      userId: number;
+      role: string;
+    };
 
     req.user = decoded;
 
     next();
   } catch (error) {
-    console.log("❌ TOKEN ERROR:", error);
-
-    return res.status(401).json({
-      success: false,
-      message: "Invalid or expired token",
-    });
+    next(new AppError("Token không hợp lệ", 401));
   }
 };
 
-// ======================
-// REQUIRE ROLE
-// ======================
 export const requireRole = (...roles: string[]) => {
-  return (req: any, res: Response, next: NextFunction) => {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
     const user = req.user;
 
-    console.log("🔐 ROLE CHECK:", user?.role);
-
     if (!user || !roles.includes(user.role)) {
-      return res.status(403).json({
-        success: false,
-        message: "Forbidden: insufficient role",
-      });
+      return next(new AppError("Không có quyền truy cập", 403));
     }
 
     next();

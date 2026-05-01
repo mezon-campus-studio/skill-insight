@@ -1,101 +1,141 @@
-<div class="login-wrapper">
-  <div class="login-card">
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 px-4">
 
-    <h2>ĐĂNG NHẬP</h2>
+  <div class="w-full max-w-md bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl p-8 space-y-6 border border-gray-100">
 
-    <form (ngSubmit)="onLogin()">
+    <div class="text-center">
+      <h2 class="text-3xl font-extrabold text-gray-900">Welcome Back</h2>
+      <p class="text-sm text-gray-500 mt-1">Đăng nhập để tiếp tục</p>
+    </div>
 
-      <!-- EMAIL -->
-      <div class="input-group">
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-5">
+
+      <div>
+        <label class="text-sm font-medium text-gray-600">Email</label>
         <input
           type="email"
-          [(ngModel)]="email"
-          name="email"
-          required
-          placeholder=" "
+          formControlName="email"
+          placeholder="admin@gmail.com"
           autocomplete="username"
+          class="mt-1 w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition"
+          [class.border-red-500]="f.email.touched && f.email.invalid"
         />
-        <label>Email</label>
-        <span class="line"></span>
+
+        <p *ngIf="f.email.touched && f.email.errors?.['required']"
+           class="text-xs text-red-500 mt-1">
+          Vui lòng nhập email
+        </p>
+        <p *ngIf="f.email.touched && f.email.errors?.['email']"
+           class="text-xs text-red-500 mt-1">
+          Email không hợp lệ
+        </p>
       </div>
 
-      <!-- PASSWORD -->
-      <div class="input-group">
-        <input
-          [type]="showPassword ? 'text' : 'password'"
-          [(ngModel)]="password"
-          name="password"
-          required
-          placeholder=" "
-          autocomplete="current-password"
-        />
-        <label>Mật khẩu</label>
+      <div>
+        <label class="text-sm font-medium text-gray-600">Mật khẩu</label>
+        <div class="relative mt-1">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition"
+            [class.border-red-500]="f.password.touched && f.password.invalid"
+          />
 
-        <!-- 👁 ICON -->
-        <span class="eye" (click)="showPassword = !showPassword">
+          <span
+  class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-blue-500 transition"
+  (click)="togglePassword()"
+>
+  @if (!showPassword) {
 
-          <!-- OPEN -->
-          <svg viewBox="0 0 24 24" [class.hidden]="showPassword">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
-            <circle cx="12" cy="12" r="3"/>
-          </svg>
+    <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor">
+      <path d="M3 3L21 21" stroke-width="2" stroke-linecap="round"/>
+      <path d="M10.58 10.58A2 2 0 0013.42 13.42" stroke-width="2"/>
+      <path d="M9.88 5.09A9.77 9.77 0 0112 5c5 0 9.27 3.11 11 7" stroke-width="2"/>
+      <path d="M6.71 6.72C4.68 8.07 3.16 9.94 2 12c1.73 3.89 6 7 10 7 1.61 0 3.14-.35 4.53-.98" stroke-width="2"/>
+    </svg>
+  } @else {
 
-          <!-- CLOSED -->
-          <svg viewBox="0 0 24 24" [class.hidden]="!showPassword">
-            <line x1="1" y1="1" x2="23" y2="23"/>
-            <path d="M17.94 17.94A10.94 10.94 0 0112 20c-7 0-11-8-11-8"/>
-          </svg>
+    <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor">
+      <path d="M2 12S5.5 5 12 5s10 7 10 7-3.5 7-10 7S2 12 2 12z" stroke-width="2"/>
+      <circle cx="12" cy="12" r="3" stroke-width="2"></circle>
+    </svg>
+  }
+</span>
+        </div>
 
-        </span>
-
-        <span class="line"></span>
+        <p *ngIf="f.password.touched && f.password.errors?.['required']"
+           class="text-xs text-red-500 mt-1">
+          Vui lòng nhập mật khẩu
+        </p>
+        <p *ngIf="f.password.touched && f.password.errors?.['minlength']"
+           class="text-xs text-red-500 mt-1">
+          Tối thiểu 8 ký tự
+        </p>
       </div>
 
-      <!-- OPTIONS -->
-      <div class="options">
-        <label>
-          <input type="checkbox" [(ngModel)]="remember" name="remember" />
-          Nhớ mật khẩu
+      <div class="flex justify-between items-center text-sm">
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="accent-blue-600">
+          Ghi nhớ
         </label>
 
-        <a (click)="goForgot()">Quên mật khẩu?</a>
+        <button type="button" (click)="goForgot()" class="text-blue-600 hover:underline">
+          Quên mật khẩu?
+        </button>
       </div>
 
-      <!-- ERROR -->
-      <p class="error" *ngIf="error">{{ error }}</p>
+      <div *ngIf="error" class="bg-red-50 text-red-600 text-sm p-3 rounded-xl">
+        {{ error }}
+      </div>
 
-      <!-- BUTTON -->
-      <button type="submit" [disabled]="loading">
+      <button
+        type="submit"
+        [disabled]="loading"
+        class="w-full py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-md">
+
         <span *ngIf="!loading">Đăng nhập</span>
-        <span *ngIf="loading" class="spinner"></span>
+        <span *ngIf="loading" class="animate-pulse">Đang xử lý...</span>
       </button>
 
     </form>
 
-    <!-- DIVIDER -->
-    <div class="divider">
-      <span>hoặc</span>
+    <div class="flex items-center gap-3">
+      <div class="flex-1 h-px bg-gray-200"></div>
+      <span class="text-xs text-gray-400">HOẶC</span>
+      <div class="flex-1 h-px bg-gray-200"></div>
     </div>
 
-    <!-- SOCIAL -->
-    <div class="social">
-      <button type="button" class="google" title="Google">
-        <img src="https://cdn-icons-png.flaticon.com/512/281/281764.png">
+    <div class="flex gap-3">
+
+      <button
+        type="button"
+        class="flex-1 flex items-center justify-center gap-2 border border-gray-300 p-2 rounded-xl hover:shadow-md transition bg-white">
+
+        <img src="https://www.svgrepo.com/show/475656/google-color.svg"
+             class="h-5 w-5">
+
+        <span class="text-sm font-medium">Google</span>
       </button>
 
-      <button type="button" class="mezon" title="Mezon">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTceAsfR0guuay5t_wFtrxEhHP6AGrDfR4b9ZqtalMsgQ&s">
+      <button
+        type="button"
+        (click)="loginWithMezon()"
+        class="flex-1 flex items-center justify-center gap-2 border border-gray-300 p-2 rounded-xl hover:shadow-md transition bg-white">
+
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTceAsfR0guuay5t_wFtrxEhHP6AGrDfR4b9ZqtalMsgQ&s"
+             class="h-5 w-5 rounded-full">
+
+        <span class="text-sm font-medium">Mezon</span>
       </button>
 
-      <button type="button" class="facebook" title="Facebook">
-        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png">
-      </button>
     </div>
 
-    <!-- REGISTER -->
-    <p class="register">
+    <p class="text-center text-sm text-gray-500">
       Chưa có tài khoản?
-      <a (click)="goRegister()">Đăng ký</a>
+      <button (click)="goRegister()" class="text-blue-600 font-semibold hover:underline">
+        Đăng ký
+      </button>
     </p>
 
   </div>

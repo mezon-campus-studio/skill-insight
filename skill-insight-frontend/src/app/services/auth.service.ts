@@ -1,53 +1,126 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, tap, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { environment } from '@env/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private API = 'http://localhost:3000/api/auth';
+  private readonly AUTH_API = `${environment.apiUrl}/auth`;
 
   constructor(private http: HttpClient) {}
-
-  // ===== LOGIN =====
-  login(data: { email: string; password: string }) {
-    return this.http.post(`${this.API}/login`, data);
+  
+  login(data: any): Observable<any> {
+    return this.http.post(`${this.AUTH_API}/login`, data, {
+      withCredentials: true
+    }).pipe(
+      tap((res: any) => {
+        if (res?.success && res?.user) {
+          this.saveUser(res.user);
+         
+          if (res.token) localStorage.setItem('access_token', res.token);
+        }
+      })
+    );
   }
 
-  // ===== REGISTER =====
-  register(data: any) {
-    return this.http.post(`${this.API}/register`, data);
+  register(data: any): Observable<any> {
+    return this.http.post(`${this.AUTH_API}/register`, data, {
+      withCredentials: true
+    });
   }
 
-  // ===== SAVE AUTH =====
-  saveAuth(data: any): void {
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
+  getMe(): Observable<any> {
+    return this.http.get(`${this.AUTH_API}/me`, {
+      withCredentials: true
+    }).pipe(
+      tap((res: any) => {
+        if (res?.success && res?.user) {
+          this.saveUser(res.user);
+        }
+      }),
+      catchError(err => {
+        
+        if (err.status === 401) {
+          this.clearUser();
+          localStorage.removeItem('access_token');
+        }
+       
+        return throwError(() => err);
+      })
+    );
   }
 
-  getToken(): string | null {
-    return localStorage.getItem('token');
+  getMezonUrl(): Observable<any> {
+    return this.http.get(`${this.AUTH_API}/mezon`, {
+      withCredentials: true
+    });
+  }
+
+  updateRole(data: { userId: number; role: string }): Observable<any> {
+    return this.http.post(`${this.AUTH_API}/update-role`, data, {
+      withCredentials: true
+    }).pipe(
+      tap((res: any) => {
+        if (res?.success && res?.user) {
+          this.saveUser(res.user);
+        }
+      })
+    );
+  }
+
+  updateProfile(data: any): Observable<any> {
+    return this.http.put(`${this.AUTH_API}/profile`, data, {
+      withCredentials: true
+    }).pipe(
+      tap((res: any) => {
+        if (res?.success && res?.user) {
+          this.saveUser(res.user);
+        }
+      })
+    );
   }
 
   getUser(): any {
     const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    try {
+      return user ? JSON.parse(user) : null;
+    } catch (e) {
+      return null;
+    }
   }
 
-  isLoggedIn(): boolean {
-    return !!this.getToken();
+  saveUser(user: any): void {
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    }
+  }
+
+  clearUser(): void {
+    localStorage.removeItem('user');
+    localStorage.removeItem('access_token');
   }
 
   logout(): void {
-    localStorage.clear();
+    this.http.post(`${this.AUTH_API}/logout`, {}, {
+      withCredentials: true
+    }).subscribe({
+      next: () => this.handleLocalLogout(),
+      error: () => this.handleLocalLogout()
+    });
   }
 
-  // ===== UPDATE ROLE =====
-  updateRole(role: string) {
-    return this.http.put(
-      'http://localhost:3000/api/users/update-role',
-      { role }
-    );
+  private handleLocalLogout(): void {
+    this.clearUser();
+    window.location.href = '/login';
+  }
+
+  deleteAccount(): Observable<any> {
+    return this.http.delete(`${this.AUTH_API}/me`, {
+      withCredentials: true
+    });
   }
 }

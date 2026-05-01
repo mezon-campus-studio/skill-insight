@@ -1,113 +1,119 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { finalize } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [
-    FormsModule,
-    CommonModule,
-    RouterModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './register.html',
-  styleUrl: './register.css'
+  styleUrls: ['./register.css']
 })
 export class RegisterComponent {
-  full_name = '';
-  email = '';
-  password = '';
-  confirmPassword = '';
+  loading = false;
+  error = '';
+  successMessage = ''; 
+  
+  showPopup = false;
+  popupMessage = '';
+  popupType: 'success' | 'error' = 'success';
 
   showPassword = false;
   showConfirmPassword = false;
 
-  acceptTerms = false;
+  registerForm = new FormGroup({
+    full_name: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [
+      Validators.required,
+      Validators.minLength(8),
+      Validators.pattern(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/)
+    ]),
+    confirmPassword: new FormControl('', [Validators.required]),
+    acceptTerms: new FormControl(false)
+  });
 
-  error = '';
-  loading = false;
+  constructor(private http: HttpClient, private router: Router) {}
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {}
+  get f() { return this.registerForm.controls; }
 
-  togglePassword(): void {
-    this.showPassword = !this.showPassword;
+  togglePassword() { this.showPassword = !this.showPassword; }
+  toggleConfirmPassword() { this.showConfirmPassword = !this.showConfirmPassword; }
+
+  openPopup(message: string, type: 'success' | 'error' = 'success') {
+    this.popupMessage = message;
+    this.popupType = type;
+    this.showPopup = true;
   }
 
-  toggleConfirmPassword(): void {
-    this.showConfirmPassword = !this.showConfirmPassword;
+  closePopup() {
+    this.showPopup = false;
   }
 
-  validatePassword(password: string): boolean {
-    const regex =
-      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+  getPasswordError(): string {
+    const errors = this.f.password.errors;
+    if (!errors) return '';
 
-    return regex.test(password);
+    if (errors['required']) return 'Mật khẩu là bắt buộc';
+    if (errors['minlength']) return 'Mật khẩu phải ít nhất 8 ký tự';
+    if (errors['pattern']) return 'Phải có kí tự hoa, số và ký tự đặc biệt';
+
+    return '';
   }
 
-  onRegister(): void {
+  getEmailError(): string {
+    const errors = this.f.email.errors;
+    if (!errors) return '';
+
+    if (errors['required']) return 'Email là bắt buộc';
+    if (errors['email']) return 'Email không hợp lệ';
+
+    return '';
+  }
+
+  onRegister() {
     this.error = '';
 
-    if (
-      !this.full_name.trim() ||
-      !this.email.trim() ||
-      !this.password.trim() ||
-      !this.confirmPassword.trim()
-    ) {
-      this.error = 'Vui lòng nhập đầy đủ thông tin';
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
+      this.openPopup('Vui lòng nhập đúng thông tin!', 'error');
       return;
     }
 
-    if (!this.validatePassword(this.password)) {
-      this.error =
-        'Mật khẩu phải tối thiểu 8 ký tự, có 1 chữ hoa, 1 số và 1 ký tự đặc biệt';
-      return;
-    }
-
-    if (this.password !== this.confirmPassword) {
-      this.error = 'Mật khẩu nhập lại không khớp';
-      return;
-    }
-
-    if (!this.acceptTerms) {
-      this.error =
-        'Vui lòng đồng ý với Điều khoản sử dụng và Chính sách bảo mật';
+    if (this.f.password.value !== this.f.confirmPassword.value) {
+      this.openPopup('Mật khẩu nhập lại không khớp!', 'error');
       return;
     }
 
     this.loading = true;
 
-    this.http.post(
-      `${environment.apiUrl}/auth/register`,
-      {
-        full_name: this.full_name,
-        email: this.email,
-        password: this.password
-      }
-    ).subscribe({
+    const { full_name, email, password } = this.registerForm.value;
+
+    this.http.post(`${environment.apiUrl}/auth/register`, {
+      full_name,
+      email,
+      password
+    })
+    .pipe(finalize(() => this.loading = false))
+    .subscribe({
       next: () => {
-        alert('Đăng ký thành công');
-        this.router.navigate(['/login']);
-      },
+        this.openPopup('Đăng ký thành công!', 'success');
 
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 1500);
+      },
       error: (err) => {
-        this.error =
-          err.error?.message || 'Đăng ký thất bại';
-        this.loading = false;
-      },
-
-      complete: () => {
-        this.loading = false;
+        this.openPopup(err?.error?.message || 'Đăng ký thất bại', 'error');
       }
     });
   }
 
-  goLogin(): void {
+  goLogin() {
     this.router.navigate(['/login']);
   }
 }

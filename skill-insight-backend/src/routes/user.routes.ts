@@ -1,7 +1,12 @@
 import express from "express";
+
 import {
   getUsers,
-  updateRole
+  getUser,
+  updateRole,
+  updateUserRoleByAdmin,
+  deleteUserByAdmin,
+  createUserByAdmin
 } from "../controllers/user.controller";
 
 import {
@@ -11,9 +16,24 @@ import {
 
 const router = express.Router();
 
-// ======================
-// GET USERS (ADMIN ONLY)
-// ======================
+router.get(
+  "/profile",
+  verifyToken,
+  (req: any, res) => {
+    res.json({
+      success: true,
+      successMessage: "Lấy thông tin profile thành công",
+      data: req.user
+    });
+  }
+);
+
+router.get(
+  "/:id",
+  verifyToken,
+  getUser
+);
+
 router.get(
   "/",
   verifyToken,
@@ -21,37 +41,31 @@ router.get(
   getUsers
 );
 
-// ======================
-// UPDATE ROLE
-// ======================
+router.post(
+  "/",
+  verifyToken,
+  requireRole("admin"),
+  createUserByAdmin
+);
+
 router.put(
-  "/update-role",
+  "/role",
   verifyToken,
   updateRole
 );
 
-// ======================
-// ADMIN DASHBOARD
-// ======================
-router.get(
-  "/admin",
+router.put(
+  "/:id/role",
   verifyToken,
   requireRole("admin"),
-  getUsers
+  updateUserRoleByAdmin
 );
 
-// ======================
-// USER PROFILE
-// ======================
-router.get(
-  "/profile",
+router.delete(
+  "/:id",
   verifyToken,
-  (req: any, res) => {
-    res.json({
-      success: true,
-      data: req.user
-    });
-  }
+  requireRole("admin"),
+  deleteUserByAdmin
 );
 
 export default router;

@@ -1,42 +1,63 @@
 import { Request, Response, NextFunction } from 'express';
+import { AppError } from '../utils/appError';
 
-interface CustomError extends Error {
-  statusCode?: number;
-  status?: string;
-  code?: string;
-}
+const sendErrorDev = (err: any, res: Response) => {
+  res.status(err.statusCode).json({
+    status: err.status,
+    message: err.message,
+    error: err,
+    stack: err.stack
+  });
+};
+
+const sendErrorProd = (err: any, res: Response) => {
+ 
+  if (err.isOperational) {
+    res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message
+    });
+  } 
+
+  else {
+    console.error(' CRITICAL ERROR:', err);
+    res.status(500).json({
+      status: 'error',
+      message: 'Đã có lỗi xảy ra từ phía hệ thống!'
+    });
+  }
+};
+
+const handlePrismaDuplicateFields = (err: any) => {
+  const field = err.meta?.target || 'dữ liệu';
+  const message = `Giá trị của ${field} đã tồn tại. Vui lòng sử dụng giá trị khác!`;
+  return new AppError(message, 400);
+};
 
 export const errorHandler = (
-  err: CustomError,
+  err: any,
   req: Request,
   res: Response,
   next: NextFunction
 ): void => {
-  // 1. Set default values
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
-  // 2. Detailed Error Logging for Developers
   console.error('------- START ERROR LOG -------');
   console.error(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   console.error('Message:', err.message);
-  if (err.stack) console.error('Stack:', err.stack);
   console.error('------- END ERROR LOG -------');
 
-  // 3. Handle specific MySQL errors (Security & UX)
-  if (err.code === 'ER_DUP_ENTRY') {
-    err.statusCode = 400;
-    err.message = 'Duplicate entry: This record already exists.';
-  }
-  if (err.code === 'ECONNREFUSED') {
-    err.statusCode = 503;
-    err.message = 'Database connection refused.';
-  }
+  if (process.env.NODE_ENV === 'development') {
+    sendErrorDev(err, res);
+  } else {
+    let error = { ...err };
+    error.message = err.message;
 
-  // 4. Response to Client
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message || 'Internal Server Error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
-  });
+    if (err.code === 'P2002') error = handlePrismaDuplicateFields(error);
+    if (err.name === 'JsonWebTokenError') error = new AppError('Mã xác thực không hợp lệ!', 401);
+    if (err.name === 'TokenExpiredError') error = new AppError('Phiên đăng nhập đã hết hạn!', 401);
+
+    sendErrorProd(error, res);
+  }
 };

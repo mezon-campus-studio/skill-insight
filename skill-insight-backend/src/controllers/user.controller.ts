@@ -1,7 +1,38 @@
 import { Request, Response, NextFunction } from "express";
 import * as userService from "../services/user.service";
 
-// ================= GET USERS =================
+const disableCache = (res: Response) => {
+  res.setHeader(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, proxy-revalidate"
+  );
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Surrogate-Control", "no-store");
+};
+
+export const getUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const id = Number(req.params.id);
+
+    const user = await userService.getUserById(id);
+
+    disableCache(res);
+
+    res.status(200).json({
+      success: true,
+      message: "Lấy thông tin user thành công",
+      data: user
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const getUsers = async (
   req: Request,
   res: Response,
@@ -11,10 +42,19 @@ export const getUsers = async (
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 25;
 
-    const data = await userService.getUsersService(page, limit);
+    const keyword = (req.query.keyword as string) || "";
+
+    const data = await userService.getUsersService(
+      page,
+      limit,
+      keyword
+    );
+
+    disableCache(res);
 
     res.status(200).json({
       success: true,
+      message: "Lấy danh sách user thành công",
       data
     });
   } catch (err) {
@@ -23,38 +63,107 @@ export const getUsers = async (
 };
 
 export const updateRole = async (
-  req: any, 
+  req: any,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const { role } = req.body;
+    const userId = req.user?.user_id;
 
-    // 🔥 validate
     if (!role) {
       return res.status(400).json({
         success: false,
         message: "Role is required"
       });
     }
-    
-    const userId = req.user?.user_id;
 
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized"
-      });
-    }
+    const data = await userService.updateUserRole(
+      userId,
+      role
+    );
 
-    const user = await userService.updateUserRole(userId, role);
+    disableCache(res);
 
     res.status(200).json({
       success: true,
-      message: "Cập nhật role thành công",
+      message: "Chọn role thành công",
+      data
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateUserRoleByAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = Number(req.params.id);
+    const { role } = req.body;
+
+    if (!role) {
+      return res.status(400).json({
+        success: false,
+        message: "Role is required"
+      });
+    }
+
+    const user = await userService.updateUserRole(
+      userId,
+      role
+    );
+
+    disableCache(res);
+
+    res.status(200).json({
+      success: true,
+      message: "Admin cập nhật role thành công",
       data: user
     });
+  } catch (err) {
+    next(err);
+  }
+};
 
+export const deleteUserByAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = Number(req.params.id);
+
+    await userService.deleteUserService(userId);
+
+    disableCache(res);
+
+    res.status(200).json({
+      success: true,
+      message: "Xóa user thành công"
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const createUserByAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const data = await userService.createUserByAdmin(req.body);
+
+    disableCache(res);
+
+    res.status(201).json({
+      success: true,
+      message: "Tạo user thành công",
+      data
+    });
   } catch (err) {
     next(err);
   }

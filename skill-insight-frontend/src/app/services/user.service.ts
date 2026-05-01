@@ -7,33 +7,60 @@ import { Observable } from 'rxjs';
 })
 export class UserService {
 
-  private API = 'http://localhost:3000/api/users';
+  private API = '/api/users';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient
+  ) {}
 
-  // ======================
-  // GET USERS (PAGINATION)
-  // ======================
   getUsers(
     page: number = 1,
-    limit: number = 25
+    limit: number = 25,
+    keyword: string = ''
   ): Observable<any> {
+
     return this.http.get(
-      `${this.API}?page=${page}&limit=${limit}`
+      `${this.API}?page=${page}&limit=${limit}&keyword=${keyword}&t=${Date.now()}`,
+      {
+        withCredentials: true
+      }
     );
   }
 
-  // ======================
-  // UPDATE ROLE
-  // ======================
+  createUser(data: any): Observable<any> {
+
+    return this.http.post(
+      this.API,
+      data,
+      {
+        withCredentials: true
+      }
+    );
+  }
+
   updateRole(
     userId: number,
     role: string
   ): Observable<any> {
+
     return this.http.put(
-      `${this.API}/update-role`,
-      { userId, role }
+      `${this.API}/${userId}/role`,
+      { role },
+      {
+        withCredentials: true
+      }
     );
   }
 
+  deleteUser(
+    userId: number
+  ): Observable<any> {
+
+    return this.http.delete(
+      `${this.API}/${userId}`,
+      {
+        withCredentials: true
+      }
+    );
+  }
 }

@@ -1,184 +1,139 @@
-import { prisma } from "../lib/prisma";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { Role } from "@prisma/client";
+import { userRepository } from "../repositories/user.repository";
+import { AppError } from "../utils/appError";
+import prisma from "../lib/prisma"; // Sử dụng instance singleton
 
-const JWT_SECRET = process.env.JWT_SECRET || "secret";
+export const userService = {
 
-// ================= GET 1 USER =================
-export const getUserById = async (id: number) => {
-  const user = await prisma.user.findUnique({
-    where: { user_id: id },
-    select: {
-      user_id: true,
-      full_name: true,
-      email: true,
-      role: true,
-      provider_id: true,
-      status: true,
-      created_at: true,
-      updated_at: true,
-    },
-  });
+  async login(email: string, pass: string) {
+    if (!email || !pass) throw new AppError("Vui lòng nhập đầy đủ email và mật khẩu", 400);
 
-  if (!user) {
-    throw new Error("User not found");
-  }
+    const user = await userRepository.findAuthUserByEmail(email.trim().toLowerCase());
+    if (!user || !user.password) {
+      throw new AppError("Thông tin đăng nhập không chính xác", 401);
+    }
 
-  return user;
-};
+    const isMatch = await bcrypt.compare(pass, user.password);
+    if (!isMatch) {
+      throw new AppError("Thông tin đăng nhập không chính xác", 401);
+    }
 
-// ================= GET USERS =================
-export const getUsersService = async (
-  page: number,
-  limit: number
-) => {
-  const skip = (page - 1) * limit;
+    const { password, ...userWithoutPass } = user;
+    return userWithoutPass;
+  },
 
-  const users = await prisma.user.findMany({
-    skip,
-    take: limit,
-    orderBy: { user_id: "asc" },
-    select: {
-      user_id: true,
-      full_name: true,
-      email: true,
-      role: true,
-      provider_id: true,
-      status: true,
-      created_at: true,
-    },
-  });
+  async register(data: any) {
+    const { email, password, full_name } = data;
+    if (!email || !password || !full_name) throw new AppError("Thiếu thông tin đăng ký", 400);
 
-  const totalUsers = await prisma.user.count();
-  const totalPages = Math.ceil(totalUsers / limit);
-
-  return {
-    users,
-    pagination: {
-      currentPage: page,
-      totalPages,
-      totalUsers,
-      limit,
-    },
-  };
-};
-
-// ================= REGISTER =================
-export const registerService = async (data: any) => {
-  const { email, password, full_name } = data;
-
-  if (!email || !password || !full_name) {
-    throw new Error("Missing required fields");
-  }
-
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
-  });
-
-  if (existingUser) {
-    throw new Error("Email already exists");
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = await prisma.user.create({
-    data: {
+    const isExists = await userRepository.isEmailExists(email);
+    if (isExists) throw new AppError("Email này đã được sử dụng", 409);
+    
+    const hashedPassword = await bcrypt.hash(password, 10);
+    return await userRepository.create({
       full_name,
-      email,
+      email: email.trim().toLowerCase(),
       password: hashedPassword,
       role: null 
-    },
-    select: {
-      user_id: true,
-      full_name: true,
-      email: true,
-      role: true,
-      provider_id: true,
-      status: true,
-      created_at: true,
-    },
-  });
+    });
+  },
 
-  return user;
-};
-
-// ================= LOGIN =================
-export const loginService = async (
-  email: string,
-  password: string
-) => {
-  if (!email || !password) {
-    throw new Error("Email and password are required");
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { email },
-  });
-
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  if (!user.status) {
-    throw new Error("Account is locked");
-  }
-
-  const isMatch = await bcrypt.compare(password, user.password);
-
-  if (!isMatch) {
-    throw new Error("Wrong password");
-  }
-
-  const token = jwt.sign(
-    {
-      user_id: user.user_id,
-      role: user.role || null 
-    },
-    JWT_SECRET,
-    {
-      expiresIn: "1d",
+  async updateUserRole(userId: number, role: string) {
+    const allowedRoles: string[] = ["student", "teacher", "admin"];
+    if (!allowedRoles.includes(role)) {
+      throw new AppError("Vai trò không hợp lệ", 400);
     }
-  );
 
-  return {
-    token,
-    user: {
-      user_id: user.user_id,
-      full_name: user.full_name,
-      email: user.email,
-      role: user.role,
-    },
-  };
-};
+    const user = await userRepository.findById(userId);
+    if (!user) throw new AppError("Người dùng không tồn tại", 404);
 
-// ================= UPDATE ROLE =================
-export const updateUserRole = async (
-  userId: number,
-  role: string
-) => {
-  const allowedRoles: Role[] = [
-    "student",
-    "teacher",
-    "admin",
-  ];
+    return await userRepository.update(userId, { 
+      role: role as Role 
+    });
+  },
 
-  if (!allowedRoles.includes(role as Role)) {
-    throw new Error("Invalid role");
+  async setUserPassword(userId: number, pass: string) {
+    if (!pass) throw new AppError("Mật khẩu không được để trống", 400);
+    const hashedPassword = await bcrypt.hash(pass, 10);
+    return await userRepository.update(userId, { password: hashedPassword });
+  },
+
+  async getUserById(userId: number) {
+    const user = await userRepository.findById(userId);
+    if (!user) throw new AppError("Người dùng không tồn tại", 404);
+    return user;
+  },
+
+  async deleteUser(userId: number) {
+    const user = await userRepository.findById(userId);
+    if (!user) throw new AppError("Người dùng không tồn tại", 404);
+
+    await prisma.user.delete({ where: { user_id: userId } });
+    return { message: "Xóa người dùng thành công" };
+  },
+
+  async getUsers(page: number, limit: number, keyword?: string) {
+    const skip = (page - 1) * limit;
+
+    const where = keyword?.trim()
+      ? {
+          OR: [
+            { email: { contains: keyword, mode: "insensitive" as any } },
+            { full_name: { contains: keyword, mode: "insensitive" as any } }
+          ]
+        }
+      : {};
+
+    const users = await prisma.user.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { user_id: "asc" },
+      select: {
+        user_id: true,
+        full_name: true,
+        email: true,
+        role: true,
+        created_at: true
+      }
+    });
+
+    const totalUsers = await prisma.user.count({ where });
+
+    return {
+      users,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalUsers / limit),
+        totalUsers,
+        limit
+      }
+    };
+  },
+
+  async createUserByAdmin(data: any) {
+    const { email, password, full_name, role } = data;
+    if (!email || !password || !full_name || !role) throw new AppError("Vui lòng nhập đầy đủ thông tin", 400);
+
+    const isExists = await userRepository.isEmailExists(email);
+    if (isExists) throw new AppError("Email này đã được sử dụng", 409);
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    return await userRepository.create({
+      email: email.trim().toLowerCase(),
+      password: hashedPassword,
+      full_name,
+      role: role as Role
+    });
   }
-
-  const updatedUser = await prisma.user.update({
-    where: { user_id: userId },
-    data: {
-      role: role as Role,
-    },
-    select: {
-      user_id: true,
-      full_name: true,
-      email: true,
-      role: true,
-    },
-  });
-
-  return updatedUser;
 };
+
+export const loginService = userService.login;
+export const registerService = userService.register;
+export const getUserById = userService.getUserById;
+export const updateUserRole = userService.updateUserRole;
+export const deleteUserService = userService.deleteUser;
+export const getUsersService = userService.getUsers;
+export const createUserByAdmin = userService.createUserByAdmin;
+export const setUserPassword = userService.setUserPassword;

@@ -1,17 +1,42 @@
-import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
+import { map, catchError, of } from 'rxjs';
 
-export const authGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = (route, state) => {
+  const auth = inject(AuthService);
   const router = inject(Router);
 
-  const token =
-    localStorage.getItem('token') ||
-    sessionStorage.getItem('token');
+  return auth.getMe().pipe(
+    map((res: any) => {
+      const user = res?.user;
 
-  console.log('TOKEN:', token);
+      if (!user) {
+        return router.createUrlTree(['/login']);
+      }
 
-  if (token) return true;
+      // ✅ lưu user
+      auth.saveUser(user);
 
-  router.navigate(['/login']);
-  return false;
+      // 🔥 role flow
+      if (!user.role) {
+        if (state.url === '/select-role') {
+          return true;
+        }
+        return router.createUrlTree(['/select-role']);
+      }
+
+      // 🔥 role permission
+      const roles = route.data?.['roles'] as string[];
+
+      if (roles && !roles.includes(user.role)) {
+        return router.createUrlTree(['/dashboard']);
+      }
+
+      return true;
+    }),
+    catchError(() => {
+      return of(router.createUrlTree(['/login']));
+    })
+  );
 };

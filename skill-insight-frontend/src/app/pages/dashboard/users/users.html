@@ -6,47 +6,101 @@
     <p>Danh sách người dùng trong hệ thống</p>
   </div>
 
+  <!-- CREATE USER -->
+  <div class="create-user-box">
+
+    <h3>➕ Thêm người dùng</h3>
+
+    <input
+      type="text"
+      placeholder="Họ và tên"
+      [(ngModel)]="newUser.full_name"
+    />
+
+    <input
+      type="email"
+      placeholder="Email"
+      [(ngModel)]="newUser.email"
+    />
+
+    <input
+      type="password"
+      placeholder="Mật khẩu"
+      [(ngModel)]="newUser.password"
+    />
+
+    <select [(ngModel)]="newUser.role">
+      <option value="student">Student</option>
+      <option value="teacher">Teacher</option>
+      <option value="admin">Admin</option>
+    </select>
+
+    <button
+      (click)="createUser()"
+      [disabled]="creating"
+    >
+      {{ creating ? 'Đang tạo...' : 'Tạo user' }}
+    </button>
+
+  </div>
+
   <!-- TABLE -->
   <div class="table-wrapper">
 
-    <!-- LOADING -->
-    <div *ngIf="loading" class="loading">
-      ⏳ Đang tải dữ liệu...
+    <!-- SEARCH -->
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="🔍 Tìm theo email hoặc tên..."
+        [(ngModel)]="searchKeyword"
+        (keyup.enter)="onSearch()"
+      />
+
+      <button (click)="onSearch()">
+        Tìm
+      </button>
     </div>
 
     <!-- TABLE -->
-    <table *ngIf="!loading">
+    <table>
 
       <thead>
         <tr>
-          <th>ID</th>
+          <th>STT</th>
           <th>Họ và tên</th>
           <th>Email</th>
           <th>Vai trò hiện tại</th>
           <th>Cấp quyền</th>
           <th>Lưu</th>
+          <th>Xóa</th>
         </tr>
       </thead>
 
       <tbody>
 
-        <tr *ngFor="let user of users">
+        <!-- EMPTY -->
+        <tr *ngIf="!loading && users.length === 0">
+          <td colspan="7" class="empty-data">
+            Không có dữ liệu người dùng
+          </td>
+        </tr>
 
-          <td>{{ user.user_id }}</td>
+        <!-- LIST -->
+        <tr *ngFor="let user of users; let i = index">
+
+          <td>
+            {{ (currentPage - 1) * limit + i + 1 }}
+          </td>
+
           <td>{{ user.full_name }}</td>
           <td>{{ user.email }}</td>
 
-          <!-- ROLE BADGE -->
           <td>
-            <span
-              class="role-badge"
-              [ngClass]="user.role"
-            >
+            <span class="role-badge" [ngClass]="user.role">
               {{ user.role }}
             </span>
           </td>
 
-          <!-- SELECT ROLE -->
           <td>
             <select [(ngModel)]="user.role">
               <option value="student">Student</option>
@@ -55,7 +109,6 @@
             </select>
           </td>
 
-          <!-- SAVE -->
           <td>
             <button
               class="save-btn"
@@ -64,6 +117,15 @@
             >
               <span *ngIf="!isSaving(user.user_id)">💾 Lưu</span>
               <span *ngIf="isSaving(user.user_id)">⏳...</span>
+            </button>
+          </td>
+
+          <td>
+            <button
+              class="delete-btn"
+              (click)="deleteUser(user)"
+            >
+              ❌ Xóa
             </button>
           </td>
 
@@ -78,23 +140,27 @@
   <!-- PAGINATION -->
   <div class="pagination" *ngIf="totalPages > 1">
 
-    <!-- PREV -->
     <button
-      *ngIf="currentPage > 1"
+      class="nav-btn"
       (click)="prevPage()"
+      [disabled]="currentPage === 1"
     >
       ⬅ Trang trước
     </button>
 
-    <!-- CURRENT -->
-    <span class="page-info">
-      Trang {{ currentPage }} / {{ totalPages }}
-    </span>
-
-    <!-- NEXT -->
     <button
-      *ngIf="currentPage < totalPages"
+      *ngFor="let page of pages"
+      class="page-btn"
+      [class.active]="page === currentPage"
+      (click)="changePage(page)"
+    >
+      {{ page }}
+    </button>
+
+    <button
+      class="nav-btn"
       (click)="nextPage()"
+      [disabled]="currentPage === totalPages"
     >
       Trang sau ➡
     </button>

@@ -1,57 +1,68 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-select-role',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './select-role.html',
   styleUrls: ['./select-role.css']
 })
-export class SelectRoleComponent {
-
+export class SelectRoleComponent implements OnInit {
+  user: any = null;
   loading = false;
 
   constructor(
-    private router: Router,
-    private auth: AuthService
+    private auth: AuthService,
+    private router: Router
   ) {}
 
-  selectRole(role: string) {
-
-    // tránh spam click
-    if (this.loading) return;
-
-    this.loading = true;
-
-    console.log('CLICK ROLE:', role);
-
-    this.auth.updateRole(role).subscribe({
+  ngOnInit() {
+    this.auth.getMe().subscribe({
       next: (res: any) => {
-
-        console.log('UPDATE ROLE SUCCESS:', res);
-
-        const user = this.auth.getUser();
-
-        if (user) {
-          user.role = role;
-
-          this.auth.saveAuth({
-            token: this.auth.getToken(),
-            user
-          });
+        if (!res?.user) {
+          this.router.navigate(['/login']);
+          return;
         }
 
+        this.user = {
+          ...res.user,
+          user_id: res.user.user_id || res.user.userId
+        };
+      },
+      error: () => this.router.navigate(['/login'])
+    });
+  }
+
+  selectRole(role: 'teacher' | 'student') {
+    if (!this.user || this.loading) return;
+
+    this.loading = true;
+    const payload = {
+      userId: this.user.user_id,
+      role: role
+    };
+
+    this.auth.updateRole(payload).pipe(
+      finalize(() => this.loading = false)
+    ).subscribe({
+      next: (res: any) => {
+       
+        const updatedUser = { ...this.user, role: role };
+        this.auth.saveUser(updatedUser);
+        
         this.router.navigate(['/dashboard']);
       },
-
       error: (err) => {
-        console.error('UPDATE ROLE ERROR:', err);
-        alert('Lỗi cập nhật role');
-        this.loading = false;
+        alert(err?.error?.message || 'Không thể cập nhật vai trò, vui lòng thử lại');
       }
     });
+  }
+
+  logout() {
+    this.auth.logout();
   }
 }
