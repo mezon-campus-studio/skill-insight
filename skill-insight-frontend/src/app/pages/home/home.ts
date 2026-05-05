@@ -1,30 +1,41 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, AfterViewInit, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
-  template: `
-    <h2>Home</h2>
-
-    <div *ngIf="user; else noUser">
-      <p><b>Email:</b> {{ user.email }}</p>
-      <p><b>Role:</b> {{ user.role }}</p>
-    </div>
-
-    <ng-template #noUser>
-      <p>Chưa có user</p>
-    </ng-template>
-  `,
+  imports: [CommonModule, RouterModule],
+  templateUrl: './home.html',
+  styleUrl: './home.css',
 })
-export class HomeComponent implements OnInit {
-  user: any = null;
+export class Home implements AfterViewInit {
+  constructor(private el: ElementRef) {}
 
-  ngOnInit(): void {
-    const data = localStorage.getItem('user');
-    if (data) {
-      this.user = JSON.parse(data);
-    }
+  ngAfterViewInit() {
+    this.runCounter();
+  }
+
+  runCounter() {
+    const counters = this.el.nativeElement.querySelectorAll('.counter');
+
+    counters.forEach((counter: any) => {
+      const target = +counter.getAttribute('data-target');
+      let count = 0;
+
+      const update = () => {
+        const increment = target / 80;
+
+        if (count < target) {
+          count += increment;
+          counter.innerText = Math.floor(count).toLocaleString() + '+';
+          setTimeout(update, 20);
+        } else {
+          counter.innerText = target.toLocaleString() + '+';
+        }
+      };
+
+      update();
+    });
   }
 }

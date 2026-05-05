@@ -11,6 +11,5 @@ const envConfigFile = `export const environment = {
   Oauth2_URL: '${process.env.Oauth2_URL}',
   Auth_Mezon: '${process.env.Auth_Mezon}',
   API_SUBJECT:'${process.env.apiSubject}'
-};
-`;
+};`;
 fs.writeFileSync('src/environments/environment.ts', envConfigFile);

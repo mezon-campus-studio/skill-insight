@@ -7,27 +7,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  user_id    Int     @id @default(autoincrement())
-  full_name  String?
-  email      String  @unique
-  password   String?
-  role       String  @default("student")
-  provider_id String?
-  status     Boolean @default(true)
+enum Role {
+  admin
+  teacher
+  student
+}
 
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+model User {
+  user_id     Int      @id @default(autoincrement())
+  full_name   String?  @db.VarChar(255)
+  email       String   @unique @db.VarChar(255)
+  password    String?  @db.VarChar(255)
+
+  role        Role     @default(student) 
+
+  provider_id String?  @db.VarChar(255)
+  status      Boolean  @default(true)
+
+  created_at  DateTime @default(now()) @map("created_at")
+  updated_at  DateTime @updatedAt @map("updated_at")
 
   @@map("users")
-
 }
+
 model Subject {
   subject_id   Int      @id @default(autoincrement())
   subject_name String   @db.VarChar(255)
   description  String?  @db.Text
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
-  @@map("subjects")
 
+  @@map("subjects")
 }

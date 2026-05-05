@@ -1,0 +1,46 @@
+<div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
+
+  <div class="absolute top-6 right-6">
+    <button (click)="logout()" class="text-gray-500 hover:text-red-600 font-medium transition-colors text-sm flex items-center gap-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+      Đăng xuất
+    </button>
+  </div>
+
+  <div class="max-w-3xl w-full text-center">
+    <h1 class="text-3xl font-extrabold text-gray-900 mb-2 uppercase tracking-tight">Chọn vai trò của bạn</h1>
+    <p class="text-gray-600 mb-10">Vui lòng chọn vai trò để chúng tôi cá nhân hóa trải nghiệm của bạn</p>
+
+    <div class="grid md:grid-cols-2 gap-8">
+
+      <div 
+        (click)="selectRole('teacher')"
+        class="group bg-white p-8 rounded-2xl shadow-sm border-2 border-transparent hover:border-blue-500 hover:shadow-xl transition-all cursor-pointer transform hover:-translate-y-2">
+        <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 transition-colors">
+          <span class="text-4xl group-hover:scale-110 transition-transform">👨‍🏫</span>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3 uppercase">Giảng viên</h3>
+        <p class="text-sm text-gray-500">Tôi muốn tạo khóa học, quản lý học viên và chia sẻ kiến thức.</p>
+      </div>
+
+      <div 
+        (click)="selectRole('student')"
+        class="group bg-white p-8 rounded-2xl shadow-sm border-2 border-transparent hover:border-green-500 hover:shadow-xl transition-all cursor-pointer transform hover:-translate-y-2">
+        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-green-600 transition-colors">
+          <span class="text-4xl group-hover:scale-110 transition-transform">🎓</span>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3 uppercase">Học viên</h3>
+        <p class="text-sm text-gray-500">Tôi muốn tìm kiếm các khóa học và nâng cao kỹ năng bản thân.</p>
+      </div>
+    </div>
+
+    @if (loading) {
+      <div class="fixed inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="flex flex-col items-center">
+          <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p class="mt-4 font-bold text-blue-600 animate-pulse uppercase tracking-widest">Đang thiết lập vai trò...</p>
+        </div>
+      </div>
+    }
+  </div>
+</div>

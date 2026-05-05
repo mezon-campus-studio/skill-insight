@@ -10,30 +10,30 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "axios": "^1.15.0",
+    "@prisma/client": "^5.22.0",
+    "axios": "^1.15.2",
     "bcrypt": "^6.0.0",
-    "cookie-parser": "^1.4.6",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",
     "helmet": "^7.2.0",
     "jsonwebtoken": "^9.0.3",
-    "mysql2": "^3.22.1",
-    "sequelize": "^6.37.8",
-    "yup": "^1.2.0"
+    "mysql2": "^3.21.0",
+    "prisma": "^5.22.0",
+    "qs": "^6.15.1",
+    "yup": "^1.2.0",
+    "zod": "^4.4.1"
   },
   "devDependencies": {
-    "@prisma/client": "^6.19.3",
     "@types/bcrypt": "^6.0.0",
-    "@types/cookie-parser": "^1.4.3",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.25",
     "@types/helmet": "^0.0.48",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.19.39",
-    "@types/sequelize": "^4.28.20",
     "nodemon": "^3.0.1",
-    "prisma": "^6.19.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   }

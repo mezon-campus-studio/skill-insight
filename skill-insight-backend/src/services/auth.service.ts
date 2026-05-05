@@ -1,8 +1,11 @@
-import { User } from "@prisma/client";
-import prisma from "../config/prisma";
-import { generateToken } from "../utils/jwt";
+import bcrypt from "bcrypt";
+import { userRepository } from "../repositories/user.repositories";
 import { getAccessToken, getUserInfo } from "./mezon.service";
+import { AppError } from "../utils/appError";
+import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
 import { saveState, verifyState } from "../utils/stateStore";
+import { prisma } from "../lib/prisma";
+
 interface AuthPayload {
   userId: number;
   email: string;
@@ -10,7 +13,7 @@ interface AuthPayload {
   mezonId?: string | null;
 }
 
-const buildAuthResponse = (user: User) => {
+const buildAuthResponse = (user: any) => {
   const payload: AuthPayload = {
     userId: user.user_id,
     email: user.email,
@@ -18,12 +21,40 @@ const buildAuthResponse = (user: User) => {
     mezonId: user.provider_id,
   };
 
-  const token = generateToken(payload);
-
-  return { user: payload, token };
+  return {
+    user: {
+      ...payload,
+      hasPassword: !!user.password,
+    },
+    accessToken: generateAccessToken(payload),
+    refreshToken: generateRefreshToken(payload),
+  };
 };
 
 export const authService = {
+  // ===== LOGIN thường =====
+  async login(email: string, pass: string) {
+    if (!email || !pass) {
+      throw new AppError("Thiếu email hoặc password", 400);
+    }
+
+    const user = await userRepository.findAuthUserByEmail(
+      email.trim().toLowerCase(),
+    );
+
+    if (!user || !user.password) {
+      throw new AppError("Thông tin đăng nhập không chính xác", 401);
+    }
+
+    const isMatch = await bcrypt.compare(pass, user.password);
+    if (!isMatch) {
+      throw new AppError("Thông tin đăng nhập không chính xác", 401);
+    }
+
+    return buildAuthResponse(user);
+  },
+
+  // ===== LOGIN MEZON =====
   handleMezonLogin: async (code: string, state: string) => {
     if (!verifyState(state)) {
       throw new Error("Invalid state");
@@ -81,6 +112,8 @@ export const authService = {
 
     return buildAuthResponse(user);
   },
+
+  // ===== GET AUTH URL =====
   getAuthUrl: async () => {
     const state = Math.random().toString(36).substring(2, 13);
     saveState(state);
@@ -92,5 +125,21 @@ export const authService = {
       state: state,
     });
     return `${process.env.Oauth2_URL}?${params.toString()}`;
+  },
+
+  // ===== CHECK SESSION =====
+  async validateUserSession(userId: number) {
+    const user = await userRepository.findById(userId);
+
+    if (!user) {
+      throw new AppError("Phiên không hợp lệ", 401);
+    }
+
+    const { password, ...safeUser } = user as any;
+
+    return {
+      ...safeUser,
+      hasPassword: !!password,
+    };
   },
 };
