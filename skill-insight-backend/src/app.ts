@@ -1,60 +1,90 @@
-import express, { Application, Request, Response, NextFunction } from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import cookieParser from 'cookie-parser';
+import express, { Application, Request, Response, NextFunction } from "express";
+import cors from "cors";
+import helmet from "helmet";
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 
-import authRoutes from './routes/auth.routes';
-import userRoutes from './routes/user.routes';
+import authRoutes from "./routes/auth.routes";
+import userRoutes from "./routes/user.routes";
+import subjectRoutes from "./routes/subject.routes";
 
-import { errorHandler } from './middlewares/error.middleware';
-import { AppError } from './utils/appError';
+import { errorHandler } from "./middlewares/error.middleware";
+import { AppError } from "./utils/appError";
 
 dotenv.config();
 
 const app: Application = express();
 
-const corsOrigin = process.env.FRONTEND_URL || "http://localhost:4200";
-
+// Security Headers
 app.use(
-  cors({
-    origin: corsOrigin, 
-    credentials: true, 
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
-  })
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        connectSrc: ["'self'", "http://localhost:3000"],
+      },
+    },
+  }),
 );
 
-app.use(cookieParser()); 
+// CORS config
+const corsOrigin = process.env.FRONTEND_URL || "http://localhost:4200";
+app.use(
+  cors({
+    origin: corsOrigin,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+    ],
+  }),
+);
 
+// Middleware
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Debug cookie (giữ nếu đang test auth)
 app.use((req: Request, res: Response, next: NextFunction) => {
-  const timestamp = new Date().toLocaleTimeString();
-  if (req.url.includes('/api/auth/me')) {
-    console.log(`[${timestamp}] Request tới /me | Cookie nhận được:`, req.cookies);
-    if (!req.cookies.token) {
-      console.warn("CẢNH BÁO: Không tìm thấy cookie 'token' trong request gửi lên!");
+  if (req.url.includes("/api/auth/me")) {
+    console.log("Cookie nhận được:", req.cookies);
+    if (!req.cookies.accesstoken) {
+      console.warn("Không có cookie 'token'!");
     }
   }
   next();
 });
 
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-
-app.get('/health', (req: Request, res: Response) => {
-  res.status(200).json({ 
-    success: true, 
-    message: 'Server is healthy',
-    timestamp: new Date().toISOString()
+// Health check
+app.get("/health", (req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    message: "Server is healthy",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
   });
 });
 
-app.all('*', (req: Request, res: Response, next: NextFunction) => {
-  next(new AppError(`Không tìm thấy đường dẫn ${req.originalUrl} trên máy chủ này!`, 404));
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/subjects", subjectRoutes);
+
+// 404 handler
+app.all("*", (req: Request, res: Response, next: NextFunction) => {
+  next(
+    new AppError(
+      `Không tìm thấy đường dẫn ${req.originalUrl} trên máy chủ này!`,
+      404,
+    ),
+  );
 });
 
+// Global error handler
 app.use(errorHandler);
 
 export default app;

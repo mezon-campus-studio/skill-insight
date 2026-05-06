@@ -1,27 +1,25 @@
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import { AppError } from "./appError";
 
-const JWT_SECRET: Secret = process.env.JWT_SECRET || "your_default_access_secret_123";
-const JWT_REFRESH_SECRET: Secret = process.env.JWT_REFRESH_SECRET || "your_default_refresh_secret_456";
+const JWT_SECRET: Secret = process.env.JWT_SECRET as string;
+const JWT_REFRESH_SECRET: Secret = process.env.JWT_REFRESH_SECRET as string;
 
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h";
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || "7d";
+
+if (!JWT_SECRET || !JWT_REFRESH_SECRET) {
+  throw new Error("JWT secrets are not defined in environment variables");
+}
 
 export interface TokenPayload {
   userId: number;
+  email?: string;
   role: string;
+  mezonId?: string | null;
 }
 
-export const generateToken = (payload: TokenPayload): string => {
-  return generateAccessToken(payload);
-};
-
-export const verifyToken = (token: string): TokenPayload => {
-  return verifyAccessToken(token);
-};
-
+// ===== Generate =====
 export const generateAccessToken = (payload: TokenPayload): string => {
-  // TypeScript sẽ không còn báo lỗi vì JWT_SECRET đã chắc chắn là string
   return jwt.sign(payload, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN as any,
   });
@@ -33,13 +31,19 @@ export const generateRefreshToken = (payload: TokenPayload): string => {
   });
 };
 
+// Alias cho code cũ (tránh vỡ project)
+export const generateToken = generateAccessToken;
+
+// ===== Verify =====
 export const verifyAccessToken = (token: string): TokenPayload => {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
     return {
       userId: decoded.userId as number,
+      email: decoded.email as string,
       role: decoded.role as string,
+      mezonId: decoded.mezonId as string | null,
     };
   } catch (err: any) {
     if (err.name === "TokenExpiredError") {
@@ -55,7 +59,9 @@ export const verifyRefreshToken = (token: string): TokenPayload => {
 
     return {
       userId: decoded.userId as number,
+      email: decoded.email as string,
       role: decoded.role as string,
+      mezonId: decoded.mezonId as string | null,
     };
   } catch (err: any) {
     if (err.name === "TokenExpiredError") {

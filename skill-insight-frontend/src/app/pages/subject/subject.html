@@ -1,0 +1,46 @@
+<button (click)="showList()">Hiển thị danh sách</button>
+<button (click)="showAdd()">Thêm</button>
+<button (click)="showDelete()">Xóa</button>
+<button (click)="showUpdate()">Cập nhật</button>
+
+<hr />
+
+<div *ngIf="view === 'list'">
+  <h3>Danh sách môn học</h3>
+
+  <ul>
+    <li *ngFor="let s of subjects">{{ s.id }} - {{ s.subject_name }} - {{ s.description }}</li>
+  </ul>
+</div>
+
+<!-- ADD -->
+<div *ngIf="view === 'add'">
+  <h3>Thêm môn học</h3>
+
+  <input type="text" [(ngModel)]="newSubject.subject_name" placeholder="Tên môn học" />
+
+  <input type="text" [(ngModel)]="newSubject.description" placeholder="Mô tả" />
+
+  <button (click)="addSubject()">Thêm</button>
+</div>
+<!-- DELETE -->
+<div *ngIf="view === 'delete'">
+  <h3>Xóa môn học</h3>
+
+  <input type="number" [(ngModel)]="deleteId" placeholder="ID cần xóa" />
+
+  <button (click)="deleteSubject()">Xóa</button>
+</div>
+
+<!-- UPDATE -->
+<div *ngIf="view === 'update'">
+  <h3>Cập nhật môn học</h3>
+
+  <input type="number" [(ngModel)]="updateSubjectData.id" placeholder="ID" />
+
+  <input type="text" [(ngModel)]="updateSubjectData.subject_name" placeholder="Tên mới" />
+
+  <input type="text" [(ngModel)]="updateSubjectData.description" placeholder="Mô tả mới" />
+
+  <button (click)="updateSubject()">Cập nhật</button>
+</div>

@@ -1,14 +1,15 @@
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 px-4">
-
-  <div class="w-full max-w-md bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl p-8 space-y-6 border border-gray-100">
-
+<div
+  class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 px-4"
+>
+  <div
+    class="w-full max-w-md bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl p-8 space-y-6 border border-gray-100"
+  >
     <div class="text-center">
       <h2 class="text-3xl font-extrabold text-gray-900">Welcome Back</h2>
       <p class="text-sm text-gray-500 mt-1">Đăng nhập để tiếp tục</p>
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-5">
-
       <div>
         <label class="text-sm font-medium text-gray-600">Email</label>
         <input
@@ -20,12 +21,13 @@
           [class.border-red-500]="f.email.touched && f.email.invalid"
         />
 
-        <p *ngIf="f.email.touched && f.email.errors?.['required']"
-           class="text-xs text-red-500 mt-1">
+        <p
+          *ngIf="f.email.touched && f.email.errors?.['required']"
+          class="text-xs text-red-500 mt-1"
+        >
           Vui lòng nhập email
         </p>
-        <p *ngIf="f.email.touched && f.email.errors?.['email']"
-           class="text-xs text-red-500 mt-1">
+        <p *ngIf="f.email.touched && f.email.errors?.['email']" class="text-xs text-red-500 mt-1">
           Email không hợp lệ
         </p>
       </div>
@@ -43,40 +45,45 @@
           />
 
           <span
-  class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-blue-500 transition"
-  (click)="togglePassword()"
->
-  @if (!showPassword) {
-
-    <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor">
-      <path d="M3 3L21 21" stroke-width="2" stroke-linecap="round"/>
-      <path d="M10.58 10.58A2 2 0 0013.42 13.42" stroke-width="2"/>
-      <path d="M9.88 5.09A9.77 9.77 0 0112 5c5 0 9.27 3.11 11 7" stroke-width="2"/>
-      <path d="M6.71 6.72C4.68 8.07 3.16 9.94 2 12c1.73 3.89 6 7 10 7 1.61 0 3.14-.35 4.53-.98" stroke-width="2"/>
-    </svg>
-  } @else {
-
-    <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor">
-      <path d="M2 12S5.5 5 12 5s10 7 10 7-3.5 7-10 7S2 12 2 12z" stroke-width="2"/>
-      <circle cx="12" cy="12" r="3" stroke-width="2"></circle>
-    </svg>
-  }
-</span>
+            class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-blue-500 transition"
+            (click)="togglePassword()"
+          >
+            @if (!showPassword) {
+              <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor">
+                <path d="M3 3L21 21" stroke-width="2" stroke-linecap="round" />
+                <path d="M10.58 10.58A2 2 0 0013.42 13.42" stroke-width="2" />
+                <path d="M9.88 5.09A9.77 9.77 0 0112 5c5 0 9.27 3.11 11 7" stroke-width="2" />
+                <path
+                  d="M6.71 6.72C4.68 8.07 3.16 9.94 2 12c1.73 3.89 6 7 10 7 1.61 0 3.14-.35 4.53-.98"
+                  stroke-width="2"
+                />
+              </svg>
+            } @else {
+              <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor">
+                <path d="M2 12S5.5 5 12 5s10 7 10 7-3.5 7-10 7S2 12 2 12z" stroke-width="2" />
+                <circle cx="12" cy="12" r="3" stroke-width="2"></circle>
+              </svg>
+            }
+          </span>
         </div>
 
-        <p *ngIf="f.password.touched && f.password.errors?.['required']"
-           class="text-xs text-red-500 mt-1">
+        <p
+          *ngIf="f.password.touched && f.password.errors?.['required']"
+          class="text-xs text-red-500 mt-1"
+        >
           Vui lòng nhập mật khẩu
         </p>
-        <p *ngIf="f.password.touched && f.password.errors?.['minlength']"
-           class="text-xs text-red-500 mt-1">
+        <p
+          *ngIf="f.password.touched && f.password.errors?.['minlength']"
+          class="text-xs text-red-500 mt-1"
+        >
           Tối thiểu 8 ký tự
         </p>
       </div>
 
       <div class="flex justify-between items-center text-sm">
         <label class="flex items-center gap-2">
-          <input type="checkbox" class="accent-blue-600">
+          <input type="checkbox" class="accent-blue-600" />
           Ghi nhớ
         </label>
 
@@ -92,12 +99,11 @@
       <button
         type="submit"
         [disabled]="loading"
-        class="w-full py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-md">
-
+        class="w-full py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-md"
+      >
         <span *ngIf="!loading">Đăng nhập</span>
         <span *ngIf="loading" class="animate-pulse">Đang xử lý...</span>
       </button>
-
     </form>
 
     <div class="flex items-center gap-3">
@@ -107,28 +113,27 @@
     </div>
 
     <div class="flex gap-3">
-
       <button
         type="button"
-        class="flex-1 flex items-center justify-center gap-2 border border-gray-300 p-2 rounded-xl hover:shadow-md transition bg-white">
-
-        <img src="https://www.svgrepo.com/show/475656/google-color.svg"
-             class="h-5 w-5">
+        class="flex-1 flex items-center justify-center gap-2 border border-gray-300 p-2 rounded-xl hover:shadow-md transition bg-white"
+      >
+        <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="h-5 w-5" />
 
         <span class="text-sm font-medium">Google</span>
       </button>
 
       <button
         type="button"
-        (click)="loginWithMezon()"
-        class="flex-1 flex items-center justify-center gap-2 border border-gray-300 p-2 rounded-xl hover:shadow-md transition bg-white">
-
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTceAsfR0guuay5t_wFtrxEhHP6AGrDfR4b9ZqtalMsgQ&s"
-             class="h-5 w-5 rounded-full">
+        (click)="login()"
+        class="flex-1 flex items-center justify-center gap-2 border border-gray-300 p-2 rounded-xl hover:shadow-md transition bg-white"
+      >
+        <img
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTceAsfR0guuay5t_wFtrxEhHP6AGrDfR4b9ZqtalMsgQ&s"
+          class="h-5 w-5 rounded-full"
+        />
 
         <span class="text-sm font-medium">Mezon</span>
       </button>
-
     </div>
 
     <p class="text-center text-sm text-gray-500">
@@ -137,6 +142,5 @@
         Đăng ký
       </button>
     </p>
-
   </div>
 </div>

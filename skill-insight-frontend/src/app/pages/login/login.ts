@@ -5,26 +5,18 @@ import { Router, RouterModule } from '@angular/router';
 import { finalize, switchMap } from 'rxjs/operators';
 
 import { AuthService } from '../../services/auth.service';
-
 @Component({
   selector: 'app-login',
   standalone: true,
   // Sử dụng ReactiveFormsModule thay vì FormsModule để quản lý form chuyên nghiệp
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.html',
-  styleUrls: ['./login.css'] 
+  styleUrls: ['./login.css'],
 })
 export class LoginComponent implements OnInit {
-  
   loginForm = new FormGroup({
-    email: new FormControl('', [
-      Validators.required, 
-      Validators.email
-    ]),
-    password: new FormControl('', [
-      Validators.required, 
-      Validators.minLength(8)
-    ])
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [Validators.required, Validators.minLength(8)]),
   });
 
   loading = false;
@@ -33,24 +25,22 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private auth: AuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
-
-    this.auth.getMe().subscribe({
-      next: (res: any) => {
-        if (res?.success && res?.user) {
-          this.auth.saveUser(res.user);
-          this.navigateToNextStep(res.user);
-        }
-      },
-      error: () => console.log("Hệ thống sẵn sàng cho đăng nhập mới.")
-    });
+    // this.auth.getMe().subscribe({
+    //   next: (res: any) => {
+    //     if (res?.success && res?.user) {
+    //       this.auth.saveUser(res.user);
+    //       this.navigateToNextStep(res.user);
+    //     }
+    //   },
+    //   error: () => console.log('Hệ thống sẵn sàng cho đăng nhập mới.'),
+    // });
   }
 
   onLogin(): void {
-    
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
@@ -61,13 +51,14 @@ export class LoginComponent implements OnInit {
 
     const credentials = {
       email: this.loginForm.value.email?.trim().toLowerCase() || '',
-      password: this.loginForm.value.password || ''
+      password: this.loginForm.value.password || '',
     };
 
-    this.auth.login(credentials)
+    this.auth
+      .login(credentials)
       .pipe(
-        switchMap(() => this.auth.getMe()),
-        finalize(() => this.loading = false)
+        //switchMap(() => this.auth.getMe()),
+        finalize(() => (this.loading = false)),
       )
       .subscribe({
         next: (res: any) => {
@@ -78,7 +69,7 @@ export class LoginComponent implements OnInit {
         },
         error: (err: any) => {
           this.error = err?.error?.message || 'Email hoặc mật khẩu không chính xác';
-        }
+        },
       });
   }
 
@@ -90,21 +81,9 @@ export class LoginComponent implements OnInit {
     alert('Chức năng quên mật khẩu hiện đang được phát triển');
   }
 
-  loginWithMezon(): void {
-    this.auth.getMezonUrl().subscribe({
-      next: (res: any) => {
-        if (res?.url) {
-          window.location.href = res.url;
-        } else {
-          this.error = 'Không lấy được đường dẫn xác thực Mezon';
-        }
-      },
-      error: () => {
-        this.error = 'Lỗi kết nối với máy chủ Mezon';
-      }
-    });
+  login() {
+    this.auth.loginWithMezon();
   }
-
   private navigateToNextStep(user: any): void {
     // Nếu user mới chưa chọn vai trò (Student/Teacher)
     if (!user.role) {
@@ -114,7 +93,9 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  get f() { return this.loginForm.controls; }
+  get f() {
+    return this.loginForm.controls;
+  }
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;

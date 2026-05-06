@@ -1,15 +1,32 @@
 import bcrypt from "bcrypt";
 import { Role } from "@prisma/client";
-import { userRepository } from "../repositories/user.repository";
+import { userRepository } from "../repositories/user.repositories";
 import { AppError } from "../utils/appError";
-import prisma from "../lib/prisma"; // Sử dụng instance singleton
+import prisma from "../lib/prisma";
+
+export interface User {
+  user_id?: number;
+  full_name?: string | null;
+  email: string;
+  password?: string | null;
+  role?: Role;
+  provider_id?: string | null;
+  status?: boolean;
+  created_at?: Date;
+  updated_at?: Date;
+}
 
 export const userService = {
-
+  // ===== LOGIN =====
   async login(email: string, pass: string) {
-    if (!email || !pass) throw new AppError("Vui lòng nhập đầy đủ email và mật khẩu", 400);
+    if (!email || !pass) {
+      throw new AppError("Vui lòng nhập đầy đủ email và mật khẩu", 400);
+    }
 
-    const user = await userRepository.findAuthUserByEmail(email.trim().toLowerCase());
+    const user = await userRepository.findAuthUserByEmail(
+      email.trim().toLowerCase(),
+    );
+
     if (!user || !user.password) {
       throw new AppError("Thông tin đăng nhập không chính xác", 401);
     }
@@ -23,56 +40,77 @@ export const userService = {
     return userWithoutPass;
   },
 
+  // ===== REGISTER =====
   async register(data: any) {
     const { email, password, full_name } = data;
-    if (!email || !password || !full_name) throw new AppError("Thiếu thông tin đăng ký", 400);
+
+    if (!email || !password || !full_name) {
+      throw new AppError("Thiếu thông tin đăng ký", 400);
+    }
 
     const isExists = await userRepository.isEmailExists(email);
-    if (isExists) throw new AppError("Email này đã được sử dụng", 409);
-    
+    if (isExists) {
+      throw new AppError("Email này đã được sử dụng", 409);
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
+
     return await userRepository.create({
       full_name,
       email: email.trim().toLowerCase(),
       password: hashedPassword,
-      role: null 
+      role: Role.student, // ✅ FIX QUAN TRỌNG (không dùng null)
     });
   },
 
-  async updateUserRole(userId: number, role: string) {
-    const allowedRoles: string[] = ["student", "teacher", "admin"];
-    if (!allowedRoles.includes(role)) {
+  // ===== GET USER =====
+  async getUserById(userId: number) {
+    if (!userId || isNaN(userId) || userId <= 0) {
+      throw new AppError("Invalid ID", 400);
+    }
+
+    const user = await userRepository.findById(userId);
+    if (!user) throw new AppError("Người dùng không tồn tại", 404);
+
+    return user;
+  },
+
+  // ===== UPDATE ROLE =====
+  async updateUserRole(userId: number, role: Role) {
+    if (!Object.values(Role).includes(role)) {
       throw new AppError("Vai trò không hợp lệ", 400);
     }
 
     const user = await userRepository.findById(userId);
     if (!user) throw new AppError("Người dùng không tồn tại", 404);
 
-    return await userRepository.update(userId, { 
-      role: role as Role 
+    return await userRepository.update(userId, { role });
+  },
+
+  // ===== SET PASSWORD =====
+  async setUserPassword(userId: number, pass: string) {
+    if (!pass) {
+      throw new AppError("Mật khẩu không được để trống", 400);
+    }
+
+    const hashedPassword = await bcrypt.hash(pass, 10);
+
+    return await userRepository.update(userId, {
+      password: hashedPassword,
     });
   },
 
-  async setUserPassword(userId: number, pass: string) {
-    if (!pass) throw new AppError("Mật khẩu không được để trống", 400);
-    const hashedPassword = await bcrypt.hash(pass, 10);
-    return await userRepository.update(userId, { password: hashedPassword });
-  },
-
-  async getUserById(userId: number) {
-    const user = await userRepository.findById(userId);
-    if (!user) throw new AppError("Người dùng không tồn tại", 404);
-    return user;
-  },
-
+  // ===== DELETE USER =====
   async deleteUser(userId: number) {
     const user = await userRepository.findById(userId);
     if (!user) throw new AppError("Người dùng không tồn tại", 404);
 
     await prisma.user.delete({ where: { user_id: userId } });
+
     return { message: "Xóa người dùng thành công" };
   },
 
+  // ===== GET USERS (PAGINATION) =====
   async getUsers(page: number, limit: number, keyword?: string) {
     const skip = (page - 1) * limit;
 
@@ -80,8 +118,8 @@ export const userService = {
       ? {
           OR: [
             { email: { contains: keyword, mode: "insensitive" as any } },
-            { full_name: { contains: keyword, mode: "insensitive" as any } }
-          ]
+            { full_name: { contains: keyword, mode: "insensitive" as any } },
+          ],
         }
       : {};
 
@@ -95,8 +133,8 @@ export const userService = {
         full_name: true,
         email: true,
         role: true,
-        created_at: true
-      }
+        created_at: true,
+      },
     });
 
     const totalUsers = await prisma.user.count({ where });
@@ -107,28 +145,40 @@ export const userService = {
         currentPage: page,
         totalPages: Math.ceil(totalUsers / limit),
         totalUsers,
-        limit
-      }
+        limit,
+      },
     };
   },
 
+  // ===== CREATE USER BY ADMIN =====
   async createUserByAdmin(data: any) {
     const { email, password, full_name, role } = data;
-    if (!email || !password || !full_name || !role) throw new AppError("Vui lòng nhập đầy đủ thông tin", 400);
+
+    if (!email || !password || !full_name || !role) {
+      throw new AppError("Vui lòng nhập đầy đủ thông tin", 400);
+    }
+
+    if (!Object.values(Role).includes(role)) {
+      throw new AppError("Vai trò không hợp lệ", 400);
+    }
 
     const isExists = await userRepository.isEmailExists(email);
-    if (isExists) throw new AppError("Email này đã được sử dụng", 409);
+    if (isExists) {
+      throw new AppError("Email này đã được sử dụng", 409);
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+
     return await userRepository.create({
       email: email.trim().toLowerCase(),
       password: hashedPassword,
       full_name,
-      role: role as Role
+      role,
     });
-  }
+  },
 };
 
+// ===== Export giữ tương thích =====
 export const loginService = userService.login;
 export const registerService = userService.register;
 export const getUserById = userService.getUserById;

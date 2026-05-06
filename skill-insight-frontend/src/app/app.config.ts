@@ -1,4 +1,8 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import {
+  ApplicationConfig,
+  provideZoneChangeDetection,
+  provideBrowserGlobalErrorListeners,
+} from '@angular/core';
 import { provideRouter, withRouterConfig, withViewTransitions } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
@@ -7,20 +11,19 @@ import { authInterceptor } from './interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-
+    provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
 
+    // router nâng cao
     provideRouter(
       routes,
       withRouterConfig({
-        onSameUrlNavigation: 'reload'
+        onSameUrlNavigation: 'reload',
       }),
-     
-      withViewTransitions()
+      withViewTransitions(),
     ),
 
-    provideHttpClient(
-      withInterceptors([authInterceptor])
-    )
-  ]
+    // http + interceptor
+    provideHttpClient(withInterceptors([authInterceptor])),
+  ],
 };

@@ -7,24 +7,27 @@ import {
   setPassword,
   getMe,
   logout,
+  mezonCallback,
   getMezonUrl,
-  mezonCallback
 } from "../controllers/auth.controller";
+import { authService } from "../services/auth.service";
 
 const router = express.Router();
 
-console.log("AUTH ROUTES LOADED");
-
+// ===== AUTH BASIC =====
 router.post("/login", login);
 router.post("/register", register);
 router.post("/logout", logout);
 
+// ===== USER =====
 router.get("/me", getMe);
 
+// ===== USER MANAGEMENT =====
 router.post("/update-role", updateRole);
 router.post("/set-password", setPassword);
 
-router.get("/mezon", getMezonUrl);
+// ===== MEZON OAUTH =====
 router.get("/mezon/callback", mezonCallback);
+router.get("/mezon/url", getMezonUrl);
 
 export default router;

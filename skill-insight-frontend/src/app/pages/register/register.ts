@@ -11,13 +11,13 @@ import { environment } from '../../../environments/environment';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './register.html',
-  styleUrls: ['./register.css']
+  styleUrls: ['./register.css'],
 })
 export class RegisterComponent {
   loading = false;
   error = '';
-  successMessage = ''; 
-  
+  successMessage = '';
+
   showPopup = false;
   popupMessage = '';
   popupType: 'success' | 'error' = 'success';
@@ -31,18 +31,27 @@ export class RegisterComponent {
     password: new FormControl('', [
       Validators.required,
       Validators.minLength(8),
-      Validators.pattern(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/)
+      Validators.pattern(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/),
     ]),
     confirmPassword: new FormControl('', [Validators.required]),
-    acceptTerms: new FormControl(false)
+    acceptTerms: new FormControl(false),
   });
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+  ) {}
 
-  get f() { return this.registerForm.controls; }
+  get f() {
+    return this.registerForm.controls;
+  }
 
-  togglePassword() { this.showPassword = !this.showPassword; }
-  toggleConfirmPassword() { this.showConfirmPassword = !this.showConfirmPassword; }
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
+  toggleConfirmPassword() {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
 
   openPopup(message: string, type: 'success' | 'error' = 'success') {
     this.popupMessage = message;
@@ -93,24 +102,25 @@ export class RegisterComponent {
 
     const { full_name, email, password } = this.registerForm.value;
 
-    this.http.post(`${environment.apiUrl}/auth/register`, {
-      full_name,
-      email,
-      password
-    })
-    .pipe(finalize(() => this.loading = false))
-    .subscribe({
-      next: () => {
-        this.openPopup('Đăng ký thành công!', 'success');
+    this.http
+      .post(`${environment.apiUrl}/register`, {
+        full_name,
+        email,
+        password,
+      })
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: () => {
+          this.openPopup('Đăng ký thành công!', 'success');
 
-        setTimeout(() => {
-          this.router.navigate(['/login']);
-        }, 1500);
-      },
-      error: (err) => {
-        this.openPopup(err?.error?.message || 'Đăng ký thất bại', 'error');
-      }
-    });
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 1500);
+        },
+        error: (err) => {
+          this.openPopup(err?.error?.message || 'Đăng ký thất bại', 'error');
+        },
+      });
   }
 
   goLogin() {
