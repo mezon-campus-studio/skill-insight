@@ -14,10 +14,10 @@ export interface AuthRequest extends Request {
 export const verifyToken = (
   req: AuthRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
-    const token = req.cookies?.token;
+    const token = req.cookies?.accessToken;
 
     if (!token) {
       throw new AppError("Chưa đăng nhập", 401);
@@ -29,6 +29,7 @@ export const verifyToken = (
     };
 
     req.user = decoded;
+    console.log("USER:", req.user);
 
     next();
   } catch (error) {
@@ -45,5 +46,27 @@ export const requireRole = (...roles: string[]) => {
     }
 
     next();
+  };
+};
+export const requireOwnership = (getResource: Function) => {
+  return async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const resource = await getResource(req);
+
+      if (!resource) {
+        return next(new AppError("Không tìm thấy dữ liệu", 404));
+      }
+
+      if (
+        req.user?.role !== "admin" &&
+        resource.created_by !== req.user?.userId
+      ) {
+        return next(new AppError("Không có quyền", 403));
+      }
+
+      next();
+    } catch (err) {
+      next(err);
+    }
   };
 };

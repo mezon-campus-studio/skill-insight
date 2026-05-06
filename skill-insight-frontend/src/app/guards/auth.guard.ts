@@ -13,49 +13,30 @@ export const authGuard: CanActivateFn = (route, state) => {
     return router.createUrlTree(['/login']);
   }
 
-  // try {
-  //   // decode JWT
-  //   const payload = JSON.parse(atob(token.split('.')[1]));
-  //   const exp = payload.exp * 1000;
-
-  //   if (Date.now() > exp) {
-  //     localStorage.clear();
-  //     return router.createUrlTree(['/login']);
-  //   }
-  // } catch {
-  //   localStorage.clear();
-  //   return router.createUrlTree(['/login']);
-  // }
   return auth.getMe().pipe(
     map((res: any) => {
-      const user = res?.user;
-
-      if (!user) {
+      if (!res?.success || !res?.user) {
+        auth.clearUser();
         return router.createUrlTree(['/login']);
       }
 
       //lưu user
+      const user = res.user;
       auth.saveUser(user);
-
-      //role flow
-      if (!user.role) {
+      //check role
+      const role = user.role;
+      if (!role) {
         if (state.url === '/select-role') {
           return true;
         }
         return router.createUrlTree(['/select-role']);
       }
-
-      //role permission
-      const roles = route.data?.['roles'] as string[];
-
-      if (roles && !roles.includes(user.role)) {
-        return router.createUrlTree(['/dashboard']);
+      if (state.url === '/select-role') {
+        return router.createUrlTree(['/subject']);
       }
 
       return true;
     }),
-    catchError(() => {
-      return of(router.createUrlTree(['/login']));
-    }),
+    catchError(() => of(router.createUrlTree(['/login']))),
   );
 };

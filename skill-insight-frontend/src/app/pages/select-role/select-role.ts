@@ -9,7 +9,7 @@ import { finalize } from 'rxjs';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './select-role.html',
-  styleUrls: ['./select-role.css']
+  styleUrls: ['./select-role.css'],
 })
 export class SelectRoleComponent implements OnInit {
   user: any = null;
@@ -17,24 +17,21 @@ export class SelectRoleComponent implements OnInit {
 
   constructor(
     private auth: AuthService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit() {
-    this.auth.getMe().subscribe({
-      next: (res: any) => {
-        if (!res?.user) {
-          this.router.navigate(['/login']);
-          return;
-        }
+    const user = this.auth.getUser();
 
-        this.user = {
-          ...res.user,
-          user_id: res.user.user_id || res.user.userId
-        };
-      },
-      error: () => this.router.navigate(['/login'])
-    });
+    if (!user) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.user = {
+      ...user,
+      user_id: user.user_id || user.userId,
+    };
   }
 
   selectRole(role: 'teacher' | 'student') {
@@ -43,23 +40,24 @@ export class SelectRoleComponent implements OnInit {
     this.loading = true;
     const payload = {
       userId: this.user.user_id,
-      role: role
+      role: role,
     };
 
-    this.auth.updateRole(payload).pipe(
-      finalize(() => this.loading = false)
-    ).subscribe({
-      next: (res: any) => {
-       
-        const updatedUser = { ...this.user, role: role };
-        this.auth.saveUser(updatedUser);
-        
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        alert(err?.error?.message || 'Không thể cập nhật vai trò, vui lòng thử lại');
-      }
-    });
+    this.auth
+      .updateRole(payload)
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: (res: any) => {
+          const updatedUser = { ...this.user, role: role };
+          this.auth.saveUser(updatedUser);
+
+          //this.router.navigate(['/dashboard']);
+          this.router.navigate(['/subject']);
+        },
+        error: (err) => {
+          alert(err?.error?.message || 'Không thể cập nhật vai trò, vui lòng thử lại');
+        },
+      });
   }
 
   logout() {

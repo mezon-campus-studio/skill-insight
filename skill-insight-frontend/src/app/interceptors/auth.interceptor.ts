@@ -7,29 +7,30 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const token = localStorage.getItem('access_token');
 
-  let authReq = req.clone({
-    withCredentials: true,
-  });
+  const isPublicApi =
+    req.url.includes('/login') ||
+    req.url.includes('/register') ||
+    req.url.includes('/callback') ||
+    req.url.includes('/auth/mezon');
+  let headers = req.headers;
 
-  if (token) {
-    authReq = authReq.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  if (token && !isPublicApi) {
+    headers = headers.set('Authorization', `Bearer ${token}`);
   }
-
+  const authReq = req.clone({
+    withCredentials: true,
+    headers,
+  });
   return next(authReq).pipe(
     catchError((err) => {
       if (err.status === 401) {
-        const isAuthPage = router.url.includes('/login') || router.url.includes('/callback');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user');
 
-        if (!isAuthPage) {
-          localStorage.removeItem('access_token');
+        if (!router.url.includes('/login')) {
           router.navigate(['/login']);
         }
       }
-
       return throwError(() => err);
     }),
   );

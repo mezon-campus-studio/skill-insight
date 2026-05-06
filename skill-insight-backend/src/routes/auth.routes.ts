@@ -10,7 +10,6 @@ import {
   mezonCallback,
   getMezonUrl,
 } from "../controllers/auth.controller";
-import { authService } from "../services/auth.service";
 
 const router = express.Router();
 

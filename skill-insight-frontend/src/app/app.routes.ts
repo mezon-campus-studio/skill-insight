@@ -40,6 +40,7 @@ export const routes: Routes = [
 
   {
     path: 'subject',
+    canActivate: [authGuard],
     component: Subject,
   },
 

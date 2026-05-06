@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class SubjectService {
   private apiUrl = environment.API_SUBJECT;
   constructor(private http: HttpClient) {}
-  //Get all
+
   // GET all
   getAll(): Observable<any> {
     return this.http.get(this.apiUrl);

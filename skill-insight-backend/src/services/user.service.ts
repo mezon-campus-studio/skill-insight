@@ -59,7 +59,7 @@ export const userService = {
       full_name,
       email: email.trim().toLowerCase(),
       password: hashedPassword,
-      role: Role.student, // ✅ FIX QUAN TRỌNG (không dùng null)
+      role: null,
     });
   },
 

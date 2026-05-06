@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SubjectService } from '../../services/subject.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '@services/auth.service';
 
 @Component({
   selector: 'app-subject',
@@ -10,11 +11,16 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './subject.html',
   styleUrl: './subject.css',
 })
-export class Subject {
+export class Subject implements OnInit {
   view: string = 'list';
   subjects: any[] = [];
 
-  constructor(private subjectService: SubjectService) {}
+  user: any;
+
+  constructor(
+    private subjectService: SubjectService,
+    private authService: AuthService,
+  ) {}
 
   // ===== FORM DATA =====
   newSubject = {
@@ -22,13 +28,17 @@ export class Subject {
     description: '',
   };
 
-  deleteId: number | null = null;
-
   updateSubjectData = {
     id: null as number | null,
     subject_name: '',
     description: '',
   };
+
+  // ===== INIT =====
+  ngOnInit() {
+    this.user = this.authService.getUser();
+    this.loadSubjects();
+  }
 
   // ===== VIEW =====
   showList() {
@@ -40,22 +50,16 @@ export class Subject {
     this.view = 'add';
   }
 
-  showDelete() {
-    this.view = 'delete';
-  }
-
-  showUpdate() {
-    this.view = 'update';
-  }
-
   // ===== API =====
   loadSubjects() {
     this.subjectService.getAll().subscribe((res) => {
-      this.subjects = res;
+      this.subjects = res.data || res;
     });
   }
 
   addSubject() {
+    if (!this.newSubject.subject_name) return;
+
     this.subjectService.add(this.newSubject).subscribe(() => {
       this.newSubject = {
         subject_name: '',
@@ -65,13 +69,14 @@ export class Subject {
     });
   }
 
-  deleteSubject() {
-    if (!this.deleteId) return;
+  startUpdate(subject: any) {
+    this.view = 'update';
 
-    this.subjectService.delete(this.deleteId).subscribe(() => {
-      this.deleteId = null;
-      this.showList();
-    });
+    this.updateSubjectData = {
+      id: subject.subject_id,
+      subject_name: subject.subject_name,
+      description: subject.description,
+    };
   }
 
   updateSubject() {
@@ -90,5 +95,24 @@ export class Subject {
         };
         this.showList();
       });
+  }
+
+  deleteSubject(id: number) {
+    if (!confirm('Bạn chắc chắn muốn xóa?')) return;
+
+    this.subjectService.delete(id).subscribe(() => {
+      this.loadSubjects();
+    });
+  }
+
+  // ===== RBAC =====
+  canEdit(subject: any): boolean {
+    console.log('USER:', this.user);
+    console.log('SUBJECT:', this.subjects);
+    return this.user?.role === 'admin' || subject.created_by === this.user?.user_id;
+  }
+
+  canDelete(subject: any): boolean {
+    return this.canEdit(subject);
   }
 }

@@ -52,7 +52,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use((req: Request, res: Response, next: NextFunction) => {
   if (req.url.includes("/api/auth/me")) {
     console.log("Cookie nhận được:", req.cookies);
-    if (!req.cookies.accesstoken) {
+    if (!req.cookies.accessToken) {
       console.warn("Không có cookie 'token'!");
     }
   }

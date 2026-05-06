@@ -28,17 +28,7 @@ export class LoginComponent implements OnInit {
     private router: Router,
   ) {}
 
-  ngOnInit(): void {
-    // this.auth.getMe().subscribe({
-    //   next: (res: any) => {
-    //     if (res?.success && res?.user) {
-    //       this.auth.saveUser(res.user);
-    //       this.navigateToNextStep(res.user);
-    //     }
-    //   },
-    //   error: () => console.log('Hệ thống sẵn sàng cho đăng nhập mới.'),
-    // });
-  }
+  ngOnInit(): void {}
 
   onLogin(): void {
     if (this.loginForm.invalid) {
@@ -56,15 +46,19 @@ export class LoginComponent implements OnInit {
 
     this.auth
       .login(credentials)
-      .pipe(
-        //switchMap(() => this.auth.getMe()),
-        finalize(() => (this.loading = false)),
-      )
+      .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: (res: any) => {
           if (res?.user) {
             this.auth.saveUser(res.user);
-            this.navigateToNextStep(res.user);
+            const role = res.user?.role;
+            if (!role || role.trim() === '') {
+              this.router.navigate(['/select-role']);
+            } else if (role === 'teacher' || role === 'admin') {
+              this.router.navigate(['/subject']);
+            } else {
+              this.router.navigate(['/home']);
+            }
           }
         },
         error: (err: any) => {
@@ -83,14 +77,6 @@ export class LoginComponent implements OnInit {
 
   login() {
     this.auth.loginWithMezon();
-  }
-  private navigateToNextStep(user: any): void {
-    // Nếu user mới chưa chọn vai trò (Student/Teacher)
-    if (!user.role) {
-      this.router.navigate(['/select-role']);
-    } else {
-      this.router.navigate(['/dashboard']);
-    }
   }
 
   get f() {

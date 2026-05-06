@@ -79,14 +79,24 @@ export class AuthService {
 
   updateProfile(data: any): Observable<any> {
     return this.http
-      .put(`${this.AUTH_API}/profile`, data, {
-        withCredentials: true,
+      .put<any>(`${this.AUTH_API}/profile`, data, {
+        withCredentials: true, // chỉ giữ nếu bạn dùng cookie auth
       })
       .pipe(
-        tap((res: any) => {
+        tap((res) => {
           if (res?.success && res?.user) {
             this.saveUser(res.user);
           }
+        }),
+        catchError((err) => {
+          console.error('Update profile failed:', err);
+
+          // xử lý 401 token hết hạn
+          if (err?.status === 401) {
+            this.logout?.(); // nếu bạn có hàm logout
+          }
+
+          return throwError(() => err);
         }),
       );
   }

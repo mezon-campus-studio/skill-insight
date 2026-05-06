@@ -50,7 +50,6 @@ export const authService = {
     if (!isMatch) {
       throw new AppError("Thông tin đăng nhập không chính xác", 401);
     }
-
     return buildAuthResponse(user);
   },
 
@@ -95,7 +94,7 @@ export const authService = {
             full_name: name,
             email,
             password: null,
-            role: "student",
+            role: null,
             provider_id: mezonUserId,
           },
         });
