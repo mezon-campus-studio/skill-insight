@@ -1,16 +1,34 @@
-<button (click)="showList()">Hiển thị danh sách</button>
+<button (click)="showList()">Danh sách</button>
 <button (click)="showAdd()">Thêm</button>
-<button (click)="showDelete()">Xóa</button>
-<button (click)="showUpdate()">Cập nhật</button>
 
 <hr />
 
+<!-- LIST -->
 <div *ngIf="view === 'list'">
   <h3>Danh sách môn học</h3>
 
-  <ul>
-    <li *ngFor="let s of subjects">{{ s.id }} - {{ s.subject_name }} - {{ s.description }}</li>
-  </ul>
+  <table border="1" cellpadding="8">
+    <tr>
+      <th>ID</th>
+      <th>Tên</th>
+      <th>Mô tả</th>
+      <th>Action</th>
+    </tr>
+
+    <tr *ngFor="let s of subjects">
+      <td>{{ s.subject_id }}</td>
+      <td>{{ s.subject_name }}</td>
+      <td>{{ s.description }}</td>
+
+      <td>
+        <!-- EDIT -->
+        <button *ngIf="canEdit(s)" (click)="startUpdate(s)">Sửa</button>
+
+        <!-- DELETE -->
+        <button *ngIf="canDelete(s)" (click)="deleteSubject(s.subject_id)">Xóa</button>
+      </td>
+    </tr>
+  </table>
 </div>
 
 <!-- ADD -->
@@ -23,20 +41,10 @@
 
   <button (click)="addSubject()">Thêm</button>
 </div>
-<!-- DELETE -->
-<div *ngIf="view === 'delete'">
-  <h3>Xóa môn học</h3>
-
-  <input type="number" [(ngModel)]="deleteId" placeholder="ID cần xóa" />
-
-  <button (click)="deleteSubject()">Xóa</button>
-</div>
 
 <!-- UPDATE -->
 <div *ngIf="view === 'update'">
   <h3>Cập nhật môn học</h3>
-
-  <input type="number" [(ngModel)]="updateSubjectData.id" placeholder="ID" />
 
   <input type="text" [(ngModel)]="updateSubjectData.subject_name" placeholder="Tên mới" />
 

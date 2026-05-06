@@ -14,7 +14,7 @@ if (!JWT_SECRET || !JWT_REFRESH_SECRET) {
 export interface TokenPayload {
   userId: number;
   email?: string;
-  role: string;
+  role?: string;
   mezonId?: string | null;
 }
 
@@ -31,20 +31,17 @@ export const generateRefreshToken = (payload: TokenPayload): string => {
   });
 };
 
-// Alias cho code cũ (tránh vỡ project)
-export const generateToken = generateAccessToken;
-
 // ===== Verify =====
 export const verifyAccessToken = (token: string): TokenPayload => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
 
-    return {
-      userId: decoded.userId as number,
-      email: decoded.email as string,
-      role: decoded.role as string,
-      mezonId: decoded.mezonId as string | null,
-    };
+    // return {
+    //   userId: decoded.userId as number,
+    //   email: decoded.email as string,
+    //   mezonId: decoded.mezonId as string | null,
+    // };
+    return decoded;
   } catch (err: any) {
     if (err.name === "TokenExpiredError") {
       throw new AppError("Access token hết hạn", 401);
@@ -60,7 +57,6 @@ export const verifyRefreshToken = (token: string): TokenPayload => {
     return {
       userId: decoded.userId as number,
       email: decoded.email as string,
-      role: decoded.role as string,
       mezonId: decoded.mezonId as string | null,
     };
   } catch (err: any) {

@@ -107,13 +107,13 @@ export const register = async (
     const accessToken = generateAccessToken({
       userId: user.user_id,
       email: user.email,
-      role: user.role,
+      role: user.role!,
     });
 
     const refreshToken = generateRefreshToken({
       userId: user.user_id,
       email: user.email,
-      role: user.role,
+      role: user.role!,
     });
 
     res.cookie("accessToken", accessToken, accessTokenCookie);

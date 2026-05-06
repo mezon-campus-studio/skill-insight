@@ -1,39 +1,53 @@
 import { Request, Response } from "express";
 import { subjectService } from "../services/subject.service";
-export const createSubject = async (req: Request, res: Response) => {
+import { AuthRequest } from "../middlewares/auth.middleware";
+export const createSubject = async (req: AuthRequest, res: Response) => {
   try {
-    const subject = await subjectService.createSubject(req.body);
+    const subject = await subjectService.createSubject(
+      req.body,
+      req.user!.userId,
+    );
     res.status(201).json(subject);
   } catch (error) {
-    res.status(500).json({ message: "Create failed" });
+    return res.status(500).json({
+      message: "Tạo môn học thất bại",
+    });
   }
 };
-export const getSubjects = async (req: Request, res: Response) => {
+export const getSubjects = async (req: AuthRequest, res: Response) => {
   const subjects = await subjectService.getAllSubjects();
   res.json(subjects);
 };
-export const updateSubject = async (req: Request, res: Response) => {
+export const updateSubject = async (req: AuthRequest, res: Response) => {
   try {
     const id = Number(req.params.id);
     if (!id) {
-      return res.status(400).json({ message: "Invalid id" });
+      return res.status(400).json({
+        message: "ID không hợp lệ",
+      });
     }
-    const subject = await subjectService.updateSubject(id, req.body);
+    const subject = await subjectService.updateSubject(id, req.body, req.user!);
     res.json(subject);
   } catch {
-    res.status(500).json({ message: "Update failed" });
+    return res.status(500).json({
+      message: "Cập nhật môn học thất bại",
+    });
   }
 };
 
-export const deleteSubject = async (req: Request, res: Response) => {
+export const deleteSubject = async (req: AuthRequest, res: Response) => {
   try {
     const id = Number(req.params.id);
     if (!id) {
-      return res.status(400).json({ message: "Invalid id" });
+      return res.status(400).json({
+        message: "ID không hợp lệ",
+      });
     }
-    await subjectService.deleteSubject(id);
-    res.json({ message: "Deleted successfully" });
+    await subjectService.deleteSubject(id, req.user!);
+    res.json({ message: "Đã xóa môn học" });
   } catch {
-    res.status(500).json({ message: "Delete failed" });
+    return res.status(500).json({
+      message: "Xóa môn học thất bại",
+    });
   }
 };

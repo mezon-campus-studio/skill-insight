@@ -19,7 +19,7 @@ model User {
   email       String   @unique @db.VarChar(255)
   password    String?  @db.VarChar(255)
 
-  role        Role     @default(student) 
+  role        Role?   
 
   provider_id String?  @db.VarChar(255)
   status      Boolean  @default(true)
@@ -27,15 +27,23 @@ model User {
   created_at  DateTime @default(now()) @map("created_at")
   updated_at  DateTime @updatedAt @map("updated_at")
 
+  // relation
+  subjects    Subject[]
+
   @@map("users")
 }
 
 model Subject {
   subject_id   Int      @id @default(autoincrement())
-  subject_name String   @db.VarChar(255)
+  subject_name String   @db.VarChar(255) @unique
   description  String?  @db.Text
+
+  created_by   Int
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
+
+  // relation
+  user         User     @relation(fields: [created_by], references: [user_id])
 
   @@map("subjects")
 }

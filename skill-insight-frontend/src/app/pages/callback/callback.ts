@@ -41,6 +41,7 @@ export class CallbackComponent implements OnInit {
         }
       },
       error: () => {
+        localStorage.removeItem('access_token');
         this.router.navigate(['/login']);
       },
     });

@@ -3,14 +3,14 @@ import { inject } from '@angular/core';
 
 export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const router = inject(Router);
-
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const requiredRole = route.data?.['role'];
+  const allowedRoles: string[] = route.data?.['roles'];
 
-  if (user?.role === requiredRole) {
+  if (!allowedRoles) return true;
+
+  if (allowedRoles.includes(user?.role)) {
     return true;
   }
 
-  router.navigate(['/login']);
-  return false;
+  return router.createUrlTree(['/login']);
 };
