@@ -1,4 +1,3 @@
-
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -12,10 +11,9 @@ import { environment } from '../../../environments/environment';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './set-password.html',
-  styleUrls: ['./set-password.css']
+  styleUrls: ['./set-password.css'],
 })
 export class SetPasswordComponent {
-
   password = '';
   confirmPassword = '';
   error = '';
@@ -33,7 +31,7 @@ export class SetPasswordComponent {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
   ) {
     const userStr = localStorage.getItem('user');
     this.user = userStr ? JSON.parse(userStr) : null;
@@ -51,12 +49,7 @@ export class SetPasswordComponent {
   }
 
   isValidPassword(): boolean {
-    return (
-      this.hasMinLength &&
-      this.hasUppercase &&
-      this.hasNumber &&
-      this.hasSpecial
-    );
+    return this.hasMinLength && this.hasUppercase && this.hasNumber && this.hasSpecial;
   }
 
   submit() {
@@ -81,26 +74,25 @@ export class SetPasswordComponent {
 
     this.loading = true;
 
-    this.http.post(
-      `${environment.apiUrl}/auth/set-password`,
-      {
+    this.http
+      .post(`${environment.apiUrl}/auth/set-password`, {
         userId: this.user.userId,
-        password: this.password
-      }
-    ).subscribe({
-      next: () => {
-        this.loading = false;
+        password: this.password,
+      })
+      .subscribe({
+        next: () => {
+          this.loading = false;
 
-        if (!this.user.role) {
-          this.router.navigate(['/select-role']);
-        } else {
-          this.router.navigate(['/dashboard']);
-        }
-      },
-      error: (err) => {
-        this.loading = false;
-        this.error = err?.error?.message || 'Lỗi server';
-      }
-    });
+          if (!this.user.role) {
+            this.router.navigate(['/select-role']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
+        },
+        error: (err) => {
+          this.loading = false;
+          this.error = err?.error?.message || 'Lỗi server';
+        },
+      });
   }
 }
