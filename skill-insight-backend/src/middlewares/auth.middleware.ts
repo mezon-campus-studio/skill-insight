@@ -29,7 +29,6 @@ export const verifyToken = (
     };
 
     req.user = decoded;
-    console.log("USER:", req.user);
 
     next();
   } catch (error) {
@@ -44,7 +43,6 @@ export const requireRole = (...roles: string[]) => {
     if (!user || !roles.includes(user.role)) {
       return next(new AppError("Không có quyền truy cập", 403));
     }
-
     next();
   };
 };

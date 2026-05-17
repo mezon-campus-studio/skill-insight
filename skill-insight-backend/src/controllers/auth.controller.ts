@@ -8,25 +8,23 @@ import {
 } from "../utils/jwt";
 import { AppError } from "../utils/appError";
 
-// ===== Cookie config =====
+//Cookie config
 const cookieOptions = {
   httpOnly: true,
-  secure: false, // production -> true
+  secure: false,
   sameSite: "lax" as const,
   path: "/",
 };
-
 const accessTokenCookie = {
   ...cookieOptions,
   maxAge: 24 * 60 * 60 * 1000, // 1 day
 };
-
 const refreshTokenCookie = {
   ...cookieOptions,
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
-// ===== Extract token =====
+//Extract token
 const extractToken = (req: Request): string | null => {
   const authHeader = req.headers.authorization;
   if (authHeader?.startsWith("Bearer ")) {
@@ -35,11 +33,10 @@ const extractToken = (req: Request): string | null => {
   return req.cookies?.accessToken || null;
 };
 
-// ===== OAuth callback =====
+//OAuth callback
 export const mezonCallback = async (req: Request, res: Response) => {
   try {
     const { code, state } = req.query;
-
     if (!code) {
       return res.status(400).json({ message: "Missing code" });
     }
@@ -50,7 +47,6 @@ export const mezonCallback = async (req: Request, res: Response) => {
       code as string,
       state as string,
     );
-
     return res.redirect(
       `${process.env.REDIRECT_URI}?token=${result.accessToken}`,
     );
@@ -59,8 +55,8 @@ export const mezonCallback = async (req: Request, res: Response) => {
     return res.status(500).json({ message: error.message });
   }
 };
-// ===== URL OAuth ====
-export const getMezonUrl = async (req: Request, res: Response) => {
+//URL OAuth
+export const getMezonUrl = async (res: Response) => {
   try {
     const url = await authService.getAuthUrl();
     return res.json({ success: true, url });
@@ -68,7 +64,7 @@ export const getMezonUrl = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Lỗi tạo URL OAuth" });
   }
 };
-// ===== Login =====
+//Login
 export const login = async (
   req: Request,
   res: Response,
@@ -95,7 +91,7 @@ export const login = async (
   }
 };
 
-// ===== Register =====
+//Register
 export const register = async (
   req: Request,
   res: Response,
@@ -128,7 +124,7 @@ export const register = async (
   }
 };
 
-// ===== Get current user =====
+//Get current user
 export const getMe = async (
   req: Request,
   res: Response,
@@ -147,14 +143,14 @@ export const getMe = async (
   }
 };
 
-// ===== Logout =====
+//Logout
 export const logout = (req: Request, res: Response) => {
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
   return res.json({ success: true });
 };
 
-// ===== Update role =====
+//Update role
 export const updateRole = async (
   req: Request,
   res: Response,
@@ -168,14 +164,29 @@ export const updateRole = async (
     const { role } = req.body;
 
     const user = await userService.updateUserRole(decoded.userId, role);
+    // TẠO TOKEN MỚI
+    const accessToken = generateAccessToken({
+      userId: user.user_id,
+      email: user.email,
+      role: user.role!,
+    });
 
+    const refreshToken = generateRefreshToken({
+      userId: user.user_id,
+      email: user.email,
+      role: user.role!,
+    });
+    // SET COOKIE MỚI
+    res.cookie("accessToken", accessToken, accessTokenCookie);
+
+    res.cookie("refreshToken", refreshToken, refreshTokenCookie);
     return res.json({ success: true, user });
   } catch (error) {
     next(error);
   }
 };
 
-// ===== Set password =====
+//Set password
 export const setPassword = async (
   req: Request,
   res: Response,
