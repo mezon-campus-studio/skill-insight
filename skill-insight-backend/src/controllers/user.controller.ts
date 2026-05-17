@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import * as userService from "../services/user.service";
 
-// ===== Disable cache =====
+//Disable cache
 const disableCache = (res: Response) => {
   res.setHeader(
     "Cache-Control",
@@ -12,7 +12,7 @@ const disableCache = (res: Response) => {
   res.setHeader("Surrogate-Control", "no-store");
 };
 
-// ===== Get single user =====
+//Get single user
 export const getUser = async (
   req: Request,
   res: Response,
@@ -21,7 +21,7 @@ export const getUser = async (
   try {
     const id = Number(req.params.id);
 
-    // validate ID (giữ từ HEAD)
+    // validate ID
     if (isNaN(id) || id <= 0) {
       return res.status(400).json({
         success: false,
@@ -43,7 +43,7 @@ export const getUser = async (
   }
 };
 
-// ===== Get list users =====
+//Get list users
 export const getUsers = async (
   req: Request,
   res: Response,
@@ -68,7 +68,7 @@ export const getUsers = async (
   }
 };
 
-// ===== Update role (user tự chọn) =====
+//Update role (user tự chọn)
 export const updateRole = async (
   req: any,
   res: Response,
@@ -106,7 +106,7 @@ export const updateRole = async (
   }
 };
 
-// ===== Admin update role =====
+//Admin update role
 export const updateUserRoleByAdmin = async (
   req: Request,
   res: Response,
@@ -144,7 +144,7 @@ export const updateUserRoleByAdmin = async (
   }
 };
 
-// ===== Delete user =====
+//Delete user
 export const deleteUserByAdmin = async (
   req: Request,
   res: Response,
@@ -173,7 +173,7 @@ export const deleteUserByAdmin = async (
   }
 };
 
-// ===== Create user =====
+//Create user
 export const createUserByAdmin = async (
   req: Request,
   res: Response,

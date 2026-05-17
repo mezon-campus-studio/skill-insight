@@ -19,7 +19,7 @@ model User {
   email       String   @unique @db.VarChar(255)
   password    String?  @db.VarChar(255)
 
-  role        Role?   
+  role        Role?
 
   provider_id String?  @db.VarChar(255)
   status      Boolean  @default(true)
@@ -35,15 +35,23 @@ model User {
 
 model Subject {
   subject_id   Int      @id @default(autoincrement())
-  subject_name String   @db.VarChar(255) @unique
+
+  subject_name String   @db.VarChar(255)
+
   description  String?  @db.Text
 
   created_by   Int
+
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
 
   // relation
-  user         User     @relation(fields: [created_by], references: [user_id])
+  user User @relation(fields: [created_by],references: [user_id])
+
+  // cùng teacher không được trùng môn
+  @@unique([subject_name, created_by])
+
+  @@index([created_by])
 
   @@map("subjects")
 }

@@ -14,7 +14,7 @@ import { Request } from "express";
 import { subjectService } from "../services/subject.service";
 const router = express.Router();
 // GET: tất cả đều xem được
-router.get("/", verifyToken, getSubjects);
+router.get("/", verifyToken, requireRole("admin", "teacher"), getSubjects);
 // CREATE: admin + teacher
 router.post("/", verifyToken, requireRole("admin", "teacher"), createSubject);
 // UPDATE

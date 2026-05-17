@@ -107,8 +107,6 @@ export class Subject implements OnInit {
 
   // ===== RBAC =====
   canEdit(subject: any): boolean {
-    console.log('USER:', this.user);
-    console.log('SUBJECT:', this.subjects);
     return this.user?.role === 'admin' || subject.created_by === this.user?.user_id;
   }
 

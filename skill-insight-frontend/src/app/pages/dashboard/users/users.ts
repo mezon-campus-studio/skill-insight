@@ -1,7 +1,4 @@
-import {
-  Component,
-  OnInit
-} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,15 +10,11 @@ import { UserService } from '../../../services/user.service';
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule
-  ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './users.html',
-  styleUrls: ['./users.css']
+  styleUrls: ['./users.css'],
 })
 export class UsersComponent implements OnInit {
-
   users: any[] = [];
 
   currentPage = 1;
@@ -38,14 +31,14 @@ export class UsersComponent implements OnInit {
     full_name: '',
     email: '',
     password: '',
-    role: 'student'
+    role: 'student',
   };
 
   creating = false;
 
   constructor(
     private userService: UserService,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -53,40 +46,32 @@ export class UsersComponent implements OnInit {
   }
 
   loadUsers(page: number = 1): void {
-
     this.loading = true;
 
-    this.userService
-      .getUsers(page, this.limit, this.searchKeyword)
-      .subscribe({
-        next: (res: any) => {
+    this.userService.getUsers(page, this.limit, this.searchKeyword).subscribe({
+      next: (res: any) => {
+        const data = res?.data || {};
 
-          console.log("📦 USERS RESPONSE:", res);
+        this.users = data.users || [];
 
-          const data = res?.data || {};
+        this.currentPage = data.pagination?.currentPage || 1;
 
-          this.users = data.users || [];
+        this.totalPages = data.pagination?.totalPages || 1;
 
-          this.currentPage =
-            data.pagination?.currentPage || 1;
+        this.loading = false;
+      },
 
-          this.totalPages =
-            data.pagination?.totalPages || 1;
+      error: (err: HttpErrorResponse) => {
+        console.error('LOAD USERS ERROR:', err);
 
-          this.loading = false;
-        },
+        this.loading = false;
+        this.users = [];
 
-        error: (err: HttpErrorResponse) => {
-          console.error('LOAD USERS ERROR:', err);
-
-          this.loading = false;
-          this.users = [];
-
-          if (err.status === 401) {
-            this.router.navigate(['/login']);
-          }
+        if (err.status === 401) {
+          this.router.navigate(['/login']);
         }
-      });
+      },
+    });
   }
 
   onSearch(): void {
@@ -94,11 +79,7 @@ export class UsersComponent implements OnInit {
   }
 
   changePage(page: number): void {
-    if (
-      page < 1 ||
-      page > this.totalPages ||
-      page === this.currentPage
-    ) return;
+    if (page < 1 || page > this.totalPages || page === this.currentPage) return;
 
     this.loadUsers(page);
   }
@@ -112,103 +93,87 @@ export class UsersComponent implements OnInit {
   }
 
   createUser(): void {
-
     if (this.creating) return;
 
-    if (
-      !this.newUser.full_name ||
-      !this.newUser.email ||
-      !this.newUser.password
-    ) {
+    if (!this.newUser.full_name || !this.newUser.email || !this.newUser.password) {
       alert('Vui lòng nhập đầy đủ thông tin');
       return;
     }
 
     this.creating = true;
 
-    this.userService
-      .createUser(this.newUser)
-      .subscribe({
-        next: () => {
+    this.userService.createUser(this.newUser).subscribe({
+      next: () => {
+        alert('Tạo user thành công');
 
-          alert('Tạo user thành công');
+        this.newUser = {
+          full_name: '',
+          email: '',
+          password: '',
+          role: 'student',
+        };
 
-          this.newUser = {
-            full_name: '',
-            email: '',
-            password: '',
-            role: 'student'
-          };
+        this.loadUsers(1);
 
-          this.loadUsers(1);
+        this.creating = false;
+      },
 
-          this.creating = false;
-        },
+      error: (err: HttpErrorResponse) => {
+        console.error('CREATE USER ERROR:', err);
 
-        error: (err: HttpErrorResponse) => {
-          console.error('CREATE USER ERROR:', err);
+        alert(err.error?.message || 'Tạo user thất bại');
 
-          alert(err.error?.message || 'Tạo user thất bại');
-
-          this.creating = false;
-        }
-      });
+        this.creating = false;
+      },
+    });
   }
 
   saveRole(user: any): void {
-
     const id = user.user_id;
 
     if (this.savingMap[id]) return;
 
     this.savingMap[id] = true;
 
-    this.userService
-      .updateRole(id, user.role)
-      .subscribe({
-        next: () => {
-          alert('Cập nhật quyền thành công');
+    this.userService.updateRole(id, user.role).subscribe({
+      next: () => {
+        alert('Cập nhật quyền thành công');
 
-          this.loadUsers(this.currentPage);
+        this.loadUsers(this.currentPage);
 
-          this.savingMap[id] = false;
-        },
+        this.savingMap[id] = false;
+      },
 
-        error: (err: HttpErrorResponse) => {
-          console.error('UPDATE ROLE ERROR:', err);
+      error: (err: HttpErrorResponse) => {
+        console.error('UPDATE ROLE ERROR:', err);
 
-          alert(err.error?.message || 'Lỗi cập nhật quyền');
+        alert(err.error?.message || 'Lỗi cập nhật quyền');
 
-          this.savingMap[id] = false;
-        }
-      });
+        this.savingMap[id] = false;
+      },
+    });
   }
 
   deleteUser(user: any): void {
-
     const id = user.user_id;
 
-    const confirmDelete = confirm(
-      `Bạn có chắc muốn xóa user "${user.full_name}"?`
-    );
+    const confirmDelete = confirm(`Bạn có chắc muốn xóa user "${user.full_name}"?`);
 
     if (!confirmDelete) return;
 
-    this.userService
-      .deleteUser(id)
-      .subscribe({
-        next: () => {
-          alert('Xóa user thành công');
+    this.userService.deleteUser(id).subscribe({
+      next: () => {
+        alert('Xóa user thành công');
 
-          this.loadUsers(this.currentPage);
-        },
+        this.loadUsers(this.currentPage);
+      },
 
-        error: (err: HttpErrorResponse) => {
-          console.error('DELETE USER ERROR:', err);
+      error: (err: HttpErrorResponse) => {
+        console.error('DELETE USER ERROR:', err);
 
-          alert(err.error?.message || 'Xóa user thất bại');
-        }
-      });
+        alert(err.error?.message || 'Xóa user thất bại');
+      },
+    });
   }
 
   // ======================
@@ -219,9 +184,6 @@ export class UsersComponent implements OnInit {
   }
 
   get pages(): number[] {
-    return Array.from(
-      { length: this.totalPages },
-      (_, i) => i + 1
-    );
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 }
