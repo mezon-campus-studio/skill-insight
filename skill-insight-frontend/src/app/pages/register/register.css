@@ -1,0 +1,89 @@
+/* ===== INPUT ===== */
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb; /* gray-200 */
+  border-radius: 12px;
+  outline: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  border-color: #3b82f6; /* blue-500 */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+/* ===== LABEL ===== */
+.label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #374151; /* gray-700 */
+}
+
+/* ===== BUTTON ===== */
+.btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(to right, #3b82f6, #2563eb);
+  color: white;
+  border-radius: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== EYE ICON ===== */
+.eye {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  stroke: #6b7280; /* gray-500 */
+  fill: none;
+}
+
+/* ===== TOAST ANIMATION ===== */
+.animate-fade {
+  animation: fadeInOut 3s ease-in-out;
+}
+
+/* ===== KEYFRAMES ===== */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* ===== OPTIONAL: SMOOTH TRANSITION ===== */
+* {
+  transition: all 0.15s ease-in-out;
+}

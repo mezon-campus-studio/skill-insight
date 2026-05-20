@@ -1,0 +1,34 @@
+
+.nav-item {
+  @apply flex items-center p-3.5 rounded-2xl transition-all duration-300 mb-1 mx-1 text-slate-400 border border-transparent;
+}
+
+.nav-item:hover {
+  @apply bg-white/5 text-blue-400 border-white/5;
+}
+
+.active-link {
+  @apply bg-blue-600 text-white shadow-xl shadow-blue-900/40 border-blue-500/30 font-black !important;
+}
+
+.dropdown-item {
+  @apply w-full text-left px-5 py-3 text-sm text-slate-600 hover:bg-blue-50 transition-all flex items-center gap-4 font-bold;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-slate-700 rounded-full;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-down {
+  animation: fadeInDown 0.3s ease-out;
+}
