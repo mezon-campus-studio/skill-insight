@@ -1,109 +1,63 @@
-.users-page {
-  padding: 24px;
+/* 1. THẺ THỐNG KÊ (STAT CARDS) */
+.stat-card {
+  @apply bg-white p-5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer 
+         hover:shadow-md hover:-translate-y-0.5 transition-all duration-200;
 }
 
-.page-header {
-  margin-bottom: 24px;
+/* Hiệu ứng khi thẻ thống kê được chọn */
+.active-stat {
+  @apply ring-2 ring-indigo-500 bg-white border-transparent shadow-indigo-100 shadow-lg;
 }
 
-.page-header h2 {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 6px;
+/* 2. HỆ THỐNG TAB LỌC */
+.tab-btn {
+  @apply px-5 py-2 text-xs font-bold text-slate-500 rounded-xl transition-all duration-200 
+         flex-1 md:flex-none hover:text-indigo-600;
 }
 
-.page-header p {
-  font-size: 14px;
-  color: #64748b;
+/* Hiệu ứng khi Tab được chọn */
+.active-tab {
+  @apply bg-white text-indigo-600 shadow-sm ring-1 ring-slate-200/50;
 }
 
-.table-wrapper {
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
-  overflow-x: auto;
+/* 3. ĐIỀU HƯỚNG PHÂN TRANG */
+.page-nav-btn {
+  @apply px-4 py-2 bg-white border border-slate-200 rounded-xl text-[11px] font-bold 
+         text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 
+         disabled:opacity-30 disabled:cursor-not-allowed transition-all;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
+.page-num-btn {
+  @apply w-9 h-9 flex items-center justify-center rounded-xl text-[11px] font-bold 
+         text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-all;
 }
 
-thead {
-  background: #f8fafc;
+/* Hiệu ứng khi số trang hiện tại được chọn */
+.active-page {
+  @apply bg-indigo-600 text-white shadow-lg shadow-indigo-200 scale-110;
 }
 
-th {
-  text-align: left;
-  padding: 14px;
-  font-size: 14px;
-  color: #334155;
-  border-bottom: 1px solid #e2e8f0;
+/* 4. TÙY CHỈNH TABLE & FORM (BỔ TRỢ) */
+input[type="email"]:focus, 
+select:focus {
+  @apply ring-2 ring-indigo-500/20 border-transparent outline-none;
 }
 
-td {
-  padding: 14px;
-  font-size: 14px;
-  border-bottom: 1px solid #f1f5f9;
+/* Tạo độ bo tròn mượt hơn cho thanh cuộn trên mobile */
+.overflow-x-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f0 transparent;
 }
 
-.role-badge {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
+.overflow-x-auto::-webkit-scrollbar {
+  height: 4px;
 }
 
-.role-badge.admin {
-  background: #fee2e2;
-  color: #dc2626;
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full;
 }
 
-.role-badge.teacher {
-  background: #dbeafe;
-  color: #2563eb;
-}
-
-.role-badge.student {
-  background: #dcfce7;
-  color: #16a34a;
-}
-
-select {
-  padding: 8px 12px;
-  border: 1px solid #dbeafe;
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-  background: white;
-}
-
-.pagination {
-  margin-top: 24px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.pagination button {
-  min-width: 42px;
-  height: 42px;
-  border: none;
-  border-radius: 10px;
-  background: #f1f5f9;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.pagination button:hover {
-  transform: translateY(-1px);
-}
-
-.pagination button.active {
-  background: #2563eb;
-  color: white;
+/* Hiệu ứng hàng khi di chuột vào */
+tr.group:hover {
+  @apply cursor-default;
 }

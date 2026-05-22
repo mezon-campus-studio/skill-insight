@@ -5,14 +5,13 @@ import { AppError } from "../utils/appError";
 
 export const authService = {
 
+  // 1. Đăng nhập truyền thống
   async login(email: string, pass: string) {
     if (!email || !pass) {
       throw new AppError("Thiếu email hoặc password", 400);
     }
 
-    const user = await userRepository.findAuthUserByEmail(
-      email.trim().toLowerCase()
-    );
+    const user = await userRepository.findAuthUserByEmail(email.trim().toLowerCase());
 
     if (!user || !user.password) {
       throw new AppError("Thông tin đăng nhập không chính xác", 401);
@@ -27,12 +26,7 @@ export const authService = {
     return { ...safeUser, hasPassword: true };
   },
 
-  async getUserWithPassword(email: string) {
-    return await userRepository.findAuthUserByEmail(
-      email.trim().toLowerCase()
-    );
-  },
-
+  // 2. Xử lý logic Login Mezon (Bước 4, 5 flow Mentor)
   async handleMezonLogin(code: string, state: string) {
     try {
       if (!code) throw new AppError("Mã xác thực Mezon không hợp lệ", 400);
@@ -45,43 +39,36 @@ export const authService = {
 
       if (!email) throw new AppError("Không thể truy cập email từ tài khoản Mezon", 400);
 
+      const emailClean = email.trim().toLowerCase();
       const defaultName = userInfo.display_name || userInfo.username || email.split("@")[0];
 
-      let user = await userRepository.findAuthUserByEmail(email.trim().toLowerCase());
+      let user = await userRepository.findAuthUserByEmail(emailClean);
 
       if (!user) {
-
         user = await userRepository.create({
-          email: email.trim().toLowerCase(),
+          email: emailClean,
           full_name: defaultName,
           provider_id: String(mezonId),
           role: null 
         }) as any;
       } else {
-        
         if (!user.provider_id) {
-          await userRepository.update(user.user_id, {
+          user = await userRepository.update(user.user_id, {
             provider_id: String(mezonId)
-          });
+          }) as any;
         }
-       
-        user = await userRepository.findAuthUserByEmail(email);
       }
 
       if (!user) throw new AppError("Lỗi đồng bộ dữ liệu người dùng", 500);
 
-      
       const hasPassword = !!user.password; 
       const needSetPassword = !hasPassword;
 
-      const { password, ...safeUser } = user;
+      const { password, ...safeUser } = user as any;
 
-    
+      // Trả về object chứa user lồng bên trong để khớp với Controller
       return {
-        user: { 
-          ...safeUser, 
-          hasPassword 
-        },
+        user: { ...safeUser, hasPassword },
         needSetPassword
       };
 
@@ -92,11 +79,28 @@ export const authService = {
     }
   },
 
-  async validateUserSession(userId: number) {
-    const user = await userRepository.findById(userId);
-    if (!user) throw new AppError("Phiên làm việc không hợp lệ", 401);
-    
-    const { password, ...safeUser } = user as any;
-    return { ...safeUser, hasPassword: !!password };
+  // 3. Kiểm tra phiên làm việc (Dùng cho hàm getMe)
+ // skill-insight-backend/src/services/auth.service.ts
+async validateUserSession(userId: number) {
+  // Lấy user an toàn để trả về FE
+  const userSafe = await userRepository.findById(userId);
+  // Lấy user đầy đủ để check password
+  const userFull = await userRepository.findAuthUserByEmail(userSafe?.email || '');
+
+  if (!userSafe) throw new AppError("Phiên làm việc không hợp lệ", 401);
+
+  return {
+    user: userSafe,
+    hasPassword: !!userFull?.password // Trả về true nếu có pass, false nếu null (Mezon)
+  };
+},
+
+  // 4. Cập nhật mật khẩu (Hàm còn thiếu khiến Controller báo lỗi)
+  async updateUserPassword(userId: number, pass: string) {
+    const hashedPassword = await bcrypt.hash(pass, 10);
+    return await userRepository.update(userId, {
+      password: hashedPassword
+    });
   }
 };
+

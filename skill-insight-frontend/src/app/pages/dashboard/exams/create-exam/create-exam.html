@@ -1,0 +1,470 @@
+<div class="p-6 max-w-6xl mx-auto">
+
+  <!-- ======================================== -->
+  <!-- HEADER -->
+  <!-- ======================================== -->
+
+  <div class="mb-8">
+
+    <h1 class="text-3xl font-bold text-slate-800">
+      Tạo đề thi
+    </h1>
+
+    <p class="text-slate-500 mt-2">
+      Tạo ngân hàng đề thi, import câu hỏi và cấu hình random
+    </p>
+  </div>
+
+  <!-- ======================================== -->
+  <!-- MAIN CARD -->
+  <!-- ======================================== -->
+
+  <div
+    class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6"
+  >
+
+    <!-- ======================================== -->
+    <!-- BASIC INFO -->
+    <!-- ======================================== -->
+
+    <div class="mb-10">
+
+      <h2
+        class="text-xl font-semibold text-slate-800 mb-5"
+      >
+        Thông tin đề thi
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+        <!-- TITLE -->
+        <div class="md:col-span-2">
+
+          <label
+            class="block text-sm font-medium text-slate-700 mb-2"
+          >
+            Tên đề thi *
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="examData.title"
+            placeholder="Nhập tên đề thi..."
+            class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none"
+          />
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="md:col-span-2">
+
+          <label
+            class="block text-sm font-medium text-slate-700 mb-2"
+          >
+            Mô tả
+          </label>
+
+          <textarea
+            rows="4"
+            [(ngModel)]="examData.description"
+            placeholder="Mô tả đề thi..."
+            class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none"
+          ></textarea>
+        </div>
+
+        <!-- SUBJECT -->
+        <div>
+
+          <label
+            class="block text-sm font-medium text-slate-700 mb-2"
+          >
+            Môn học *
+          </label>
+
+          <select
+            [(ngModel)]="examData.subject_id"
+            (change)="onSubjectChange()"
+            class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none"
+          >
+
+            <option value="">
+              -- Chọn môn học --
+            </option>
+
+            <option
+              *ngFor="let subject of subjects"
+              [value]="subject.subject_id"
+            >
+              {{ subject.subject_name }}
+            </option>
+          </select>
+
+          <!-- QUICK CREATE -->
+          <div class="flex gap-2 mt-3">
+
+            <input
+              type="text"
+              [(ngModel)]="newSubjectName"
+              placeholder="Tạo môn học nhanh..."
+              class="flex-1 border border-slate-300 rounded-xl px-4 py-2"
+            />
+
+            <button
+              type="button"
+              (click)="createSubjectByEnter()"
+              class="px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700"
+            >
+              Thêm
+            </button>
+          </div>
+        </div>
+
+        <!-- TOPIC -->
+        <div>
+
+          <label
+            class="block text-sm font-medium text-slate-700 mb-2"
+          >
+            Chủ đề
+          </label>
+
+          <select
+            [(ngModel)]="examData.topic_id"
+            class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none"
+          >
+
+            <option value="">
+              -- Không chọn --
+            </option>
+
+            <option
+              *ngFor="let topic of topics"
+              [value]="topic.topic_id"
+            >
+              {{ topic.topic_name }}
+            </option>
+          </select>
+
+          <!-- QUICK CREATE -->
+          <div class="flex gap-2 mt-3">
+
+            <input
+              type="text"
+              [(ngModel)]="newTopicName"
+              placeholder="Tạo chủ đề nhanh..."
+              class="flex-1 border border-slate-300 rounded-xl px-4 py-2"
+            />
+
+            <button
+              type="button"
+              (click)="createTopicByEnter()"
+              class="px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700"
+            >
+              Thêm
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================== -->
+    <!-- EXAM SETTINGS -->
+    <!-- ======================================== -->
+
+    <div class="mb-10">
+
+      <h2
+        class="text-xl font-semibold text-slate-800 mb-5"
+      >
+        Cấu hình đề thi
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+        <!-- DURATION -->
+        <div>
+
+          <label
+            class="block text-sm font-medium text-slate-700 mb-2"
+          >
+            Thời gian thi (phút)
+          </label>
+
+          <input
+            type="number"
+            [(ngModel)]="examData.duration"
+            class="w-full border border-slate-300 rounded-xl px-4 py-3"
+          />
+        </div>
+
+        <!-- PASS SCORE -->
+        <div>
+
+          <label
+            class="block text-sm font-medium text-slate-700 mb-2"
+          >
+            Điểm đạt
+          </label>
+
+          <input
+            type="number"
+            [(ngModel)]="examData.pass_score"
+            class="w-full border border-slate-300 rounded-xl px-4 py-3"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================== -->
+    <!-- RANDOM SETTINGS -->
+    <!-- ======================================== -->
+
+    <div class="mb-10">
+
+      <h2
+        class="text-xl font-semibold text-slate-800 mb-5"
+      >
+        Random câu hỏi
+      </h2>
+
+      <div
+        class="border border-slate-200 rounded-2xl p-5 bg-slate-50"
+      >
+
+        <!-- TOGGLE -->
+        <label
+          class="flex items-center gap-3 cursor-pointer mb-5"
+        >
+
+          <input
+            type="checkbox"
+            [(ngModel)]="examData.is_random"
+            (change)="onToggleRandom()"
+            class="w-5 h-5"
+          />
+
+          <span
+            class="font-medium text-slate-700"
+          >
+            Random câu hỏi cho mỗi học sinh
+          </span>
+        </label>
+
+        <!-- RANDOM OPTIONS -->
+        <div *ngIf="examData.is_random">
+
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 gap-5"
+          >
+
+            <!-- RANDOM COUNT -->
+            <div>
+
+              <label
+                class="block text-sm font-medium text-slate-700 mb-2"
+              >
+                Số câu random
+              </label>
+
+              <input
+                type="number"
+                [(ngModel)]="examData.random_question_count"
+                class="w-full border border-slate-300 rounded-xl px-4 py-3"
+              />
+            </div>
+
+            <div
+              class="flex flex-col gap-4 justify-center"
+            >
+
+              <!-- SHUFFLE QUESTIONS -->
+              <label
+                class="flex items-center gap-3"
+              >
+
+                <input
+                  type="checkbox"
+                  [(ngModel)]="examData.shuffle_questions"
+                  class="w-5 h-5"
+                />
+
+                <span>
+                  Đảo thứ tự câu hỏi
+                </span>
+              </label>
+
+              <!-- SHUFFLE ANSWERS -->
+              <label
+                class="flex items-center gap-3"
+              >
+
+                <input
+                  type="checkbox"
+                  [(ngModel)]="examData.shuffle_answers"
+                  class="w-5 h-5"
+                />
+
+                <span>
+                  Đảo đáp án
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================== -->
+    <!-- IMPORT QUESTIONS -->
+    <!-- ======================================== -->
+
+    <div class="mb-10">
+
+      <h2
+        class="text-xl font-semibold text-slate-800 mb-5"
+      >
+        Import câu hỏi
+      </h2>
+
+      <div
+        class="border-2 border-dashed border-slate-300 rounded-2xl p-8 bg-slate-50"
+      >
+
+        <div class="text-center">
+
+          <div
+            class="text-5xl mb-4"
+          >
+            📄
+          </div>
+
+          <h3
+            class="text-lg font-semibold text-slate-700 mb-2"
+          >
+            Upload file câu hỏi
+          </h3>
+
+          <p
+            class="text-slate-500 mb-5"
+          >
+            Hỗ trợ Excel (.xlsx), CSV
+          </p>
+
+          <input
+            type="file"
+            accept=".xlsx,.xls,.csv"
+            (change)="onQuestionFileChange($event)"
+            class="hidden"
+            #questionFileInput
+          />
+
+          <button
+            type="button"
+            (click)="questionFileInput.click()"
+            class="px-5 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700"
+          >
+            Chọn file
+          </button>
+        </div>
+
+        <!-- FILE INFO -->
+        <div
+          *ngIf="selectedQuestionFile"
+          class="mt-6 bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between"
+        >
+
+          <div>
+
+            <div
+              class="font-medium text-slate-800"
+            >
+              {{ selectedQuestionFile.name }}
+            </div>
+
+            <div
+              class="text-sm text-slate-500 mt-1"
+            >
+              {{
+                (
+                  selectedQuestionFile.size
+                  / 1024
+                ).toFixed(2)
+              }}
+              KB
+            </div>
+          </div>
+
+          <button
+            type="button"
+            (click)="removeSelectedFile()"
+            class="px-4 py-2 bg-rose-100 text-rose-600 rounded-lg hover:bg-rose-200"
+          >
+            Xóa
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================== -->
+    <!-- SYSTEM -->
+    <!-- ======================================== -->
+
+    <div class="mb-10">
+
+      <h2
+        class="text-xl font-semibold text-slate-800 mb-5"
+      >
+        Hệ thống
+      </h2>
+
+      <label
+        class="flex items-center gap-3"
+      >
+
+        <input
+          type="checkbox"
+          [(ngModel)]="examData.allow_system_integration"
+          class="w-5 h-5"
+        />
+
+        <span class="text-slate-700">
+          Cho phép tích hợp vào ngân hàng hệ thống
+        </span>
+      </label>
+    </div>
+
+    <!-- ======================================== -->
+    <!-- ACTION -->
+    <!-- ======================================== -->
+
+    <div
+      class="flex flex-col md:flex-row gap-4 justify-end pt-6 border-t border-slate-200"
+    >
+
+      <!-- BACK -->
+      <button
+        type="button"
+        routerLink="/dashboard/exams"
+        class="px-6 py-3 rounded-xl border border-slate-300 hover:bg-slate-100"
+      >
+        Quay lại
+      </button>
+
+      <!-- SUBMIT -->
+      <button
+        type="button"
+        (click)="createExam()"
+        [disabled]="loading"
+        class="px-8 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-50"
+      >
+
+        <span *ngIf="!loading">
+          Tạo đề thi
+        </span>
+
+        <span *ngIf="loading">
+          Đang tạo...
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

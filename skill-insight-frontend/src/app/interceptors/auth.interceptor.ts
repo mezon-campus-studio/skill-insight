@@ -1,19 +1,37 @@
-import { HttpInterceptorFn } from '@angular/common/http';
-import { catchError, throwError } from 'rxjs';
+import {
+  HttpInterceptorFn,
+  HttpErrorResponse
+} from '@angular/common/http';
+
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 
+import {
+  catchError,
+  throwError
+} from 'rxjs';
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
+
   const router = inject(Router);
 
-  const token = localStorage.getItem('accessToken'); 
+  // =========================
+  // FIX TOKEN RETRIEVAL
+  // =========================
+  const token =
+    localStorage.getItem('accessToken') ||
+    localStorage.getItem('token') ||
+    localStorage.getItem('authToken');
 
-  let authReq = req.clone({
-    withCredentials: true
-  });
+  console.log('[INTERCEPTOR TOKEN]', token);
 
-  if (token) {
-    authReq = authReq.clone({
+  let authReq = req;
+
+  // =========================
+  // ATTACH TOKEN IF VALID
+  // =========================
+  if (token && token !== 'null' && token !== 'undefined') {
+    authReq = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`
       }
@@ -21,16 +39,21 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   return next(authReq).pipe(
-    catchError((err) => {
+    catchError((err: HttpErrorResponse) => {
+
       if (err.status === 401) {
-        console.warn('Unauthorized');
 
         const isAuthPage =
           router.url.includes('/login') ||
           router.url.includes('/callback');
 
         if (!isAuthPage) {
-          localStorage.removeItem('accessToken'); 
+
+          // clear all possible token keys
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('token');
+          localStorage.removeItem('authToken');
+
           router.navigate(['/login']);
         }
       }

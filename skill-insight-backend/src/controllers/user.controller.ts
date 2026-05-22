@@ -43,11 +43,16 @@ export const getUsers = async (
     const limit = Number(req.query.limit) || 25;
 
     const keyword = (req.query.keyword as string) || "";
+    const role = (req.query.role as string) || "";
+
+    console.log("KEYWORD =", keyword);
+    console.log("ROLE =", role);
 
     const data = await userService.getUsersService(
       page,
       limit,
-      keyword
+      keyword,
+      role
     );
 
     disableCache(res);
@@ -55,6 +60,31 @@ export const getUsers = async (
     res.status(200).json({
       success: true,
       message: "Lấy danh sách user thành công",
+      data
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const toggleUserStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = Number(req.params.id);
+
+    const data = await userService.toggleUserStatusService(userId);
+
+    disableCache(res);
+
+    res.status(200).json({
+      success: true,
+      message:
+        data.status === true
+          ? "Mở tài khoản thành công"
+          : "Đóng tài khoản thành công",
       data
     });
   } catch (err) {

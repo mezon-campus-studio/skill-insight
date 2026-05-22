@@ -9,7 +9,6 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  // Sử dụng ReactiveFormsModule thay vì FormsModule để quản lý form chuyên nghiệp
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.html',
   styleUrls: ['./login.css'] 
@@ -36,21 +35,43 @@ export class LoginComponent implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit(): void {
+  // ngOnInit(): void {
+  //   // Tự động kiểm tra nếu đã đăng nhập thì vào Dashboard luôn
+  //   this.auth.getMe().subscribe({
+  //     next: (res: any) => {
+  //       if (res?.success && res?.user) {
+  //         this.auth.saveUser(res.user);
+  //         this.navigateToNextStep(res.user);
+  //       }
+  //     },
+  //     error: () => console.log("Hệ thống sẵn sàng cho đăng nhập mới.")
+  //   });
+  // }
 
-    this.auth.getMe().subscribe({
-      next: (res: any) => {
-        if (res?.success && res?.user) {
-          this.auth.saveUser(res.user);
-          this.navigateToNextStep(res.user);
-        }
-      },
-      error: () => console.log("Hệ thống sẵn sàng cho đăng nhập mới.")
-    });
+ngOnInit(): void {
+  const token = localStorage.getItem('accessToken');
+
+  if (!token) {
+    console.log('Hệ thống sẵn sàng cho đăng nhập mới.');
+    return;
   }
 
+  this.auth.getMe().subscribe({
+    next: (res: any) => {
+      if (res?.success && res?.user) {
+        this.auth.saveUser(res.user);
+        this.navigateToNextStep(res.user);
+      }
+    },
+    error: () => {
+      localStorage.removeItem('accessToken');
+      console.log('Token không hợp lệ.');
+    }
+  });
+}
+
+  // Đăng nhập truyền thống bằng Email/Password
   onLogin(): void {
-    
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
@@ -82,36 +103,45 @@ export class LoginComponent implements OnInit {
       });
   }
 
+  // Đăng nhập bằng Mezon (FLOW CHUẨN MENTOR: FE -> BE -> Mezon)
+  loginWithMezon(): void {
+    this.loading = true;
+    this.error = '';
+
+    this.auth.getMezonUrl().subscribe({
+      next: (res: any) => {
+        if (res?.success && res?.url) {
+          // Khi Backend trả về URL kèm state và client_id, FE thực hiện nhảy trang
+          console.log('Redirecting to Mezon:', res.url);
+          window.location.href = res.url;
+        } else {
+          this.error = 'Không lấy được đường dẫn xác thực từ Server';
+          this.loading = false;
+        }
+      },
+      error: (err) => {
+        console.error('Lỗi lấy URL Mezon:', err);
+        this.error = 'Lỗi kết nối Server khi lấy URL Mezon';
+        this.loading = false;
+      }
+    });
+  }
+
+  private navigateToNextStep(user: any): void {
+    // Logic điều hướng sau khi login thành công
+    if (!user.role) {
+      this.router.navigate(['/select-role']);
+    } else {
+      this.router.navigate(['/dashboard']);
+    }
+  }
+
   goRegister(): void {
     this.router.navigate(['/register']);
   }
 
   goForgot(): void {
     alert('Chức năng quên mật khẩu hiện đang được phát triển');
-  }
-
-  loginWithMezon(): void {
-    this.auth.getMezonUrl().subscribe({
-      next: (res: any) => {
-        if (res?.url) {
-          window.location.href = res.url;
-        } else {
-          this.error = 'Không lấy được đường dẫn xác thực Mezon';
-        }
-      },
-      error: () => {
-        this.error = 'Lỗi kết nối với máy chủ Mezon';
-      }
-    });
-  }
-
-  private navigateToNextStep(user: any): void {
-    // Nếu user mới chưa chọn vai trò (Student/Teacher)
-    if (!user.role) {
-      this.router.navigate(['/select-role']);
-    } else {
-      this.router.navigate(['/dashboard']);
-    }
   }
 
   get f() { return this.loginForm.controls; }

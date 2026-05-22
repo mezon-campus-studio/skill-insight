@@ -1,0 +1,651 @@
+<!-- <div class="p-6 max-w-5xl mx-auto">
+
+  <div
+    class="flex items-center justify-between mb-8"
+  >
+
+    <div>
+
+      <h1
+        class="text-3xl font-bold text-gray-800"
+      >
+        Question Detail
+      </h1>
+
+      <p
+        class="text-gray-500 mt-1"
+      >
+        Xem chi tiết câu hỏi
+      </p>
+
+    </div>
+
+    <button
+      (click)="goBack()"
+      class="px-5 py-3 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 transition"
+    >
+      Back
+    </button>
+
+  </div>
+
+  <div
+    *ngIf="loading"
+    class="flex justify-center items-center py-20"
+  >
+
+    <div
+      class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"
+    ></div>
+
+  </div>
+
+  <div
+    *ngIf="!loading && question"
+    class="bg-white rounded-3xl border border-gray-100 shadow-sm p-8"
+  >
+
+    <div class="mb-8">
+
+      <div
+        class="text-sm font-semibold text-blue-600 mb-2 uppercase tracking-wide"
+      >
+        Question
+      </div>
+
+      <h2
+        class="text-2xl font-bold text-gray-800 leading-relaxed"
+      >
+        {{ question.question_text }}
+      </h2>
+
+    </div>
+
+    <div
+      class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8"
+    >
+
+      <div
+        class="bg-gray-50 rounded-2xl p-5"
+      >
+
+        <div
+          class="text-sm text-gray-500 mb-2"
+        >
+          Subject
+        </div>
+
+        <div
+          class="font-semibold text-gray-800"
+        >
+          {{
+            question.subject_name ||
+            'Unknown'
+          }}
+        </div>
+
+      </div>
+
+      <div
+        class="bg-gray-50 rounded-2xl p-5"
+      >
+
+        <div
+          class="text-sm text-gray-500 mb-2"
+        >
+          Topic
+        </div>
+
+        <div
+          class="font-semibold text-gray-800"
+        >
+          {{
+            question.topic_name ||
+            'Unknown'
+          }}
+        </div>
+
+      </div>
+
+      <div
+        class="bg-gray-50 rounded-2xl p-5"
+      >
+
+        <div
+          class="text-sm text-gray-500 mb-2"
+        >
+          Difficulty
+        </div>
+
+        <div>
+
+          <span
+            class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium"
+            [ngClass]="{
+
+              'bg-green-100 text-green-700':
+              question.difficulty === 'easy',
+
+              'bg-yellow-100 text-yellow-700':
+              question.difficulty === 'medium',
+
+              'bg-red-100 text-red-700':
+              question.difficulty === 'hard'
+
+            }"
+          >
+
+            {{ question.difficulty }}
+
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="mb-8">
+
+      <div
+        class="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide"
+      >
+        Answer Options
+      </div>
+
+      <div class="space-y-4">
+
+        <div
+          class="border rounded-2xl p-5 transition"
+          [ngClass]="{
+
+            'border-green-500 bg-green-50':
+            question.correct_answer === 'A',
+
+            'border-gray-200':
+            question.correct_answer !== 'A'
+
+          }"
+        >
+
+          <div
+            class="flex items-start gap-4"
+          >
+
+            <div
+              class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold"
+            >
+              A
+            </div>
+
+            <div
+              class="text-gray-700 font-medium"
+            >
+              {{ question.option_a }}
+            </div>
+
+          </div>
+
+        </div>
+
+        <div
+          class="border rounded-2xl p-5 transition"
+          [ngClass]="{
+
+            'border-green-500 bg-green-50':
+            question.correct_answer === 'B',
+
+            'border-gray-200':
+            question.correct_answer !== 'B'
+
+          }"
+        >
+
+          <div
+            class="flex items-start gap-4"
+          >
+
+            <div
+              class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold"
+            >
+              B
+            </div>
+
+            <div
+              class="text-gray-700 font-medium"
+            >
+              {{ question.option_b }}
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="border rounded-2xl p-5 transition"
+          [ngClass]="{
+
+            'border-green-500 bg-green-50':
+            question.correct_answer === 'C',
+
+            'border-gray-200':
+            question.correct_answer !== 'C'
+
+          }"
+        >
+
+          <div
+            class="flex items-start gap-4"
+          >
+
+            <div
+              class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold"
+            >
+              C
+            </div>
+
+            <div
+              class="text-gray-700 font-medium"
+            >
+              {{ question.option_c }}
+            </div>
+
+          </div>
+
+        </div>
+
+        <div
+          class="border rounded-2xl p-5 transition"
+          [ngClass]="{
+
+            'border-green-500 bg-green-50':
+            question.correct_answer === 'D',
+
+            'border-gray-200':
+            question.correct_answer !== 'D'
+
+          }"
+        >
+
+          <div
+            class="flex items-start gap-4"
+          >
+
+            <div
+              class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold"
+            >
+              D
+            </div>
+
+            <div
+              class="text-gray-700 font-medium"
+            >
+              {{ question.option_d }}
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div
+      *ngIf="question.explanation"
+      class="bg-blue-50 border border-blue-100 rounded-3xl p-6"
+    >
+
+      <div
+        class="text-sm font-semibold text-blue-700 mb-3 uppercase tracking-wide"
+      >
+        Explanation
+      </div>
+
+      <p
+        class="text-gray-700 leading-relaxed"
+      >
+        {{ question.explanation }}
+      </p>
+
+    </div>
+
+  </div>
+
+</div> -->
+
+
+<div class="p-6 max-w-5xl mx-auto">
+
+  <div
+    class="flex items-center justify-between mb-8"
+  >
+
+    <div>
+
+      <h1
+        class="text-3xl font-bold text-gray-800"
+      >
+        Chi tiết câu hỏi
+      </h1>
+
+      <p
+        class="text-gray-500 mt-1"
+      >
+        Xem đầy đủ nội dung câu hỏi
+      </p>
+
+    </div>
+
+    <button
+      (click)="goBack()"
+      class="px-5 py-3 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 transition"
+    >
+      Quay lại
+    </button>
+
+  </div>
+
+  <div
+    *ngIf="loading"
+    class="flex justify-center items-center py-20"
+  >
+
+    <div
+      class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"
+    ></div>
+
+  </div>
+
+  <div
+    *ngIf="!loading && question"
+    class="bg-white rounded-3xl border border-gray-100 shadow-sm p-8"
+  >
+
+    <!-- HEADER -->
+
+    <div
+      class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8"
+    >
+
+      <div>
+
+        <div
+          class="text-sm font-semibold text-blue-600 mb-2 uppercase tracking-wide"
+        >
+          Câu hỏi
+        </div>
+
+        <h2
+          class="text-2xl font-bold text-gray-800 leading-relaxed"
+        >
+          {{ question.content }}
+        </h2>
+
+      </div>
+
+      <span
+        class="px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap"
+        [ngClass]="{
+
+          'bg-green-100 text-green-700':
+            question.is_approved,
+
+          'bg-yellow-100 text-yellow-700':
+            !question.is_approved
+
+        }"
+      >
+
+        {{
+          question.is_approved
+            ? 'Đã duyệt'
+            : 'Chờ duyệt'
+        }}
+
+      </span>
+
+    </div>
+
+    <!-- INFO -->
+
+    <div
+      class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8"
+    >
+
+      <div
+        class="bg-gray-50 rounded-2xl p-5"
+      >
+
+        <div
+          class="text-sm text-gray-500 mb-2"
+        >
+          Môn học
+        </div>
+
+        <div
+          class="font-semibold text-gray-800"
+        >
+          {{
+            question.subject?.subject_name ||
+            'Unknown'
+          }}
+        </div>
+
+      </div>
+
+      <div
+        class="bg-gray-50 rounded-2xl p-5"
+      >
+
+        <div
+          class="text-sm text-gray-500 mb-2"
+        >
+          Chủ đề
+        </div>
+
+        <div
+          class="font-semibold text-gray-800"
+        >
+          {{
+            question.topic?.topic_name ||
+            'Unknown'
+          }}
+        </div>
+
+      </div>
+
+      <div
+        class="bg-gray-50 rounded-2xl p-5"
+      >
+
+        <div
+          class="text-sm text-gray-500 mb-2"
+        >
+          Độ khó
+        </div>
+
+        <div>
+
+          <span
+            class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium"
+            [ngClass]="{
+
+              'bg-green-100 text-green-700':
+                question.level === 'EASY',
+
+              'bg-yellow-100 text-yellow-700':
+                question.level === 'MEDIUM',
+
+              'bg-red-100 text-red-700':
+                question.level === 'HARD'
+
+            }"
+          >
+
+            {{
+              question.level === 'EASY'
+                ? 'Dễ'
+                : question.level === 'MEDIUM'
+                ? 'Trung bình'
+                : 'Khó'
+            }}
+
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ANSWERS -->
+
+    <div class="mb-8">
+
+      <div
+        class="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide"
+      >
+        Danh sách đáp án
+      </div>
+
+      <div class="space-y-4">
+
+        <div
+          *ngFor="
+            let answer of question.answers;
+            let i = index
+          "
+          class="border rounded-2xl p-5 transition"
+          [ngClass]="{
+
+            'border-green-500 bg-green-50':
+              answer.is_correct,
+
+            'border-gray-200':
+              !answer.is_correct
+
+          }"
+        >
+
+          <div
+            class="flex items-start gap-4"
+          >
+
+            <div
+              class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold"
+            >
+
+              {{
+                ['A', 'B', 'C', 'D'][i]
+              }}
+
+            </div>
+
+            <div
+              class="flex-1"
+            >
+
+              <div
+                class="text-gray-700 font-medium"
+              >
+                {{ answer.answer_text }}
+              </div>
+
+              <div
+                *ngIf="answer.is_correct"
+                class="text-green-600 text-sm font-semibold mt-2"
+              >
+                Đáp án đúng
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- EXPLANATION -->
+
+    <div
+      *ngIf="question.explanation"
+      class="bg-blue-50 border border-blue-100 rounded-3xl p-6 mb-8"
+    >
+
+      <div
+        class="text-sm font-semibold text-blue-700 mb-3 uppercase tracking-wide"
+      >
+        Giải thích
+      </div>
+
+      <p
+        class="text-gray-700 leading-relaxed whitespace-pre-line"
+      >
+        {{ question.explanation }}
+      </p>
+
+    </div>
+
+    <!-- FOOTER -->
+
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 gap-5"
+    >
+
+      <div
+        class="bg-gray-50 rounded-2xl p-5"
+      >
+
+        <div
+          class="text-sm text-gray-500 mb-2"
+        >
+          Người tạo
+        </div>
+
+        <div
+          class="font-semibold text-gray-800"
+        >
+          {{
+            question.teacher?.full_name ||
+            'Unknown'
+          }}
+        </div>
+
+      </div>
+
+      <div
+        class="bg-gray-50 rounded-2xl p-5"
+      >
+
+        <div
+          class="text-sm text-gray-500 mb-2"
+        >
+          Ngày tạo
+        </div>
+
+        <div
+          class="font-semibold text-gray-800"
+        >
+          {{
+            question.created_at
+              ? (
+                  question.created_at
+                  | date:'dd/MM/yyyy HH:mm'
+                )
+              : '--/--/----'
+          }}
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
