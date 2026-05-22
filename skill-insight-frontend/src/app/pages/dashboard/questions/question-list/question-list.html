@@ -1,0 +1,723 @@
+
+<div class="p-6">
+
+  <!-- HEADER -->
+
+  <div
+    class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6"
+  >
+
+    <div>
+
+      <h1
+        class="text-3xl font-bold text-gray-800"
+      >
+        Ngân hàng câu hỏi
+      </h1>
+
+      <p
+        class="text-gray-500 mt-1"
+      >
+        Quản lý toàn bộ câu hỏi trong hệ thống
+      </p>
+
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+
+      <!-- CREATE BATCH -->
+
+      <button
+        (click)="createBatch()"
+        class="bg-indigo-600 hover:bg-indigo-700 transition text-white px-5 py-3 rounded-xl font-medium shadow"
+      >
+        + Tạo bộ câu hỏi
+      </button>
+
+      <!-- BATCH LIST -->
+
+      <button
+        (click)="goToBatchList()"
+        class="bg-gray-800 hover:bg-black transition text-white px-5 py-3 rounded-xl font-medium shadow"
+      >
+        Lịch sử import
+      </button>
+
+    </div>
+
+
+
+  </div>
+
+  <!-- TABS -->
+
+  <div
+    class="flex gap-3 mb-6"
+  >
+
+    <button
+
+      (click)="setTab('SYSTEM_BANK')"
+
+      class="px-5 py-3 rounded-xl font-semibold transition"
+
+      [ngClass]="
+        currentTab === 'SYSTEM_BANK'
+          ? 'bg-blue-600 text-white shadow'
+          : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'
+      "
+    >
+
+      Kho hệ thống
+
+    </button>
+
+    <button
+
+      (click)="setTab('PRIVATE')"
+
+      class="px-5 py-3 rounded-xl font-semibold transition"
+
+      [ngClass]="
+        currentTab === 'PRIVATE'
+          ? 'bg-blue-600 text-white shadow'
+          : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'
+      "
+    >
+
+      Kho cá nhân
+
+    </button>
+
+  </div>
+
+  <!-- FILTER -->
+
+  <div
+    class="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 mb-6"
+  >
+
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5"
+    >
+
+      <!-- SEARCH -->
+
+      <div>
+
+        <label
+          class="block text-sm font-semibold text-gray-700 mb-2"
+        >
+          Tìm kiếm
+        </label>
+
+        <input
+
+          type="text"
+
+          [(ngModel)]="searchKeyword"
+
+          (input)="filterQuestions()"
+
+          placeholder="Nhập nội dung câu hỏi..."
+
+          class="w-full h-[52px] border border-gray-300 rounded-2xl px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+      </div>
+
+      <!-- SUBJECT -->
+
+      <div>
+
+        <label
+          class="block text-sm font-semibold text-gray-700 mb-2"
+        >
+          Môn học
+        </label>
+
+        <ng-select
+
+          [items]="subjects"
+
+          bindLabel="subject_name"
+
+          bindValue="subject_id"
+
+          [(ngModel)]="selectedSubject"
+
+          placeholder="Tất cả môn học"
+
+          [searchable]="true"
+
+          [clearable]="true"
+
+          [appendTo]="'body'"
+
+          [closeOnSelect]="true"
+
+          [clearOnBackspace]="true"
+
+          (ngModelChange)="onSubjectChange()"
+
+          class="custom-ng-select"
+        >
+        </ng-select>
+
+      </div>
+
+      <!-- TOPIC -->
+
+      <div>
+
+        <label
+          class="block text-sm font-semibold text-gray-700 mb-2"
+        >
+          Chủ đề
+        </label>
+
+        <ng-select
+
+          [items]="filteredTopics"
+
+          bindLabel="topic_name"
+
+          bindValue="topic_id"
+
+          [(ngModel)]="selectedTopic"
+
+          placeholder="Tất cả chủ đề"
+
+          [searchable]="true"
+
+          [clearable]="true"
+
+          [appendTo]="'body'"
+
+          [closeOnSelect]="true"
+
+          [clearOnBackspace]="true"
+
+          (ngModelChange)="filterQuestions()"
+
+          class="custom-ng-select"
+        >
+        </ng-select>
+
+      </div>
+
+      <!-- LEVEL -->
+
+      <div>
+
+        <label
+          class="block text-sm font-semibold text-gray-700 mb-2"
+        >
+          Mức độ
+        </label>
+
+        <ng-select
+
+          [items]="difficultyOptions"
+
+          bindLabel="label"
+
+          bindValue="value"
+
+          [(ngModel)]="selectedDifficulty"
+
+          placeholder="Tất cả mức độ"
+
+          [searchable]="false"
+
+          [clearable]="true"
+
+          [appendTo]="'body'"
+
+          [closeOnSelect]="true"
+
+          (ngModelChange)="filterQuestions()"
+
+          class="custom-ng-select"
+        >
+        </ng-select>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- LOADING -->
+
+  <div
+    *ngIf="loading"
+    class="flex justify-center items-center py-20"
+  >
+
+    <div
+      class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"
+    >
+    </div>
+
+  </div>
+
+  <!-- EMPTY -->
+
+  <div
+
+    *ngIf="
+      !loading &&
+      filteredQuestions.length === 0
+    "
+
+    class="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center"
+  >
+
+    <h3
+      class="text-xl font-semibold text-gray-700 mb-2"
+    >
+      Không có câu hỏi nào
+    </h3>
+
+    <p
+      class="text-gray-500"
+    >
+      Hãy tạo câu hỏi mới
+    </p>
+
+  </div>
+
+  <!-- TABLE -->
+
+  <div
+
+    *ngIf="
+      !loading &&
+      filteredQuestions.length > 0
+    "
+
+    class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+  >
+
+    <div
+      class="overflow-x-auto"
+    >
+
+      <table
+        class="w-full min-w-[1200px]"
+      >
+
+        <!-- HEAD -->
+
+        <thead
+          class="bg-gray-50 border-b border-gray-100"
+        >
+
+          <tr>
+
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+              STT
+            </th>
+
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+              Câu hỏi
+            </th>
+
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+              Môn học
+            </th>
+
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+              Chủ đề
+            </th>
+
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+              Độ khó
+            </th>
+
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+              Kho
+            </th>
+
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+              Người tạo
+            </th>
+
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+              Ngày tạo
+            </th>
+
+            <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">
+              Thao tác
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <!-- BODY -->
+
+        <tbody>
+
+          <tr
+
+            *ngFor="
+              let question of paginatedQuestions;
+              let i = index;
+              trackBy: trackByQuestionId
+            "
+
+            class="border-b border-gray-100 hover:bg-gray-50 transition"
+          >
+
+            <!-- STT -->
+
+            <td
+              class="px-6 py-4 text-gray-700 font-medium"
+            >
+
+              {{
+                (currentPage - 1)
+                * itemsPerPage
+                + i + 1
+              }}
+
+            </td>
+
+            <!-- CONTENT -->
+
+            <td
+              class="px-6 py-4"
+            >
+
+              <div
+                class="font-semibold text-gray-800 line-clamp-2 min-w-[250px]"
+              >
+
+                {{ question.content }}
+
+              </div>
+
+            </td>
+
+            <!-- SUBJECT -->
+
+            <td
+              class="px-6 py-4"
+            >
+
+              <span
+                class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-700 whitespace-nowrap"
+              >
+
+                {{
+                  getSubjectName(
+                    question.subject_id
+                  )
+                }}
+
+              </span>
+
+            </td>
+
+            <!-- TOPIC -->
+
+            <td
+              class="px-6 py-4 text-gray-600 whitespace-nowrap"
+            >
+
+              {{
+                getTopicName(
+                  question.topic_id
+                )
+              }}
+
+            </td>
+
+            <!-- LEVEL -->
+
+            <td
+              class="px-6 py-4"
+            >
+
+              <span
+
+                class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+
+                [ngClass]="{
+
+                  'bg-green-100 text-green-700':
+                    question.level === 'EASY',
+
+                  'bg-yellow-100 text-yellow-700':
+                    question.level === 'MEDIUM',
+
+                  'bg-red-100 text-red-700':
+                    question.level === 'HARD'
+
+                }"
+              >
+
+                {{
+                  question.level === 'EASY'
+                    ? 'Dễ'
+                    : question.level === 'MEDIUM'
+                    ? 'Trung bình'
+                    : 'Khó'
+                }}
+
+              </span>
+
+            </td>
+
+            <!-- VISIBILITY -->
+
+            <td
+              class="px-6 py-4"
+            >
+
+              <span
+
+                class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+
+                [ngClass]="{
+
+                  'bg-blue-100 text-blue-700':
+                    question.visibility === 'SYSTEM_BANK',
+
+                  'bg-purple-100 text-purple-700':
+                    question.visibility === 'PRIVATE'
+
+                }"
+              >
+
+                {{
+                  question.visibility === 'SYSTEM_BANK'
+                    ? 'Hệ thống'
+                    : 'Cá nhân'
+                }}
+
+              </span>
+
+            </td>
+
+            <!-- CREATOR -->
+
+            <td
+              class="px-6 py-4 text-gray-700 whitespace-nowrap"
+            >
+
+              {{
+                question.teacher?.full_name
+                || 'Unknown'
+              }}
+
+            </td>
+
+            <!-- CREATED -->
+
+            <td
+              class="px-6 py-4 text-gray-500 whitespace-nowrap"
+            >
+
+              {{
+                question.created_at
+                  ? (
+                      question.created_at
+                      | date:'dd/MM/yyyy'
+                    )
+                  : '--/--/----'
+              }}
+
+            </td>
+
+            <!-- ACTIONS -->
+
+            <td
+              class="px-6 py-4"
+            >
+
+              <div
+                class="flex justify-center gap-2 whitespace-nowrap"
+              >
+
+                <!-- VIEW -->
+
+                <button
+
+                  (click)="viewDetail(question.question_id)"
+
+                  class="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition"
+                >
+
+                  Xem
+
+                </button>
+
+                <!-- EDIT -->
+
+                <button
+
+                  *ngIf="canEdit(question)"
+
+                  (click)="editQuestion(question.question_id)"
+
+                  class="px-4 py-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-white text-sm font-medium transition"
+                >
+
+                  Sửa
+
+                </button>
+
+                <!-- CLONE -->
+
+                <button
+
+                  *ngIf="canClone(question)"
+
+                  (click)="cloneQuestion(question)"
+
+                  class="px-4 py-2 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium transition"
+                >
+
+                  Clone
+
+                </button>
+
+                <!-- DELETE -->
+
+                <button
+
+                  *ngIf="canDelete(question)"
+
+                  (click)="deleteQuestion(question.question_id)"
+
+                  [disabled]="
+                    deletingId ===
+                    question.question_id
+                  "
+
+                  class="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-medium transition disabled:opacity-50"
+                >
+
+                  {{
+                    deletingId ===
+                    question.question_id
+                      ? 'Đang xoá...'
+                      : 'Xoá'
+                  }}
+
+                </button>
+
+                @if (
+                  currentTab === 'PRIVATE' &&
+                  question.visibility === 'PRIVATE'
+                ) {
+
+                  <button
+                    (click)="integrateQuestion(question.question_id)"
+                    class="px-3 h-9 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase">
+
+                    Tích hợp hệ thống
+
+                  </button>
+
+                }
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+  <!-- PAGINATION -->
+
+  <div
+
+    *ngIf="
+      filteredQuestions.length > 0
+    "
+
+    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-6"
+  >
+
+    <div
+      class="text-sm text-gray-500"
+    >
+
+      Tổng:
+      {{ filteredQuestions.length }}
+      câu hỏi
+
+    </div>
+
+    <div
+      class="flex items-center gap-2 flex-wrap"
+    >
+
+      <button
+
+        (click)="previousPage()"
+
+        [disabled]="currentPage === 1"
+
+        class="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50"
+      >
+
+        Trước
+
+      </button>
+
+      <button
+
+        *ngFor="let page of pages"
+
+        (click)="goToPage(page)"
+
+        class="w-10 h-10 rounded-lg border transition"
+
+        [ngClass]="
+
+          currentPage === page
+
+            ? 'bg-blue-600 text-white border-blue-600'
+
+            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+
+        "
+      >
+
+        {{ page }}
+
+      </button>
+
+      <button
+
+        (click)="nextPage()"
+
+        [disabled]="
+          currentPage === totalPages
+        "
+
+        class="px-4 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50"
+      >
+
+        Sau
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+

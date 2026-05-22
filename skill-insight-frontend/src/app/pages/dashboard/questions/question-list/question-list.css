@@ -1,0 +1,349 @@
+/* =========================================
+   NG-SELECT
+========================================= */
+
+::ng-deep .custom-ng-select {
+  width: 100%;
+}
+
+/* CONTAINER */
+
+::ng-deep .custom-ng-select .ng-select-container {
+
+  min-height: 52px !important;
+
+  border: 1px solid #d1d5db !important;
+
+  border-radius: 14px !important;
+
+  background: #ffffff !important;
+
+  box-shadow: none !important;
+
+  padding: 0 14px !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+
+  transition: all 0.2s ease;
+
+}
+
+/* FOCUS */
+
+::ng-deep
+.custom-ng-select.ng-select-focused
+.ng-select-container {
+
+  border-color: #3b82f6 !important;
+
+  box-shadow:
+    0 0 0 3px rgba(59,130,246,0.15) !important;
+
+}
+
+/* VALUE CONTAINER */
+
+::ng-deep
+.custom-ng-select
+.ng-value-container {
+
+  display: flex !important;
+
+  align-items: center !important;
+
+  padding: 0 !important;
+
+}
+
+/* PLACEHOLDER */
+
+::ng-deep
+.custom-ng-select
+.ng-placeholder {
+
+  color: #9ca3af !important;
+
+  font-size: 14px !important;
+
+  top: auto !important;
+
+}
+
+/* FIX PLACEHOLDER KHI ĐÃ CHỌN */
+
+::ng-deep
+.custom-ng-select.ng-has-value
+.ng-placeholder {
+
+  display: none !important;
+
+}
+
+/* VALUE */
+
+::ng-deep
+.custom-ng-select
+.ng-value {
+
+  color: #111827 !important;
+
+  font-size: 14px !important;
+
+  font-weight: 500;
+
+}
+
+/* INPUT */
+
+::ng-deep
+.custom-ng-select
+.ng-input {
+
+  top: auto !important;
+
+}
+
+/* CLEAR BUTTON */
+
+::ng-deep
+.custom-ng-select
+.ng-clear-wrapper {
+
+  color: #9ca3af !important;
+
+  margin-right: 8px;
+
+}
+
+/* ARROW */
+
+::ng-deep
+.custom-ng-select
+.ng-arrow-wrapper {
+
+  padding-right: 2px;
+
+}
+
+/* DROPDOWN */
+
+::ng-deep
+.custom-ng-select
+.ng-dropdown-panel {
+
+  margin-top: 6px !important;
+
+  border-radius: 14px !important;
+
+  border: 1px solid #e5e7eb !important;
+
+  background: #ffffff !important;
+
+  overflow: hidden !important;
+
+  z-index: 9999 !important;
+
+  box-shadow:
+    0 12px 28px rgba(0,0,0,0.08);
+
+}
+
+/* DROPDOWN SCROLL */
+
+::ng-deep
+.custom-ng-select
+.ng-dropdown-panel-items {
+
+  max-height: 260px !important;
+
+}
+
+/* OPTION */
+
+::ng-deep
+.custom-ng-select
+.ng-option {
+
+  padding: 12px 16px !important;
+
+  font-size: 14px !important;
+
+  color: #111827 !important;
+
+}
+
+/* OPTION HOVER */
+
+::ng-deep
+.custom-ng-select
+.ng-option.ng-option-marked {
+
+  background: #eff6ff !important;
+
+  color: #2563eb !important;
+
+}
+
+/* OPTION SELECTED */
+
+::ng-deep
+.custom-ng-select
+.ng-option.ng-option-selected {
+
+  background: #dbeafe !important;
+
+  color: #1d4ed8 !important;
+
+  font-weight: 600 !important;
+
+}
+
+/* =========================================
+   FILE IMPORT
+========================================= */
+
+.upload-box {
+
+  width: 100%;
+
+  min-height: 52px;
+
+  border: 1px dashed #cbd5e1;
+
+  border-radius: 14px;
+
+  background: #f8fafc;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+}
+
+.upload-box:hover {
+
+  border-color: #3b82f6;
+
+  background: #eff6ff;
+
+}
+
+.upload-box input {
+
+  display: none;
+
+}
+
+.upload-content {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  font-size: 14px;
+
+  color: #475569;
+
+  font-weight: 500;
+
+}
+
+/* =========================================
+   TABLE
+========================================= */
+
+table {
+
+  border-collapse: collapse;
+
+}
+
+thead th {
+
+  white-space: nowrap;
+
+}
+
+tbody tr:last-child {
+
+  border-bottom: none;
+
+}
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+.overflow-x-auto::-webkit-scrollbar {
+
+  height: 8px;
+
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+
+  background: #d1d5db;
+
+  border-radius: 999px;
+
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+
+  background: #9ca3af;
+
+}
+
+/* =========================================
+   BUTTON
+========================================= */
+
+button {
+
+  transition: all 0.2s ease;
+
+}
+
+button:active {
+
+  transform: scale(0.97);
+
+}
+
+/* =========================================
+   PAGINATION
+========================================= */
+
+.pagination-btn-active {
+
+  background: #2563eb;
+
+  color: white;
+
+  border-color: #2563eb;
+
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .table-mobile {
+
+    min-width: 1100px;
+
+  }
+
+}

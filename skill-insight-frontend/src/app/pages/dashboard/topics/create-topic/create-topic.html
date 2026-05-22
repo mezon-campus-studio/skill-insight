@@ -1,0 +1,480 @@
+<div class="min-h-screen bg-gray-50 p-6">
+
+  <div class="max-w-7xl mx-auto">
+
+    <!-- ===================================== -->
+    <!-- CARD -->
+    <!-- ===================================== -->
+
+    <div
+      class="bg-white border border-gray-100 rounded-3xl shadow-sm overflow-hidden"
+    >
+
+      <!-- HEADER -->
+      <div
+        class="px-8 py-7 border-b border-gray-100 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
+      >
+
+        <div>
+
+          <h1
+            class="text-3xl font-bold text-gray-900"
+          >
+            Tạo Chủ Đề
+          </h1>
+
+          <p
+            class="text-sm text-gray-500 mt-2"
+          >
+            Tạo thủ công hoặc import
+            bằng Excel / CSV
+          </p>
+
+        </div>
+
+        <a
+          routerLink="/dashboard/topics"
+          class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl border border-gray-200 bg-white hover:bg-gray-50 transition text-sm font-semibold text-gray-700 shadow-sm"
+        >
+
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+            />
+
+          </svg>
+
+          Quay lại
+
+        </a>
+
+      </div>
+
+      <!-- ===================================== -->
+      <!-- IMPORT -->
+      <!-- ===================================== -->
+
+      <div class="p-8 border-b border-gray-100">
+
+        <div
+          class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-6"
+        >
+
+          <!-- LEFT -->
+          <div class="flex-1">
+
+            <div
+              class="flex flex-col md:flex-row md:items-center gap-4"
+            >
+
+              <input
+                #fileInput
+                type="file"
+                accept=".xlsx,.csv"
+                class="hidden"
+                (change)="onFileChange($event)"
+              />
+
+              <button
+                type="button"
+                (click)="fileInput.click()"
+                [disabled]="loading"
+                class="h-12 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition shadow-sm disabled:opacity-50"
+              >
+                Import Excel / CSV
+              </button>
+
+              <div
+                class="text-sm text-gray-500 truncate"
+              >
+                {{
+                  selectedFileName
+                    || 'Chưa chọn file'
+                }}
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- GUIDE -->
+        <div
+          class="mt-8 bg-blue-50 border border-blue-100 rounded-3xl p-6"
+        >
+
+          <div
+            class="flex items-center gap-2 mb-4"
+          >
+
+            <div
+              class="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center"
+            >
+              ?
+            </div>
+
+            <div>
+
+              <h3
+                class="font-bold text-blue-900"
+              >
+                Hướng dẫn cấu trúc file import
+              </h3>
+
+              <p
+                class="text-sm text-blue-700"
+              >
+                File phải đúng tên cột
+                bên dưới
+              </p>
+
+            </div>
+
+          </div>
+
+          <!-- TABLE GUIDE -->
+          <div
+            class="overflow-x-auto rounded-2xl border border-blue-100"
+          >
+
+            <table
+              class="w-full min-w-[600px]"
+            >
+
+              <thead
+                class="bg-blue-100"
+              >
+
+                <tr>
+
+                  <th
+                    class="px-4 py-3 text-left text-xs font-bold text-blue-900 uppercase"
+                  >
+                    subject_name
+                  </th>
+
+                  <th
+                    class="px-4 py-3 text-left text-xs font-bold text-blue-900 uppercase"
+                  >
+                    topic_name
+                  </th>
+
+                  <th
+                    class="px-4 py-3 text-left text-xs font-bold text-blue-900 uppercase"
+                  >
+                    description
+                  </th>
+
+                </tr>
+
+              </thead>
+
+              <tbody
+                class="bg-white"
+              >
+
+                <tr
+                  class="border-t border-blue-50"
+                >
+
+                  <td
+                    class="px-4 py-3 text-sm text-gray-700"
+                  >
+                    Toán học
+                  </td>
+
+                  <td
+                    class="px-4 py-3 text-sm text-gray-700"
+                  >
+                    Đạo hàm
+                  </td>
+
+                  <td
+                    class="px-4 py-3 text-sm text-gray-700"
+                  >
+                    Các quy tắc đạo hàm cơ bản
+                  </td>
+
+                </tr>
+
+                <tr
+                  class="border-t border-blue-50"
+                >
+
+                  <td
+                    class="px-4 py-3 text-sm text-gray-700"
+                  >
+                    Vật lý
+                  </td>
+
+                  <td
+                    class="px-4 py-3 text-sm text-gray-700"
+                  >
+                    Chuyển động thẳng đều
+                  </td>
+
+                  <td
+                    class="px-4 py-3 text-sm text-gray-700"
+                  >
+                    Kiến thức vận tốc
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+          <!-- RULE -->
+          <div
+            class="mt-5 grid md:grid-cols-3 gap-4"
+          >
+
+            <div
+              class="bg-white rounded-2xl p-4 border border-blue-100"
+            >
+
+              <div
+                class="font-semibold text-sm text-gray-900"
+              >
+                Nếu Subject đã tồn tại
+              </div>
+
+              <div
+                class="text-sm text-gray-500 mt-1"
+              >
+                Hệ thống sẽ dùng lại
+                subject cũ
+              </div>
+
+            </div>
+
+            <div
+              class="bg-white rounded-2xl p-4 border border-blue-100"
+            >
+
+              <div
+                class="font-semibold text-sm text-gray-900"
+              >
+                Nếu Subject chưa tồn tại
+              </div>
+
+              <div
+                class="text-sm text-gray-500 mt-1"
+              >
+                Tự động tạo mới subject
+              </div>
+
+            </div>
+
+            <div
+              class="bg-white rounded-2xl p-4 border border-blue-100"
+            >
+
+              <div
+                class="font-semibold text-sm text-gray-900"
+              >
+                Nếu trùng Subject + Topic
+              </div>
+
+              <div
+                class="text-sm text-gray-500 mt-1"
+              >
+                Hệ thống bỏ qua không thêm
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ===================================== -->
+      <!-- FORM -->
+      <!-- ===================================== -->
+
+      <form
+        (ngSubmit)="createTopic()"
+        class="p-8 space-y-6"
+      >
+
+        <!-- TOPIC -->
+        <div>
+
+          <label
+            class="block text-sm font-semibold text-gray-700 mb-2"
+          >
+            Tên chủ đề
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="formData.topic_name"
+            name="topic_name"
+            placeholder="Nhập tên chủ đề..."
+            class="w-full h-12 rounded-2xl border border-gray-300 px-4 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
+          />
+
+        </div>
+
+        <!-- SUBJECT -->
+        <div
+          class="relative"
+        >
+
+          <label
+            class="block text-sm font-semibold text-gray-700 mb-2"
+          >
+            Môn học
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="search"
+            name="search"
+            (focus)="showDropdown = true"
+            (ngModelChange)="onSearch()"
+            placeholder="Tìm môn học..."
+            autocomplete="off"
+            class="w-full h-12 rounded-2xl border border-gray-300 px-4 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition"
+          />
+
+          <!-- DROPDOWN -->
+          <div
+            *ngIf="showDropdown"
+            class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden z-50"
+          >
+
+            <div
+              *ngIf="subjects.length > 0"
+              class="max-h-72 overflow-y-auto"
+            >
+
+              <button
+                type="button"
+                *ngFor="let subject of subjects"
+                (click)="selectSubject(subject)"
+                class="w-full text-left px-4 py-3 hover:bg-blue-50 transition border-b border-gray-100 last:border-0"
+              >
+
+                <div
+                  class="font-semibold text-sm text-gray-800"
+                >
+                  {{
+                    subject.subject_name
+                  }}
+                </div>
+
+              </button>
+
+            </div>
+
+            <div
+              *ngIf="subjects.length === 0"
+              class="p-5 text-center text-sm text-gray-400"
+            >
+              Không tìm thấy môn học
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- SELECTED -->
+        <div
+          *ngIf="selectedSubject"
+          class="flex items-center justify-between bg-blue-50 border border-blue-100 rounded-2xl px-4 py-3"
+        >
+
+          <div
+            class="flex items-center gap-2"
+          >
+
+            <div
+              class="w-2 h-2 rounded-full bg-blue-600"
+            ></div>
+
+            <span
+              class="text-sm font-semibold text-blue-800"
+            >
+              {{
+                selectedSubject.subject_name
+              }}
+            </span>
+
+          </div>
+
+          <button
+            type="button"
+            (click)="selectedSubject = null; search=''; formData.subject_id = null"
+            class="text-xs font-bold text-red-500 hover:text-red-600"
+          >
+            Bỏ chọn
+          </button>
+
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div>
+
+          <label
+            class="block text-sm font-semibold text-gray-700 mb-2"
+          >
+            Mô tả
+          </label>
+
+          <textarea
+            rows="5"
+            [(ngModel)]="formData.description"
+            name="description"
+            placeholder="Nhập mô tả..."
+            class="w-full rounded-2xl border border-gray-300 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition resize-none"
+          ></textarea>
+
+        </div>
+
+        <!-- BUTTON -->
+        <div
+          class="flex justify-end"
+        >
+
+          <button
+            type="submit"
+            [disabled]="loading"
+            class="h-12 px-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition shadow-sm disabled:opacity-50"
+          >
+
+            <span *ngIf="!loading">
+              Tạo chủ đề
+            </span>
+
+            <span *ngIf="loading">
+              Đang xử lý...
+            </span>
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>

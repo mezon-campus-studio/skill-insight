@@ -1,29 +1,29 @@
-import {
-  ApplicationConfig,
-  provideZoneChangeDetection,
-  provideBrowserGlobalErrorListeners,
-} from '@angular/core';
+
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, withRouterConfig, withViewTransitions } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
 
-    // router nâng cao
     provideRouter(
       routes,
       withRouterConfig({
-        onSameUrlNavigation: 'reload',
+        onSameUrlNavigation: 'reload'
       }),
-      withViewTransitions(),
+      withViewTransitions()
     ),
 
-    // http + interceptor
-    provideHttpClient(withInterceptors([authInterceptor])),
-  ],
+    provideHttpClient(
+      withInterceptors([authInterceptor])
+    ),
+
+    provideCharts(withDefaultRegisterables())
+  ]
 };

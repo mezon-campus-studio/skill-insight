@@ -1,0 +1,416 @@
+<!-- <div class="p-6 max-w-5xl mx-auto">
+
+  <div
+    class="flex items-center justify-between mb-8"
+  >
+
+    <div>
+
+      <h1
+        class="text-3xl font-bold text-gray-800"
+      >
+        Question Review
+      </h1>
+
+      <p
+        class="text-gray-500 mt-1"
+      >
+        Luyện tập và xem đáp án
+      </p>
+
+    </div>
+
+    <button
+      routerLink="/dashboard/questions"
+      class="px-5 py-3 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 transition"
+    >
+      Back
+    </button>
+
+  </div>
+
+  <div
+    *ngIf="loading"
+    class="flex justify-center py-20"
+  >
+
+    <div
+      class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"
+    ></div>
+
+  </div>
+
+  <div
+    *ngIf="
+      !loading &&
+      questions.length === 0
+    "
+    class="bg-white rounded-3xl border border-gray-100 shadow-sm p-10 text-center"
+  >
+
+    <h2
+      class="text-2xl font-bold text-gray-700 mb-2"
+    >
+      No Questions
+    </h2>
+
+    <p
+      class="text-gray-500"
+    >
+      Chưa có câu hỏi nào
+    </p>
+
+  </div>
+
+  <div
+    *ngIf="
+      !loading &&
+      currentQuestion
+    "
+    class="bg-white rounded-3xl border border-gray-100 shadow-sm p-8"
+  >
+
+    <div
+      class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8"
+    >
+
+
+      <div>
+
+        <div
+          class="text-sm text-blue-600 font-semibold mb-2 uppercase tracking-wide"
+        >
+          Question
+          {{ currentIndex + 1 }}
+          /
+          {{ questions.length }}
+        </div>
+
+        <h2
+          class="text-2xl font-bold text-gray-800 leading-relaxed"
+        >
+          {{
+            currentQuestion.question_text
+          }}
+        </h2>
+
+      </div>
+
+      <div
+        class="bg-blue-50 text-blue-700 rounded-2xl px-6 py-4 text-center"
+      >
+
+        <div
+          class="text-sm font-medium"
+        >
+          Correct
+        </div>
+
+        <div
+          class="text-3xl font-bold"
+        >
+          {{ correctCount }}
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="space-y-4 mb-8">
+
+      <button
+        (click)="selectAnswer('A')"
+        [ngClass]="
+          getOptionClass('A')
+        "
+        class="w-full text-left border-2 rounded-2xl p-5 transition"
+      >
+
+        <div
+          class="flex items-start gap-4"
+        >
+
+          <div
+            class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold"
+          >
+            A
+          </div>
+
+          <div
+            class="font-medium"
+          >
+            {{
+              currentQuestion.option_a
+            }}
+          </div>
+
+        </div>
+
+      </button>
+
+      <button
+        (click)="selectAnswer('B')"
+        [ngClass]="
+          getOptionClass('B')
+        "
+        class="w-full text-left border-2 rounded-2xl p-5 transition"
+      >
+
+        <div
+          class="flex items-start gap-4"
+        >
+
+          <div
+            class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold"
+          >
+            B
+          </div>
+
+          <div
+            class="font-medium"
+          >
+            {{
+              currentQuestion.option_b
+            }}
+          </div>
+
+        </div>
+
+      </button>
+
+      <button
+        (click)="selectAnswer('C')"
+        [ngClass]="
+          getOptionClass('C')
+        "
+        class="w-full text-left border-2 rounded-2xl p-5 transition"
+      >
+
+        <div
+          class="flex items-start gap-4"
+        >
+
+          <div
+            class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold"
+          >
+            C
+          </div>
+
+          <div
+            class="font-medium"
+          >
+            {{
+              currentQuestion.option_c
+            }}
+          </div>
+
+        </div>
+
+      </button>
+
+      <button
+        (click)="selectAnswer('D')"
+        [ngClass]="
+          getOptionClass('D')
+        "
+        class="w-full text-left border-2 rounded-2xl p-5 transition"
+      >
+
+        <div
+          class="flex items-start gap-4"
+        >
+
+          <div
+            class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold"
+          >
+            D
+          </div>
+
+          <div
+            class="font-medium"
+          >
+            {{
+              currentQuestion.option_d
+            }}
+          </div>
+
+        </div>
+
+      </button>
+
+    </div>
+
+    <div
+      *ngIf="
+        showAnswer &&
+        currentQuestion.explanation
+      "
+      class="bg-yellow-50 border border-yellow-200 rounded-3xl p-6 mb-8"
+    >
+
+      <div
+        class="font-semibold text-yellow-700 mb-2"
+      >
+        Explanation
+      </div>
+
+      <p
+        class="text-gray-700 leading-relaxed"
+      >
+        {{
+          currentQuestion.explanation
+        }}
+      </p>
+
+    </div>
+
+    <div
+      class="flex flex-col md:flex-row gap-4"
+    >
+
+      <button
+        (click)="previousQuestion()"
+        [disabled]="currentIndex === 0"
+        class="flex-1 py-4 rounded-2xl border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-50 transition"
+      >
+        Previous
+      </button>
+
+      <button
+        *ngIf="!showAnswer"
+        (click)="checkAnswer()"
+        class="flex-1 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
+      >
+        Check Answer
+      </button>
+
+      <button
+        *ngIf="showAnswer"
+        (click)="nextQuestion()"
+        [disabled]="
+          currentIndex ===
+          questions.length - 1
+        "
+        class="flex-1 py-4 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-semibold disabled:opacity-50 transition"
+      >
+        Next Question
+      </button>
+
+    </div>
+
+  </div>
+
+</div> -->
+
+<div
+  *ngIf="loading"
+  class="p-10 text-center"
+>
+  Đang tải...
+</div>
+
+<div
+  *ngIf="question"
+  class="p-6 space-y-6"
+>
+
+  <div class="flex items-center justify-between">
+
+    <div>
+
+      <h1
+        class="text-3xl font-bold text-gray-800"
+      >
+        Duyệt câu hỏi
+      </h1>
+
+      <p class="text-gray-500 mt-1">
+        Kiểm tra nội dung trước khi duyệt
+      </p>
+
+    </div>
+
+    <button
+      *ngIf="!question.is_approved"
+      (click)="approveQuestion()"
+      class="px-5 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold"
+    >
+      Duyệt câu hỏi
+    </button>
+
+  </div>
+
+  <div
+    class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+  >
+
+    <div class="mb-5">
+
+      <h2
+        class="text-lg font-bold text-gray-800 mb-2"
+      >
+        Nội dung câu hỏi
+      </h2>
+
+      <p class="text-gray-700 leading-relaxed">
+        {{ question.content }}
+      </p>
+
+    </div>
+
+    <div class="mb-5">
+
+      <h2
+        class="text-lg font-bold text-gray-800 mb-3"
+      >
+        Danh sách đáp án
+      </h2>
+
+      <div
+        *ngFor="let answer of question.answers"
+        class="border rounded-xl p-4 mb-3"
+        [ngClass]="{
+          'border-green-500 bg-green-50':
+            answer.is_correct
+        }"
+      >
+
+        <div class="flex items-center justify-between">
+
+          <span>
+            {{ answer.answer_text }}
+          </span>
+
+          <span
+            *ngIf="answer.is_correct"
+            class="text-green-600 font-semibold"
+          >
+            Đáp án đúng
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div
+      *ngIf="question.explanation"
+    >
+
+      <h2
+        class="text-lg font-bold text-gray-800 mb-2"
+      >
+        Giải thích
+      </h2>
+
+      <p class="text-gray-700">
+        {{ question.explanation }}
+      </p>
+
+    </div>
+
+  </div>
+
+</div>

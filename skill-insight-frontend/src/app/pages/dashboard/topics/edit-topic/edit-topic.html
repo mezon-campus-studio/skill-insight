@@ -1,0 +1,141 @@
+<div class="min-h-screen bg-gray-100 p-6">
+
+  <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+
+    <!-- HEADER -->
+    <div class="flex items-center justify-between mb-8">
+
+      <div>
+
+        <h1 class="text-3xl font-bold text-gray-800">
+          Edit Topic
+        </h1>
+
+        <p class="text-gray-500 mt-1">
+          Cập nhật thông tin topic
+        </p>
+
+      </div>
+
+      <button
+        type="button"
+        routerLink="/dashboard/topics"
+        class="px-5 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition">
+
+        Quay lại
+
+      </button>
+
+    </div>
+
+    <!-- LOADING -->
+    <div
+      *ngIf="loading"
+      class="py-16 text-center text-gray-500 text-lg">
+
+      Đang tải dữ liệu...
+
+    </div>
+
+    <!-- FORM -->
+    <form
+      *ngIf="!loading"
+      (ngSubmit)="updateTopic()"
+      class="space-y-6">
+
+      <!-- TOPIC NAME -->
+      <div>
+
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+
+          Topic Name
+
+        </label>
+
+        <input
+          type="text"
+          name="topic_name"
+          [(ngModel)]="formData.topic_name"
+          placeholder="Nhập tên topic..."
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+
+      </div>
+
+      <!-- DESCRIPTION -->
+     <div>
+
+     <label class="block text-sm font-semibold text-gray-700 mb-2">
+
+     Description
+
+     </label>
+
+     <textarea
+     name="description"
+     [(ngModel)]="formData.description"
+     rows="5"
+     placeholder="Nhập mô tả topic..."
+     class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition resize-none">
+
+     </textarea>
+
+     </div>
+
+      <!-- SUBJECT -->
+      <div>
+
+        <label class="block text-sm font-semibold text-gray-700 mb-2">
+
+          Subject
+
+        </label>
+
+        <select
+          name="subject_id"
+          [(ngModel)]="formData.subject_id"
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+
+          <option value="">
+            -- Chọn Subject --
+          </option>
+
+          <option
+            *ngFor="let subject of subjects"
+            [value]="subject.subject_id">
+
+            {{ subject.subject_name }}
+
+          </option>
+
+        </select>
+
+      </div>
+
+      <!-- ACTION -->
+      <div class="flex items-center gap-4 pt-4">
+
+        <button
+          type="submit"
+          [disabled]="loading"
+          class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium px-6 py-3 rounded-xl transition">
+
+          Cập nhật Topic
+
+        </button>
+
+        <button
+          type="button"
+          routerLink="/dashboard/topics"
+          class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-6 py-3 rounded-xl transition">
+
+          Hủy
+
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>

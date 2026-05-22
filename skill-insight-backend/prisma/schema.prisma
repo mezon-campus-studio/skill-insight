@@ -7,12 +7,165 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//
+// ======================================================
+// ENUMS
+// ======================================================
+//
+
 enum Role {
   admin
   teacher
   student
 }
 
+<<<<<<< HEAD
+enum BatchStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum QuestionLevel {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum QuestionType {
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  ESSAY
+}
+
+enum ExamStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ResultStatus {
+  IN_PROGRESS
+  SUBMITTED
+}
+
+enum QuestionVisibility {
+  PRIVATE
+  SYSTEM_BANK
+}
+
+enum AssignmentStatus {
+  DRAFT
+  SCHEDULED
+  ACTIVE
+  CLOSED
+}
+
+enum NotificationType {
+  NEW_EXAM
+  NEW_MATERIAL
+  NEW_COMMENT
+  NEW_RESULT
+  NEW_POST
+}
+
+enum MaterialType {
+  PDF
+  DOC
+  PPT
+  VIDEO
+  LINK
+}
+
+enum PostType {
+  ANNOUNCEMENT
+  DISCUSSION
+}
+
+//
+// ======================================================
+// USER
+// ======================================================
+//
+
+model User {
+  user_id Int @id @default(autoincrement())
+
+  full_name String? @db.VarChar(255)
+
+  email String @unique @db.VarChar(255)
+
+  password String? @db.VarChar(255)
+
+  role Role?
+
+  provider String? @db.VarChar(50)
+
+  provider_id String? @db.VarChar(255)
+
+  avatar_url String? @db.Text
+
+  bio String? @db.Text
+
+  status Boolean @default(true)
+
+  deleted_at DateTime?
+
+  created_at DateTime @default(now())
+
+  updated_at DateTime @updatedAt
+
+  //
+  // RELATIONS
+  //
+
+  // SUBJECT
+  created_subjects Subject[] @relation("CreatedSubjects")
+
+  // TOPIC
+  topics Topic[] @relation("CreatedTopics")
+
+  // QUESTION
+  created_questions Question[] @relation("CreatedQuestions")
+  deleted_questions Question[] @relation("DeletedQuestions")
+
+  // QUESTION BATCH
+  question_batches QuestionBatch[] @relation("TeacherQuestionBatches")
+
+  approved_question_batches QuestionBatch[] @relation("ApprovedQuestionBatches")
+
+  // EXAM
+  exams Exam[] @relation("TeacherExams")
+
+  // ASSIGNMENT
+  assignments Assignment[] @relation("TeacherAssignments")
+
+  // RESULT
+  results Result[] @relation("StudentResults")
+
+  // CLASS
+  classes Class[] @relation("TeacherClasses")
+
+  class_students ClassStudent[]
+
+  // STUDENT
+  student_weaknesses StudentWeakness[]
+
+  practice_histories PracticeHistory[]
+
+  // NOTIFICATION
+  notifications Notification[]
+
+  // POST
+  posts ClassPost[]
+
+  comments PostComment[]
+
+  // MATERIAL
+  materials Material[]
+  AuditLog  AuditLog[]
+=======
 model User {
   user_id     Int      @id @default(autoincrement())
   full_name   String?  @db.VarChar(255)
@@ -29,10 +182,943 @@ model User {
 
   // relation
   subjects    Subject[]
+>>>>>>> 7831c51b0f00e6b70f4c2d7230e7bc7f04f9e0b5
 
   @@map("users")
 }
 
+<<<<<<< HEAD
+//
+// ======================================================
+// SUBJECT
+// ======================================================
+//
+
+model Subject {
+  subject_id Int @id @default(autoincrement())
+
+  subject_name String @db.VarChar(255)
+
+  description String? @db.Text
+
+  created_by Int
+
+  creator User @relation("CreatedSubjects", fields: [created_by], references: [user_id], onDelete: Restrict)
+
+  created_at DateTime @default(now())
+
+  updated_at DateTime @updatedAt
+
+  //
+  // RELATIONS
+  //
+
+  topics Topic[]
+
+  exams Exam[]
+
+  questions        Question[]
+  question_batches QuestionBatch[]
+
+  @@unique([subject_name])
+  @@index([subject_name])
+  @@index([created_by])
+  @@index([created_at])
+  @@map("subjects")
+}
+
+//
+// ======================================================
+// TOPIC
+// ======================================================
+//
+
+model Topic {
+  topic_id Int @id @default(autoincrement())
+
+  topic_name  String  @db.VarChar(255)
+  description String? @db.Text
+
+  subject_id Int
+  creator_id Int // ✅ THÊM CÁI NÀY
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  //
+  // RELATIONS
+  //
+
+  subject Subject @relation(fields: [subject_id], references: [subject_id], onDelete: Restrict)
+
+  creator User @relation("CreatedTopics", fields: [creator_id], references: [user_id], onDelete: Restrict)
+
+  questions        Question[]
+  question_batches QuestionBatch[]
+  exams            Exam[]          @relation("TopicExams")
+
+  student_weaknesses StudentWeakness[]
+  practice_histories PracticeHistory[]
+
+  @@unique([topic_name, subject_id])
+  @@index([topic_name])
+  @@index([subject_id])
+  @@index([creator_id]) // nên có index
+  @@index([created_at])
+  @@map("topics")
+}
+
+model QuestionBatch {
+  batch_id Int @id @default(autoincrement())
+
+  batch_code String @unique @db.VarChar(100)
+  batch_name String @db.VarChar(255)
+
+  description      String? @db.Text
+  rejected_reason  String? @db.Text
+  import_file_name String? @db.VarChar(255)
+  is_locked        Boolean @default(false)
+
+  subject_id  Int
+  topic_id    Int
+  teacher_id  Int
+  approved_by Int?
+
+  status      BatchStatus @default(PENDING)
+  approved_at DateTime?
+  deleted_at  DateTime?
+
+  total_questions Int     @default(0)
+  easy_count      Int     @default(0)
+  medium_count    Int     @default(0)
+  hard_count      Int     @default(0)
+  approved_note   String? @db.Text
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  integrated_exams Exam[] @relation("IntegratedBatchExams")
+
+  subject Subject @relation(fields: [subject_id], references: [subject_id], onDelete: Restrict)
+  topic   Topic   @relation(fields: [topic_id], references: [topic_id], onDelete: Restrict)
+
+  teacher User @relation("TeacherQuestionBatches", fields: [teacher_id], references: [user_id], onDelete: Restrict)
+
+  approver User? @relation("ApprovedQuestionBatches", fields: [approved_by], references: [user_id], onDelete: SetNull)
+
+  questions QuestionBatchQuestion[] @relation("BatchQuestions")
+
+  //
+  // INDEXES (OPTIMIZED)
+  //
+
+  @@index([subject_id])
+  @@index([topic_id])
+  @@index([teacher_id])
+  @@index([approved_by])
+  @@index([status, created_at])
+  @@index([deleted_at])
+  @@index([subject_id, topic_id])
+  @@index([teacher_id, status, created_at])
+  @@map("question_batches")
+}
+
+model QuestionBatchQuestion {
+  id Int @id @default(autoincrement())
+
+  batch_id    Int
+  question_id Int?
+
+  question_order Int
+
+  question_snapshot Json?
+
+  created_at DateTime @default(now())
+
+  batch QuestionBatch @relation("BatchQuestions", fields: [batch_id], references: [batch_id], onDelete: Cascade)
+
+  question Question? @relation("QuestionBatches", fields: [question_id], references: [question_id], onDelete: SetNull)
+
+  @@unique([batch_id, question_order])
+  @@index([batch_id])
+  @@index([question_id])
+  @@map("question_batch_questions")
+}
+
+//
+// ======================================================
+// QUESTION
+// ======================================================
+//
+model Question {
+  question_id Int @id @default(autoincrement())
+
+  question_code String? @unique @db.VarChar(100)
+
+  subject_id Int
+  topic_id   Int?
+
+  created_by Int
+
+  content      String @db.Text
+  content_hash String @db.VarChar(64)
+
+  image_url   String? @db.Text
+  explanation String? @db.Text
+
+  question_type QuestionType  @default(SINGLE_CHOICE)
+  level         QuestionLevel
+
+  points Float @default(1)
+
+  deleted_by Int?
+
+  visibility QuestionVisibility @default(PRIVATE)
+
+  is_active  Boolean   @default(true)
+  deleted_at DateTime?
+
+  version           Int     @default(1)
+  allow_ai_training Boolean @default(false)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  //
+  // RELATIONS
+  //
+
+  subject Subject @relation(fields: [subject_id], references: [subject_id], onDelete: Restrict)
+
+  topic Topic? @relation(fields: [topic_id], references: [topic_id], onDelete: SetNull)
+
+  creator User @relation("CreatedQuestions", fields: [created_by], references: [user_id], onDelete: Restrict)
+
+  deleted_by_user User? @relation("DeletedQuestions", fields: [deleted_by], references: [user_id], onDelete: SetNull)
+
+  answers              Answer[]
+  student_answers      StudentAnswer[]
+  exam_questions       ExamQuestion[]
+  batches              QuestionBatchQuestion[] @relation("QuestionBatches")
+  assignment_questions AssignmentQuestion[]
+  result_questions     ResultQuestion[]
+
+  //
+  // INDEXES (OPTIMIZED)
+  //
+
+  @@unique([subject_id, content_hash])
+  @@index([subject_id, topic_id, created_at])
+  @@index([subject_id, deleted_at])
+  @@index([created_by])
+  @@index([visibility])
+  @@index([level])
+  @@index([question_type])
+  @@index([is_active])
+  @@index([subject_id, is_active])
+  @@index([subject_id, visibility])
+  @@index([created_by, created_at])
+  @@index([subject_id, visibility, is_active])
+  @@map("questions")
+}
+
+//
+// ======================================================
+// ANSWER
+// ======================================================
+//
+
+model Answer {
+  answer_id Int @id @default(autoincrement())
+
+  //
+  // FOREIGN KEYS
+  //
+
+  question_id Int
+
+  //
+  // CONTENT
+  //
+
+  answer_text String @db.Text
+
+  answer_hash String @db.VarChar(64)
+
+  answer_order Int? @default(1)
+
+  is_correct Boolean @default(false)
+
+  //
+  // TIMESTAMP
+  //
+
+  created_at DateTime @default(now())
+
+  updated_at DateTime @updatedAt
+
+  //
+  // RELATIONS
+  //
+
+  question Question @relation(fields: [question_id], references: [question_id], onDelete: Cascade)
+
+  student_answer_options StudentAnswerOption[]
+
+  //
+  // INDEXES
+  //
+
+  @@unique([question_id, answer_hash])
+  @@index([question_id])
+  @@index([is_correct])
+  @@index([answer_order])
+  @@map("answers")
+}
+
+//
+// ======================================================
+// EXAM
+// ======================================================
+//
+model Exam {
+  exam_id Int @id @default(autoincrement())
+
+  title       String  @db.VarChar(255)
+  description String? @db.Text
+
+  subject_id Int
+  topic_id   Int?
+
+  teacher_id Int
+
+  duration   Int
+  pass_score Float?
+
+  status_exam ExamStatus @default(DRAFT)
+
+  is_random Boolean @default(false)
+
+  random_question_count Int @default(0)
+
+  total_questions Int @default(0)
+
+  visibility QuestionVisibility @default(PRIVATE)
+
+  allow_system_integration Boolean @default(false)
+
+  integrated_at       DateTime?
+  integrated_batch_id Int?
+  deleted_at          DateTime?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  subject Subject @relation(fields: [subject_id], references: [subject_id], onDelete: Restrict)
+
+  topic Topic? @relation("TopicExams", fields: [topic_id], references: [topic_id], onDelete: SetNull)
+
+  teacher User @relation("TeacherExams", fields: [teacher_id], references: [user_id], onDelete: Restrict)
+
+  integrated_batch QuestionBatch? @relation("IntegratedBatchExams", fields: [integrated_batch_id], references: [batch_id])
+
+  exam_questions ExamQuestion[]
+
+  assignments Assignment[]
+
+  @@index([title])
+  @@index([teacher_id])
+  @@index([subject_id])
+  @@index([topic_id])
+  @@index([visibility])
+  @@index([created_at])
+  @@map("exams")
+}
+
+model Assignment {
+  assignment_id Int @id @default(autoincrement())
+
+  exam_id Int
+
+  class_id Int
+
+  teacher_id Int
+
+  title String? @db.VarChar(255)
+
+  start_at DateTime
+
+  end_at DateTime
+
+  duration Int
+
+  created_at DateTime @default(now())
+
+  updated_at DateTime @updatedAt
+
+  status            AssignmentStatus @default(DRAFT)
+  shuffle_answers   Boolean          @default(true)
+  shuffle_questions Boolean          @default(false)
+
+  allow_review Boolean @default(true)
+
+  show_answer Boolean @default(false)
+
+  max_attempts Int @default(1)
+
+  published_at DateTime?
+  closed_at    DateTime?
+
+  //
+  // RELATIONS
+  //
+
+  exam Exam @relation(fields: [exam_id], references: [exam_id], onDelete: Cascade)
+
+  class Class @relation(fields: [class_id], references: [class_id], onDelete: Cascade)
+
+  teacher User @relation("TeacherAssignments", fields: [teacher_id], references: [user_id], onDelete: Restrict)
+
+  results Result[]
+
+  assignment_questions AssignmentQuestion[]
+
+  //
+  // INDEXES
+  //
+  @@unique([exam_id, class_id, start_at])
+  @@index([exam_id])
+  @@index([class_id])
+  @@index([teacher_id])
+  @@index([start_at])
+  @@index([end_at])
+  @@map("assignments")
+}
+
+model AssignmentQuestion {
+  assignment_question_id Int @id @default(autoincrement())
+
+  assignment_id Int
+
+  question_id Int?
+
+  question_order Int
+
+  points Float @default(1)
+
+  question_snapshot Json?
+
+  created_at DateTime @default(now())
+
+  //
+  // RELATIONS
+  //
+
+  assignment Assignment @relation(fields: [assignment_id], references: [assignment_id], onDelete: Cascade)
+
+  question Question? @relation(fields: [question_id], references: [question_id], onDelete: SetNull)
+
+  @@unique([assignment_id, question_order])
+  @@index([assignment_id, question_order])
+  @@index([assignment_id])
+  @@index([question_id])
+  @@map("assignment_questions")
+}
+
+//
+// ======================================================
+// EXAM QUESTION
+// ======================================================
+//
+
+model ExamQuestion {
+  exam_question_id Int @id @default(autoincrement())
+
+  exam_id Int
+
+  question_id Int?
+
+  question_order Int
+
+  question_snapshot Json?
+
+  created_at DateTime @default(now())
+
+  exam Exam @relation(fields: [exam_id], references: [exam_id], onDelete: Cascade)
+
+  question Question? @relation(fields: [question_id], references: [question_id], onDelete: SetNull)
+
+  @@unique([exam_id, question_order])
+  @@index([exam_id])
+  @@index([question_id])
+  @@index([question_order])
+  @@map("exam_questions")
+}
+
+model ResultQuestion {
+  result_question_id Int @id @default(autoincrement())
+
+  result_id Int
+
+  question_id Int?
+
+  question_order Int
+
+  points Float @default(1)
+
+  question_snapshot Json?
+
+  created_at DateTime @default(now())
+
+  //
+  // RELATIONS
+  //
+
+  result Result @relation(fields: [result_id], references: [result_id], onDelete: Cascade)
+
+  question      Question?       @relation(fields: [question_id], references: [question_id], onDelete: SetNull)
+  StudentAnswer StudentAnswer[]
+
+  @@unique([result_id, question_order])
+  @@index([result_id])
+  @@index([question_id])
+  @@map("result_questions")
+}
+
+//
+// ======================================================
+// CLASS
+// ======================================================
+//
+
+model Class {
+  class_id Int @id @default(autoincrement())
+
+  class_name String @db.VarChar(255)
+
+  teacher_id Int
+
+  description String? @db.Text
+
+  class_code String? @unique @db.VarChar(50)
+
+  created_at DateTime @default(now())
+
+  updated_at DateTime @updatedAt
+
+  //
+  // RELATIONS
+  //
+
+  teacher User @relation("TeacherClasses", fields: [teacher_id], references: [user_id], onDelete: Restrict)
+
+  students ClassStudent[]
+
+  assignments Assignment[]
+
+  posts ClassPost[]
+
+  materials Material[]
+
+  @@index([teacher_id])
+  @@index([class_code])
+  @@index([created_at])
+  @@map("classes")
+}
+
+//
+// ======================================================
+// CLASS STUDENT
+// ======================================================
+//
+
+model AuditLog {
+  log_id Int @id @default(autoincrement())
+
+  user_id Int?
+
+  action String
+
+  table_name String
+
+  record_id Int?
+
+  old_data Json?
+  new_data Json?
+
+  created_at DateTime @default(now())
+
+  user User? @relation(fields: [user_id], references: [user_id], onDelete: SetNull)
+
+  @@index([user_id])
+  @@index([created_at])
+}
+
+model ClassStudent {
+  class_student_id Int @id @default(autoincrement())
+
+  class_id Int
+
+  student_id Int
+
+  joined_at DateTime @default(now())
+
+  //
+  // RELATIONS
+  //
+
+  class Class @relation(fields: [class_id], references: [class_id], onDelete: Cascade)
+
+  student User @relation(fields: [student_id], references: [user_id], onDelete: Cascade)
+
+  @@unique([class_id, student_id])
+  @@index([class_id])
+  @@index([student_id])
+  @@map("class_students")
+}
+
+//
+// ======================================================
+// RESULT
+// ======================================================
+//
+
+model Result {
+  result_id Int @id @default(autoincrement())
+
+  assignment_id Int
+
+  student_id Int
+
+  time_spent Int?
+
+  score Float?
+
+  total_questions Int
+
+  correct_answers Int
+
+  status ResultStatus @default(IN_PROGRESS)
+
+  start_time DateTime
+
+  submit_time DateTime?
+
+  ai_feedback String? @db.Text
+
+  created_at DateTime @default(now())
+
+  updated_at DateTime @updatedAt
+  attempt_no Int      @default(1)
+
+  ip_address String? @db.VarChar(100)
+
+  user_agent String? @db.Text
+
+  tab_switch_count Int @default(0)
+
+  //
+  // RELATIONS
+  //
+
+  assignment Assignment @relation(fields: [assignment_id], references: [assignment_id], onDelete: Cascade)
+
+  student User @relation("StudentResults", fields: [student_id], references: [user_id], onDelete: Cascade)
+
+  student_answers  StudentAnswer[]
+  result_questions ResultQuestion[]
+
+  //
+  // INDEXES
+  //
+
+  @@unique([student_id, assignment_id, attempt_no])
+  @@index([student_id])
+  @@index([assignment_id])
+  @@index([status])
+  @@index([created_at])
+  @@map("results")
+}
+
+//
+// ======================================================
+// STUDENT ANSWER
+// ======================================================
+//
+model StudentAnswer {
+  student_answer_id Int @id @default(autoincrement())
+
+  result_id Int
+
+  result_question_id Int
+  question_id        Int?
+
+  time_spent   Int?
+  score        Float?
+  is_correct   Boolean?
+  essay_answer String?  @db.Text
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  result Result @relation(fields: [result_id], references: [result_id], onDelete: Cascade)
+
+  question Question? @relation(fields: [question_id], references: [question_id], onDelete: SetNull)
+
+  result_question ResultQuestion @relation(fields: [result_question_id], references: [result_question_id], onDelete: Cascade)
+
+  selected_options StudentAnswerOption[]
+
+  @@unique([result_id, result_question_id])
+  @@index([result_id])
+  @@index([question_id])
+  @@index([result_question_id])
+  @@map("student_answers")
+}
+
+model StudentAnswerOption {
+  student_answer_option_id Int @id @default(autoincrement())
+
+  student_answer_id Int
+
+  answer_id Int
+
+  created_at DateTime @default(now())
+
+  //
+  // RELATIONS
+  //
+
+  student_answer StudentAnswer @relation(fields: [student_answer_id], references: [student_answer_id], onDelete: Cascade)
+
+  answer Answer @relation(fields: [answer_id], references: [answer_id], onDelete: Cascade)
+
+  //
+  // INDEXES
+  //
+
+  @@unique([student_answer_id, answer_id])
+  @@index([student_answer_id])
+  @@index([answer_id])
+  @@index([student_answer_id, answer_id])
+  @@map("student_answer_options")
+}
+
+//
+// ======================================================
+// STUDENT WEAKNESS
+// ======================================================
+//
+
+model StudentWeakness {
+  weakness_id Int @id @default(autoincrement())
+
+  student_id Int
+  topic_id   Int
+
+  weakness_score     Float
+  recommended_action String? @db.Text
+
+  updated_at DateTime @updatedAt
+
+  student User @relation(fields: [student_id], references: [user_id], onDelete: Cascade)
+
+  topic Topic @relation(fields: [topic_id], references: [topic_id], onDelete: Cascade)
+
+  @@unique([student_id, topic_id])
+  @@index([student_id])
+  @@index([topic_id])
+  @@index([student_id, topic_id])
+  @@map("student_weaknesses")
+}
+
+//
+// ======================================================
+// MATERIAL
+// ======================================================
+//
+
+model Material {
+  material_id Int @id @default(autoincrement())
+
+  class_id Int
+
+  teacher_id Int
+
+  title String @db.VarChar(255)
+
+  description String? @db.Text
+
+  file_url String? @db.Text
+
+  material_type MaterialType
+
+  created_at DateTime @default(now())
+
+  updated_at DateTime @updatedAt
+
+  //
+  // RELATIONS
+  //
+
+  class Class @relation(fields: [class_id], references: [class_id], onDelete: Cascade)
+
+  teacher User @relation(fields: [teacher_id], references: [user_id], onDelete: Restrict)
+
+  @@index([class_id])
+  @@index([teacher_id])
+  @@index([material_type])
+  @@index([created_at])
+  @@map("materials")
+}
+
+//
+// ======================================================
+// CLASS POST
+// ======================================================
+//
+
+model ClassPost {
+  post_id Int @id @default(autoincrement())
+
+  class_id Int
+
+  user_id Int
+
+  title String? @db.VarChar(255)
+
+  content String @db.Text
+
+  type PostType @default(ANNOUNCEMENT)
+
+  created_at DateTime @default(now())
+
+  updated_at DateTime @updatedAt
+
+  //
+  // RELATIONS
+  //
+
+  class Class @relation(fields: [class_id], references: [class_id])
+
+  user User @relation(fields: [user_id], references: [user_id])
+
+  comments PostComment[]
+
+  @@index([class_id])
+  @@index([user_id])
+  @@index([created_at])
+  @@map("class_posts")
+}
+
+//
+// ======================================================
+// POST COMMENT
+// ======================================================
+//
+
+model PostComment {
+  comment_id Int @id @default(autoincrement())
+
+  post_id Int
+
+  user_id Int
+
+  content String @db.Text
+
+  created_at DateTime @default(now())
+
+  updated_at DateTime @updatedAt
+
+  //
+  // RELATIONS
+  //
+
+  post ClassPost @relation(fields: [post_id], references: [post_id], onDelete: Cascade)
+
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@index([post_id])
+  @@index([user_id])
+  @@index([created_at])
+  @@map("post_comments")
+}
+
+//
+// ======================================================
+// NOTIFICATION
+// ======================================================
+//
+
+model Notification {
+  notification_id Int @id @default(autoincrement())
+
+  user_id Int
+
+  title String @db.VarChar(255)
+
+  content String? @db.Text
+
+  type NotificationType
+
+  is_read Boolean @default(false)
+
+  reference_id Int?
+
+  created_at DateTime @default(now())
+
+  //
+  // RELATIONS
+  //
+
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([type])
+  @@index([is_read])
+  @@index([created_at])
+  @@index([user_id, is_read])
+  @@map("notifications")
+}
+
+//
+// ======================================================
+// PRACTICE HISTORY
+// ======================================================
+//
+
+model PracticeHistory {
+  practice_id Int @id @default(autoincrement())
+
+  student_id Int
+  topic_id   Int?
+
+  total_questions Int
+  correct_answers Int
+  score           Float
+
+  created_at DateTime @default(now())
+
+  //
+  // RELATIONS
+  //
+
+  student User @relation(fields: [student_id], references: [user_id], onDelete: Cascade)
+
+  topic Topic? @relation(fields: [topic_id], references: [topic_id], onDelete: SetNull)
+
+  //
+  // INDEXES
+  //
+
+  @@index([student_id])
+  @@index([topic_id])
+  @@index([created_at])
+  @@index([student_id, topic_id])
+  @@index([student_id, created_at])
+  @@map("practice_histories")
+}
+=======
 model Subject {
   subject_id   Int      @id @default(autoincrement())
 
@@ -55,3 +1141,4 @@ model Subject {
 
   @@map("subjects")
 }
+>>>>>>> 7831c51b0f00e6b70f4c2d7230e7bc7f04f9e0b5

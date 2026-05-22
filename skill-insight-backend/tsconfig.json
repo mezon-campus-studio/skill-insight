@@ -1,3 +1,37 @@
+<<<<<<< HEAD
+// {
+//   "compilerOptions": {
+//      "types": ["node"],
+//     "target": "ES2020",
+//     "module": "Node16",
+//     "lib": ["ES2020"],
+//     "outDir": "./dist",
+//     "rootDir": "./src",
+//     "strict": true,
+//     "esModuleInterop": true,
+//     "skipLibCheck": true,
+//     "forceConsistentCasingInFileNames": true,
+//     "moduleResolution": "node16",
+//   },
+//   "include": ["src/**/*"],
+//   "exclude": ["node_modules"]
+// }
+
+
+
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "Node16",
+    "moduleResolution": "node16",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"]
+=======
 {
   "compilerOptions": {
      "types": ["node"],
@@ -14,4 +48,5 @@
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
+>>>>>>> 7831c51b0f00e6b70f4c2d7230e7bc7f04f9e0b5
 }
