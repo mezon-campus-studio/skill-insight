@@ -58,6 +58,7 @@
     "karma": "^6.4.4",
     "postcss": "^8.5.13",
     "tailwindcss": "^3.4.19",
+    "ts-node": "^10.9.2",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8",
     "zone.js": "^0.16.2"

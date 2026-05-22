@@ -382,7 +382,7 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        connectSrc: ["'self'", "http://localhost:3000"],
+        connectSrc: ["'self'", "http://localhost:3001"],
       },
     },
   }),
