@@ -1,66 +1,3 @@
-// import { Injectable } from '@angular/core';
-// import { HttpClient, HttpParams } from '@angular/common/http';
-// import { Observable } from 'rxjs';
-// import { environment } from '@env/environment'; 
-
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class UserService {
-
-//   private readonly API = `${environment.apiUrl}/users`;
-
-//   constructor(private http: HttpClient) {}
-
-//   getUsers(
-//     page: number = 1,
-//     limit: number = 10,
-//     keyword: string = '',
-//     role: string = ''
-//   ): Observable<any> {
-    
-//     let params = new HttpParams()
-//       .set('page', page.toString())
-//       .set('limit', limit.toString())
-//       .set('keyword', keyword)
-//       .set('t', Date.now().toString()); 
-
-//     if (role) {
-//       params = params.set('role', role);
-//     }
-
-//     return this.http.get(this.API, {
-//       params,
-//       withCredentials: true
-//     });
-//   }
-
-//   createUser(data: any): Observable<any> {
-//     return this.http.post(this.API, data, {
-//       withCredentials: true
-//     });
-//   }
-
-//   updateRole(userId: number, role: string): Observable<any> {
-//     return this.http.put(`${this.API}/${userId}/role`, { role }, {
-//       withCredentials: true
-//     });
-//   }
-
-//   deleteUser(userId: number): Observable<any> {
-//     return this.http.delete(`${this.API}/${userId}`, {
-//       withCredentials: true
-//     });
-//   }
-// }
-
-
-
-
-
-
-
 
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -203,5 +140,4 @@ export class UserService {
       }
     );
   }
-
 }

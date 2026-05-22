@@ -7,10 +7,9 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './home.html',
-  styleUrl: './home.css'
+  styleUrl: './home.css',
 })
 export class Home implements AfterViewInit {
-
   constructor(private el: ElementRef) {}
 
   ngAfterViewInit() {
@@ -29,10 +28,10 @@ export class Home implements AfterViewInit {
 
         if (count < target) {
           count += increment;
-          counter.innerText = Math.floor(count).toLocaleString() + "+";
+          counter.innerText = Math.floor(count).toLocaleString() + '+';
           setTimeout(update, 20);
         } else {
-          counter.innerText = target.toLocaleString() + "+";
+          counter.innerText = target.toLocaleString() + '+';
         }
       };
 

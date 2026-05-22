@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -121,3 +122,54 @@ ngOnInit(): void {
     });
   }
 }
+=======
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '@services/auth.service';
+@Component({
+  selector: 'app-callback',
+  templateUrl: './callback.html',
+})
+export class CallbackComponent implements OnInit {
+  constructor(
+    private auth: AuthService,
+    private http: HttpClient,
+    private router: Router,
+    private route: ActivatedRoute,
+  ) {}
+
+  ngOnInit() {
+    const token = this.route.snapshot.queryParamMap.get('token');
+
+    if (!token) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    localStorage.setItem('access_token', token);
+
+    this.auth.getMe().subscribe({
+      next: (res: any) => {
+        const user = res?.user;
+
+        if (!user) {
+          this.router.navigate(['/login']);
+          return;
+        }
+
+        this.auth.saveUser(user);
+
+        if (!user.role) {
+          this.router.navigate(['/select-role']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
+      },
+      error: () => {
+        localStorage.removeItem('access_token');
+        this.router.navigate(['/login']);
+      },
+    });
+  }
+}
+>>>>>>> 7831c51b0f00e6b70f4c2d7230e7bc7f04f9e0b5

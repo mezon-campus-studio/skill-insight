@@ -6,37 +6,37 @@ import { map, catchError, of } from 'rxjs';
 export const authGuard: CanActivateFn = (route, state) => {
   const auth = inject(AuthService);
   const router = inject(Router);
+  const token = localStorage.getItem('access_token');
+
+  // Check token
+  if (!token) {
+    return router.createUrlTree(['/login']);
+  }
 
   return auth.getMe().pipe(
     map((res: any) => {
-      const user = res?.user;
-
-      if (!user) {
+      if (!res?.success || !res?.user) {
+        auth.clearUser();
         return router.createUrlTree(['/login']);
       }
 
-      // ✅ lưu user
+      //lưu user
+      const user = res.user;
       auth.saveUser(user);
-
-      // 🔥 role flow
-      if (!user.role) {
+      //check role
+      const role = user.role;
+      if (!role) {
         if (state.url === '/select-role') {
           return true;
         }
         return router.createUrlTree(['/select-role']);
       }
-
-      // 🔥 role permission
-      const roles = route.data?.['roles'] as string[];
-
-      if (roles && !roles.includes(user.role)) {
-        return router.createUrlTree(['/dashboard']);
+      if (state.url === '/select-role') {
+        return router.createUrlTree(['/subject']);
       }
 
       return true;
     }),
-    catchError(() => {
-      return of(router.createUrlTree(['/login']));
-    })
+    catchError(() => of(router.createUrlTree(['/login']))),
   );
 };
