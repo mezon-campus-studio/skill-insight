@@ -1,0 +1,231 @@
+<div class="min-h-screen bg-gray-50 p-6">
+
+  <!-- LOADING -->
+  <div
+    *ngIf="loading"
+    class="flex justify-center items-center py-32"
+  >
+
+    <p
+      class="text-2xl font-bold text-gray-500"
+    >
+      Đang tải kết quả...
+    </p>
+
+  </div>
+
+  <!-- RESULT -->
+  <div
+    *ngIf="!loading && result"
+    class="max-w-4xl mx-auto"
+  >
+
+    <!-- SUMMARY -->
+    <div
+      class="bg-white rounded-[45px] shadow-[0_30px_80px_rgba(0,0,0,0.1)] p-10 text-center border border-white mb-8"
+    >
+
+      <h2
+        class="text-2xl font-black text-gray-400 uppercase tracking-widest mb-2"
+      >
+        Kết quả bài thi
+      </h2>
+
+      <h1
+        class="text-4xl font-black text-[#1a2b4b] mb-10 uppercase"
+      >
+        {{ result.exam?.title }}
+      </h1>
+
+      <!-- SCORE -->
+      <div
+        class="relative w-48 h-48 mx-auto mb-10"
+      >
+
+        <div
+          class="absolute inset-0 rounded-full border-[12px] border-gray-100"
+        ></div>
+
+        <div
+          class="absolute inset-0 rounded-full border-[12px] border-green-500 border-t-transparent -rotate-45"
+        ></div>
+
+        <div
+          class="absolute inset-0 flex flex-col items-center justify-center"
+        >
+
+          <span
+            class="text-6xl font-black text-green-500"
+          >
+            {{ result.score }}
+          </span>
+
+          <span
+            class="text-xs font-bold text-gray-400 uppercase"
+          >
+            Điểm số
+          </span>
+
+        </div>
+
+      </div>
+
+      <!-- STATS -->
+      <div
+        class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10"
+      >
+
+        <!-- CORRECT -->
+        <div
+          class="p-4 bg-blue-50 rounded-3xl"
+        >
+
+          <p
+            class="text-[10px] font-black text-blue-500 uppercase"
+          >
+            Đúng
+          </p>
+
+          <p
+            class="text-xl font-black text-blue-700"
+          >
+            {{ result.correct_answers }}
+            /
+            {{ result.total_questions }}
+          </p>
+
+        </div>
+
+        <!-- WRONG -->
+        <div
+          class="p-4 bg-red-50 rounded-3xl"
+        >
+
+          <p
+            class="text-[10px] font-black text-red-500 uppercase"
+          >
+            Sai
+          </p>
+
+          <p
+            class="text-xl font-black text-red-700"
+          >
+            {{ wrongAnswers }}
+          </p>
+
+        </div>
+
+        <!-- STATUS -->
+        <div
+          class="p-4 bg-orange-50 rounded-3xl"
+        >
+
+          <p
+            class="text-[10px] font-black text-orange-500 uppercase"
+          >
+            Trạng thái
+          </p>
+
+          <p
+            class="text-xl font-black text-orange-700"
+          >
+            {{ result.status }}
+          </p>
+
+        </div>
+
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="flex gap-4">
+
+        <button
+          routerLink="/dashboard/practice"
+          class="flex-1 py-4 bg-gray-100 text-gray-600 rounded-2xl font-black uppercase tracking-widest hover:bg-gray-200 transition-all"
+        >
+          LÀM LẠI
+        </button>
+
+        <button
+          routerLink="/dashboard/overview"
+          class="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-95"
+        >
+          VỀ BẢNG TIN
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- ANSWER DETAILS -->
+    <div class="space-y-6">
+
+      <div
+        *ngFor="
+          let item of result.student_answers;
+          let i = index
+        "
+        class="bg-white shadow rounded-3xl p-6"
+      >
+
+        <!-- QUESTION -->
+        <h2
+          class="font-black text-lg text-gray-800 mb-3"
+        >
+          Câu {{ i + 1 }}:
+          {{ item.question.content }}
+        </h2>
+
+        <!-- SELECTED ANSWER -->
+        <div
+          class="p-4 rounded-2xl mb-3"
+          [ngClass]="
+            item.is_correct
+              ? 'bg-green-50'
+              : 'bg-red-50'
+          "
+        >
+
+          <p
+            class="font-bold"
+            [ngClass]="
+              item.is_correct
+                ? 'text-green-700'
+                : 'text-red-700'
+            "
+          >
+
+            Đáp án đã chọn:
+            {{
+              item.selected_option.answer_text
+            }}
+
+          </p>
+
+        </div>
+
+        <!-- STATUS -->
+        <p
+          class="font-black uppercase tracking-wide"
+          [ngClass]="
+            item.is_correct
+              ? 'text-green-600'
+              : 'text-red-600'
+          "
+        >
+
+          {{
+            item.is_correct
+              ? 'ĐÚNG'
+              : 'SAI'
+          }}
+
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

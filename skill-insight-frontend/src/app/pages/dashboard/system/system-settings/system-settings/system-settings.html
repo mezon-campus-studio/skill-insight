@@ -1,0 +1,558 @@
+<div class="min-h-screen bg-gray-50 p-4 md:p-6">
+
+  <!-- ========================================= -->
+  <!-- HEADER -->
+  <!-- ========================================= -->
+
+  <div
+    class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6"
+  >
+
+    <div>
+
+      <h1
+        class="text-3xl font-bold text-gray-900"
+      >
+        Cài đặt hệ thống
+      </h1>
+
+      <p
+        class="text-gray-500 mt-1"
+      >
+        Quản lý cấu hình và bảo mật toàn bộ hệ thống LMS
+      </p>
+
+    </div>
+
+    <div
+      class="flex items-center gap-3"
+    >
+
+      <button
+        class="px-5 py-3 rounded-xl bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-semibold transition"
+      >
+        Khôi phục mặc định
+      </button>
+
+      <button
+        class="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
+      >
+        Lưu thay đổi
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================= -->
+  <!-- GRID -->
+  <!-- ========================================= -->
+
+  <div
+    class="grid grid-cols-1 xl:grid-cols-4 gap-6"
+  >
+
+    <!-- ========================================= -->
+    <!-- SIDEBAR -->
+    <!-- ========================================= -->
+
+    <div
+      class="xl:col-span-1"
+    >
+
+      <div
+        class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sticky top-6"
+      >
+
+        <div
+          class="space-y-2"
+        >
+
+          <button
+            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-700 font-semibold"
+          >
+
+            <span>⚙️</span>
+
+            Tổng quan
+
+          </button>
+
+          <button
+            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700 font-medium transition"
+          >
+
+            <span>🔐</span>
+
+            Bảo mật
+
+          </button>
+
+          <button
+            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700 font-medium transition"
+          >
+
+            <span>📧</span>
+
+            Email SMTP
+
+          </button>
+
+          <button
+            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700 font-medium transition"
+          >
+
+            <span>💾</span>
+
+            Backup dữ liệu
+
+          </button>
+
+          <button
+            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700 font-medium transition"
+          >
+
+            <span>☁️</span>
+
+            Cloud Storage
+
+          </button>
+
+          <button
+            class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 text-gray-700 font-medium transition"
+          >
+
+            <span>🔔</span>
+
+            Thông báo
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================= -->
+    <!-- CONTENT -->
+    <!-- ========================================= -->
+
+    <div
+      class="xl:col-span-3 space-y-6"
+    >
+
+      <!-- SYSTEM INFO -->
+      <div
+        class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+      >
+
+        <div
+          class="flex items-center justify-between mb-6"
+        >
+
+          <div>
+
+            <h2
+              class="text-xl font-bold text-gray-900"
+            >
+              Thông tin hệ thống
+            </h2>
+
+            <p
+              class="text-sm text-gray-500 mt-1"
+            >
+              Cấu hình cơ bản của hệ thống LMS
+            </p>
+
+          </div>
+
+          <div
+            class="px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm font-semibold"
+          >
+            Online
+          </div>
+
+        </div>
+
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-5"
+        >
+
+          <!-- NAME -->
+          <div>
+
+            <label
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              Tên hệ thống
+            </label>
+
+            <input
+              type="text"
+              value="Skill Insight LMS"
+              class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
+            />
+
+          </div>
+
+          <!-- VERSION -->
+          <div>
+
+            <label
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              Phiên bản
+            </label>
+
+            <input
+              type="text"
+              value="v2.5.0"
+              class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-gray-100 text-gray-500"
+              readonly
+            />
+
+          </div>
+
+          <!-- TIMEZONE -->
+          <div>
+
+            <label
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              Múi giờ
+            </label>
+
+            <select
+              class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 bg-white"
+            >
+
+              <option>
+                Asia/Ho_Chi_Minh
+              </option>
+
+              <option>
+                UTC
+              </option>
+
+            </select>
+
+          </div>
+
+          <!-- LANGUAGE -->
+          <div>
+
+            <label
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              Ngôn ngữ mặc định
+            </label>
+
+            <select
+              class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 bg-white"
+            >
+
+              <option>
+                Tiếng Việt
+              </option>
+
+              <option>
+                English
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- SECURITY -->
+      <div
+        class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+      >
+
+        <h2
+          class="text-xl font-bold text-gray-900 mb-6"
+        >
+          Bảo mật hệ thống
+        </h2>
+
+        <div
+          class="space-y-5"
+        >
+
+          <!-- 2FA -->
+          <div
+            class="flex items-center justify-between p-5 rounded-2xl border border-gray-200"
+          >
+
+            <div>
+
+              <h3
+                class="font-semibold text-gray-900"
+              >
+                Xác thực 2 bước
+              </h3>
+
+              <p
+                class="text-sm text-gray-500 mt-1"
+              >
+                Tăng cường bảo mật tài khoản quản trị
+              </p>
+
+            </div>
+
+            <label
+              class="relative inline-flex items-center cursor-pointer"
+            >
+
+              <input
+                type="checkbox"
+                checked
+                class="sr-only peer"
+              />
+
+              <div
+                class="w-14 h-8 bg-blue-600 rounded-full peer"
+              >
+
+                <div
+                  class="absolute top-1 left-7 w-6 h-6 bg-white rounded-full transition"
+                ></div>
+
+              </div>
+
+            </label>
+
+          </div>
+
+          <!-- LOGIN -->
+          <div
+            class="flex items-center justify-between p-5 rounded-2xl border border-gray-200"
+          >
+
+            <div>
+
+              <h3
+                class="font-semibold text-gray-900"
+              >
+                Giới hạn đăng nhập
+              </h3>
+
+              <p
+                class="text-sm text-gray-500 mt-1"
+              >
+                Khóa tài khoản sau nhiều lần đăng nhập sai
+              </p>
+
+            </div>
+
+            <label
+              class="relative inline-flex items-center cursor-pointer"
+            >
+
+              <input
+                type="checkbox"
+                checked
+                class="sr-only peer"
+              />
+
+              <div
+                class="w-14 h-8 bg-blue-600 rounded-full peer"
+              >
+
+                <div
+                  class="absolute top-1 left-7 w-6 h-6 bg-white rounded-full transition"
+                ></div>
+
+              </div>
+
+            </label>
+
+          </div>
+
+          <!-- SESSION -->
+          <div
+            class="flex items-center justify-between p-5 rounded-2xl border border-gray-200"
+          >
+
+            <div>
+
+              <h3
+                class="font-semibold text-gray-900"
+              >
+                Tự động đăng xuất
+              </h3>
+
+              <p
+                class="text-sm text-gray-500 mt-1"
+              >
+                Đăng xuất sau 30 phút không hoạt động
+              </p>
+
+            </div>
+
+            <label
+              class="relative inline-flex items-center cursor-pointer"
+            >
+
+              <input
+                type="checkbox"
+                class="sr-only peer"
+              />
+
+              <div
+                class="w-14 h-8 bg-gray-300 rounded-full peer"
+              >
+
+                <div
+                  class="absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition"
+                ></div>
+
+              </div>
+
+            </label>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- SMTP -->
+      <div
+        class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+      >
+
+        <h2
+          class="text-xl font-bold text-gray-900 mb-6"
+        >
+          Email SMTP
+        </h2>
+
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-5"
+        >
+
+          <div>
+
+            <label
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              SMTP Host
+            </label>
+
+            <input
+              type="text"
+              value="smtp.gmail.com"
+              class="w-full border border-gray-300 rounded-xl px-4 py-3"
+            />
+
+          </div>
+
+          <div>
+
+            <label
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              SMTP Port
+            </label>
+
+            <input
+              type="number"
+              value="587"
+              class="w-full border border-gray-300 rounded-xl px-4 py-3"
+            />
+
+          </div>
+
+          <div>
+
+            <label
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              Email gửi
+            </label>
+
+            <input
+              type="email"
+              value="admin@skillinsight.com"
+              class="w-full border border-gray-300 rounded-xl px-4 py-3"
+            />
+
+          </div>
+
+          <div>
+
+            <label
+              class="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              Mật khẩu ứng dụng
+            </label>
+
+            <input
+              type="password"
+              value="123456789"
+              class="w-full border border-gray-300 rounded-xl px-4 py-3"
+            />
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- BACKUP -->
+      <div
+        class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl"
+      >
+
+        <div
+          class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
+        >
+
+          <div>
+
+            <h2
+              class="text-2xl font-bold"
+            >
+              Backup dữ liệu hệ thống
+            </h2>
+
+            <p
+              class="text-blue-100 mt-2"
+            >
+              Sao lưu toàn bộ dữ liệu hệ thống để đảm bảo an toàn
+            </p>
+
+          </div>
+
+          <div
+            class="flex flex-wrap gap-3"
+          >
+
+            <button
+              class="px-6 py-3 rounded-xl bg-white text-blue-700 font-semibold hover:bg-gray-100 transition"
+            >
+              Tải backup
+            </button>
+
+            <button
+              class="px-6 py-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-semibold transition"
+            >
+              Backup ngay
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

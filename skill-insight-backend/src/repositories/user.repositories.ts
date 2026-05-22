@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../lib/prisma";
 
-// ===== Safe select (không trả password) =====
+// Safe select
 const userSafeSelect = Prisma.validator<Prisma.UserSelect>()({
   user_id: true,
   full_name: true,
@@ -11,9 +11,9 @@ const userSafeSelect = Prisma.validator<Prisma.UserSelect>()({
   created_at: true,
 });
 
-// ===== Repository =====
+// Repository
 export const userRepository = {
-  // ===== FIND =====
+  // FIND
   async findByEmail(email: string) {
     return prisma.user.findUnique({
       where: { email },
@@ -41,7 +41,7 @@ export const userRepository = {
     });
   },
 
-  // ===== CREATE =====
+  // CREATE
   async create(data: Prisma.UserCreateInput) {
     return prisma.user.create({
       data,
@@ -49,7 +49,7 @@ export const userRepository = {
     });
   },
 
-  // ===== UPDATE =====
+  // UPDATE
   async update(userId: number, data: Prisma.UserUpdateInput) {
     return prisma.user.update({
       where: { user_id: userId },
@@ -58,14 +58,14 @@ export const userRepository = {
     });
   },
 
-  // ===== DELETE =====
+  //DELETE
   async delete(userId: number) {
     return prisma.user.delete({
       where: { user_id: userId },
     });
   },
 
-  // ===== UTIL =====
+  // UTIL
   async isEmailExists(email: string): Promise<boolean> {
     const user = await prisma.user.findUnique({
       where: { email },

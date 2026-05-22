@@ -27,8 +27,6 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
-
-databases:
-  - name: skill-insight-db
-    plan: free
-    region: singapore
+      - type: proxy
+        source: /api/*
+        destination: http://localhost:10000/api/* 

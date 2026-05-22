@@ -1,3 +1,4 @@
+
 import dotenv from 'dotenv';
 import fs from 'fs';
 dotenv.config({ path: './.env' });
@@ -13,3 +14,4 @@ const envConfigFile = `export const environment = {
   API_SUBJECT:'${process.env['apiSubject']}'
 };`;
 fs.writeFileSync('src/environments/environment.ts', envConfigFile);
+

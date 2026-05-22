@@ -1,0 +1,428 @@
+<div class="min-h-screen bg-gray-50 p-6">
+
+  <!-- HEADER -->
+  <div
+    class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+  >
+
+    <div>
+
+      <h1 class="text-3xl font-bold text-gray-800">
+        Giao đề thi
+      </h1>
+
+      <p class="mt-1 text-sm text-gray-500">
+        Giao đề thi cho lớp học và thiết lập lịch thi
+      </p>
+
+    </div>
+
+    <a
+      routerLink="/dashboard/assignments"
+      class="rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-100 transition"
+    >
+      ← Quay lại
+    </a>
+
+  </div>
+
+  <!-- FORM -->
+  <div
+    class="grid grid-cols-1 gap-6 xl:grid-cols-3"
+  >
+
+    <!-- LEFT -->
+    <div class="xl:col-span-2">
+
+      <div
+        class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+      >
+
+        <!-- TITLE -->
+        <div class="mb-6">
+
+          <h2 class="text-xl font-bold text-gray-800">
+            Thông tin giao đề
+          </h2>
+
+          <p class="mt-1 text-sm text-gray-500">
+            Chọn đề thi, lớp học và thời gian áp dụng
+          </p>
+
+        </div>
+
+        <!-- FORM GRID -->
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+          <!-- EXAM -->
+          <div class="md:col-span-2">
+
+            <label
+              class="mb-2 block text-sm font-semibold text-gray-700"
+            >
+              Chọn đề thi
+            </label>
+
+            <select
+              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            >
+
+              <option value="">
+                -- Chọn đề thi --
+              </option>
+
+              <option>
+                Đề thi Java Core
+              </option>
+
+              <option>
+                Đề thi Angular
+              </option>
+
+              <option>
+                Đề thi MySQL
+              </option>
+
+            </select>
+
+          </div>
+
+          <!-- CLASS -->
+          <div>
+
+            <label
+              class="mb-2 block text-sm font-semibold text-gray-700"
+            >
+              Chọn lớp học
+            </label>
+
+            <select
+              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            >
+
+              <option value="">
+                -- Chọn lớp --
+              </option>
+
+              <option>
+                CNTT K17A
+              </option>
+
+              <option>
+                Lập trình Web 01
+              </option>
+
+            </select>
+
+          </div>
+
+          <!-- MAX ATTEMPTS -->
+          <div>
+
+            <label
+              class="mb-2 block text-sm font-semibold text-gray-700"
+            >
+              Số lần làm bài
+            </label>
+
+            <input
+              type="number"
+              value="1"
+              min="1"
+              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            />
+
+          </div>
+
+          <!-- START -->
+          <div>
+
+            <label
+              class="mb-2 block text-sm font-semibold text-gray-700"
+            >
+              Thời gian mở đề
+            </label>
+
+            <input
+              type="datetime-local"
+              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            />
+
+          </div>
+
+          <!-- END -->
+          <div>
+
+            <label
+              class="mb-2 block text-sm font-semibold text-gray-700"
+            >
+              Thời gian đóng đề
+            </label>
+
+            <input
+              type="datetime-local"
+              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            />
+
+          </div>
+
+          <!-- OVERRIDE -->
+          <div>
+
+            <label
+              class="mb-2 block text-sm font-semibold text-gray-700"
+            >
+              Giới hạn thời gian riêng (phút)
+            </label>
+
+            <input
+              type="number"
+              placeholder="Để trống = dùng thời gian đề thi"
+              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            />
+
+          </div>
+
+          <!-- PASSWORD -->
+          <div>
+
+            <label
+              class="mb-2 block text-sm font-semibold text-gray-700"
+            >
+              Mật khẩu vào thi
+            </label>
+
+            <input
+              type="text"
+              placeholder="Không bắt buộc"
+              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            />
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- SECURITY -->
+      <div
+        class="mt-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+      >
+
+        <div class="mb-5">
+
+          <h2 class="text-xl font-bold text-gray-800">
+            Chống gian lận
+          </h2>
+
+          <p class="mt-1 text-sm text-gray-500">
+            Thiết lập bảo mật cho bài thi
+          </p>
+
+        </div>
+
+        <div class="space-y-4">
+
+          <!-- FULLSCREEN -->
+          <label
+            class="flex items-start gap-4 rounded-xl border border-gray-100 p-4 hover:bg-gray-50 transition"
+          >
+
+            <input
+              type="checkbox"
+              checked
+              class="mt-1 h-5 w-5 rounded border-gray-300"
+            />
+
+            <div>
+
+              <div class="font-semibold text-gray-800">
+                Bắt buộc toàn màn hình
+              </div>
+
+              <div class="mt-1 text-sm text-gray-500">
+                Học sinh không thể thoát fullscreen khi làm bài
+              </div>
+
+            </div>
+
+          </label>
+
+          <!-- TAB -->
+          <label
+            class="flex items-start gap-4 rounded-xl border border-gray-100 p-4 hover:bg-gray-50 transition"
+          >
+
+            <input
+              type="checkbox"
+              checked
+              class="mt-1 h-5 w-5 rounded border-gray-300"
+            />
+
+            <div>
+
+              <div class="font-semibold text-gray-800">
+                Phát hiện chuyển tab
+              </div>
+
+              <div class="mt-1 text-sm text-gray-500">
+                Ghi nhận nếu học sinh chuyển tab hoặc thoát trình duyệt
+              </div>
+
+            </div>
+
+          </label>
+
+          <!-- COPY -->
+          <label
+            class="flex items-start gap-4 rounded-xl border border-gray-100 p-4 hover:bg-gray-50 transition"
+          >
+
+            <input
+              type="checkbox"
+              checked
+              class="mt-1 h-5 w-5 rounded border-gray-300"
+            />
+
+            <div>
+
+              <div class="font-semibold text-gray-800">
+                Chặn copy nội dung
+              </div>
+
+              <div class="mt-1 text-sm text-gray-500">
+                Vô hiệu hóa copy và chuột phải trong lúc thi
+              </div>
+
+            </div>
+
+          </label>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+
+      <!-- SUMMARY -->
+      <div
+        class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+      >
+
+        <h2 class="text-xl font-bold text-gray-800">
+          Tổng quan
+        </h2>
+
+        <div class="mt-5 space-y-4">
+
+          <div
+            class="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3"
+          >
+
+            <span class="text-sm text-gray-500">
+              Đề thi
+            </span>
+
+            <span class="font-semibold text-gray-800">
+              Angular Final Test
+            </span>
+
+          </div>
+
+          <div
+            class="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3"
+          >
+
+            <span class="text-sm text-gray-500">
+              Số câu
+            </span>
+
+            <span class="font-semibold text-gray-800">
+              40 câu
+            </span>
+
+          </div>
+
+          <div
+            class="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3"
+          >
+
+            <span class="text-sm text-gray-500">
+              Random
+            </span>
+
+            <span
+              class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700"
+            >
+              Đang bật
+            </span>
+
+          </div>
+
+          <div
+            class="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3"
+          >
+
+            <span class="text-sm text-gray-500">
+              Thời gian thi
+            </span>
+
+            <span class="font-semibold text-gray-800">
+              60 phút
+            </span>
+
+          </div>
+
+        </div>
+
+        <!-- BUTTON -->
+        <button
+          class="mt-6 w-full rounded-xl bg-blue-600 px-5 py-4 text-sm font-semibold text-white shadow hover:bg-blue-700 transition"
+        >
+          Giao đề thi
+        </button>
+
+      </div>
+
+      <!-- NOTE -->
+      <div
+        class="mt-6 rounded-2xl border border-yellow-200 bg-yellow-50 p-5"
+      >
+
+        <div class="flex gap-3">
+
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100"
+          >
+            ⚠️
+          </div>
+
+          <div>
+
+            <h3
+              class="font-semibold text-yellow-800"
+            >
+              Lưu ý
+            </h3>
+
+            <p
+              class="mt-2 text-sm leading-6 text-yellow-700"
+            >
+              Random câu hỏi sẽ được thực hiện khi học sinh bắt đầu thi,
+              không phải lúc giao đề.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

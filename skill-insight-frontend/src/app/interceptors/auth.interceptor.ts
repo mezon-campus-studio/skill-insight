@@ -1,37 +1,65 @@
-import { HttpInterceptorFn } from '@angular/common/http';
-import { catchError, throwError } from 'rxjs';
+
+import {
+  HttpInterceptorFn,
+  HttpErrorResponse
+} from '@angular/common/http';
+
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 
+import {
+  catchError,
+  throwError
+} from 'rxjs';
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
+
   const router = inject(Router);
-  const token = localStorage.getItem('access_token');
 
-  const isPublicApi =
-    req.url.includes('/login') ||
-    req.url.includes('/register') ||
-    req.url.includes('/callback') ||
-    req.url.includes('/auth/mezon');
-  let headers = req.headers;
+  // =========================
+  // FIX TOKEN RETRIEVAL
+  // =========================
+  const token =
+    localStorage.getItem('accessToken') ||
+    localStorage.getItem('token') ||
+    localStorage.getItem('authToken');
 
-  if (token && !isPublicApi) {
-    headers = headers.set('Authorization', `Bearer ${token}`);
+  console.log('[INTERCEPTOR TOKEN]', token);
+
+  let authReq = req;
+
+  // =========================
+  // ATTACH TOKEN IF VALID
+  // =========================
+  if (token && token !== 'null' && token !== 'undefined') {
+    authReq = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
+    });
   }
-  const authReq = req.clone({
-    withCredentials: true,
-    headers,
-  });
-  return next(authReq).pipe(
-    catchError((err) => {
-      if (err.status === 401) {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('user');
 
-        if (!router.url.includes('/login')) {
+  return next(authReq).pipe(
+    catchError((err: HttpErrorResponse) => {
+
+      if (err.status === 401) {
+
+        const isAuthPage =
+          router.url.includes('/login') ||
+          router.url.includes('/callback');
+
+        if (!isAuthPage) {
+
+          // clear all possible token keys
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('token');
+          localStorage.removeItem('authToken');
+
           router.navigate(['/login']);
         }
       }
+
       return throwError(() => err);
-    }),
+    })
   );
 };

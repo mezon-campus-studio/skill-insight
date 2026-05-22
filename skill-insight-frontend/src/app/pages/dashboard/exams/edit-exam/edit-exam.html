@@ -1,0 +1,541 @@
+<div class="min-h-screen bg-gray-50 p-6">
+
+  <!-- HEADER -->
+  <div
+    class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
+  >
+
+    <div>
+
+      <h1
+        class="text-3xl font-bold text-gray-800"
+      >
+        Chỉnh sửa đề thi
+      </h1>
+
+      <p
+        class="mt-1 text-sm text-gray-500"
+      >
+        Cập nhật thông tin đề thi và cấu hình random
+      </p>
+
+    </div>
+
+    <div
+      class="flex gap-3"
+    >
+
+      <button
+        routerLink="/dashboard/exams"
+        class="rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition"
+      >
+        Quay lại
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- LOADING -->
+  <div
+    *ngIf="loading"
+    class="rounded-2xl bg-white p-10 text-center shadow-sm border border-gray-100"
+  >
+
+    <div
+      class="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"
+    ></div>
+
+    <p
+      class="mt-4 text-sm text-gray-500"
+    >
+      Đang tải dữ liệu đề thi...
+    </p>
+
+  </div>
+
+  <!-- FORM -->
+  <form
+    *ngIf="!loading"
+    (ngSubmit)="updateExam()"
+    class="space-y-6"
+  >
+
+    <!-- BASIC -->
+    <div
+      class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+    >
+
+      <div
+        class="mb-6"
+      >
+
+        <h2
+          class="text-xl font-bold text-gray-800"
+        >
+          Thông tin đề thi
+        </h2>
+
+        <p
+          class="mt-1 text-sm text-gray-500"
+        >
+          Cập nhật tên đề, môn học và mô tả
+        </p>
+
+      </div>
+
+      <div
+        class="grid grid-cols-1 gap-5 lg:grid-cols-2"
+      >
+
+        <!-- TITLE -->
+        <div
+          class="lg:col-span-2"
+        >
+
+          <label
+            class="mb-2 block text-sm font-semibold text-gray-700"
+          >
+            Tên đề thi
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="examData.title"
+            name="title"
+            placeholder="Ví dụ: Đề thi Java cơ bản"
+            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          />
+
+        </div>
+
+        <!-- SUBJECT -->
+        <div>
+
+          <label
+            class="mb-2 block text-sm font-semibold text-gray-700"
+          >
+            Môn học
+          </label>
+
+          <select
+            [(ngModel)]="examData.subject_id"
+            name="subject_id"
+            (change)="onSubjectChange()"
+            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          >
+
+            <option value="">
+              Chọn môn học
+            </option>
+
+            <option
+              *ngFor="let subject of subjects"
+              [value]="subject.subject_id"
+            >
+              {{ subject.subject_name }}
+            </option>
+
+          </select>
+
+        </div>
+
+        <!-- TOPIC -->
+        <div>
+
+          <label
+            class="mb-2 block text-sm font-semibold text-gray-700"
+          >
+            Chủ đề
+          </label>
+
+          <select
+            [(ngModel)]="examData.topic_id"
+            name="topic_id"
+            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          >
+
+            <option value="">
+              Không chọn chủ đề
+            </option>
+
+            <option
+              *ngFor="let topic of topics"
+              [value]="topic.topic_id"
+            >
+              {{ topic.topic_name }}
+            </option>
+
+          </select>
+
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div
+          class="lg:col-span-2"
+        >
+
+          <label
+            class="mb-2 block text-sm font-semibold text-gray-700"
+          >
+            Mô tả đề thi
+          </label>
+
+          <textarea
+            rows="4"
+            [(ngModel)]="examData.description"
+            name="description"
+            placeholder="Nhập mô tả đề thi..."
+            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          ></textarea>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- EXAM SETTINGS -->
+    <div
+      class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+    >
+
+      <div
+        class="mb-6"
+      >
+
+        <h2
+          class="text-xl font-bold text-gray-800"
+        >
+          Cấu hình đề thi
+        </h2>
+
+        <p
+          class="mt-1 text-sm text-gray-500"
+        >
+          Cấu hình thời gian, random và hiển thị
+        </p>
+
+      </div>
+
+      <div
+        class="grid grid-cols-1 gap-5 lg:grid-cols-2"
+      >
+
+        <!-- DURATION -->
+        <div>
+
+          <label
+            class="mb-2 block text-sm font-semibold text-gray-700"
+          >
+            Thời gian làm bài (phút)
+          </label>
+
+          <input
+            type="number"
+            min="1"
+            [(ngModel)]="examData.duration"
+            name="duration"
+            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          />
+
+        </div>
+
+        <!-- PASS SCORE -->
+        <div>
+
+          <label
+            class="mb-2 block text-sm font-semibold text-gray-700"
+          >
+            Điểm đạt
+          </label>
+
+          <input
+            type="number"
+            min="0"
+            max="10"
+            step="0.5"
+            [(ngModel)]="examData.pass_score"
+            name="pass_score"
+            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          />
+
+        </div>
+
+        <!-- STATUS -->
+        <div>
+
+          <label
+            class="mb-2 block text-sm font-semibold text-gray-700"
+          >
+            Trạng thái
+          </label>
+
+          <select
+            [(ngModel)]="examData.status_exam"
+            name="status_exam"
+            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          >
+
+            <option value="DRAFT">
+              Nháp
+            </option>
+
+            <option value="PUBLISHED">
+              Xuất bản
+            </option>
+
+            <option value="ARCHIVED">
+              Lưu trữ
+            </option>
+
+          </select>
+
+        </div>
+
+        <!-- VISIBILITY -->
+        <div>
+
+          <label
+            class="mb-2 block text-sm font-semibold text-gray-700"
+          >
+            Hiển thị
+          </label>
+
+          <select
+            [(ngModel)]="examData.visibility"
+            name="visibility"
+            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          >
+
+            <option value="PRIVATE">
+              Riêng tư
+            </option>
+
+            <option value="SYSTEM_BANK">
+              Ngân hàng hệ thống
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RANDOM -->
+    <div
+      class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+    >
+
+      <div
+        class="mb-6"
+      >
+
+        <h2
+          class="text-xl font-bold text-gray-800"
+        >
+          Random câu hỏi
+        </h2>
+
+        <p
+          class="mt-1 text-sm text-gray-500"
+        >
+          Random sẽ được tạo khi học sinh bắt đầu thi
+        </p>
+
+      </div>
+
+      <!-- RANDOM TOGGLE -->
+      <div
+        class="mb-5 flex items-center justify-between rounded-2xl border border-gray-200 bg-gray-50 p-5"
+      >
+
+        <div>
+
+          <div
+            class="font-semibold text-gray-800"
+          >
+            Bật random câu hỏi
+          </div>
+
+          <div
+            class="mt-1 text-sm text-gray-500"
+          >
+            Mỗi học sinh sẽ nhận bộ câu hỏi khác nhau
+          </div>
+
+        </div>
+
+        <label
+          class="relative inline-flex cursor-pointer items-center"
+        >
+
+          <input
+            type="checkbox"
+            [(ngModel)]="examData.is_random"
+            name="is_random"
+            (change)="onToggleRandom()"
+            class="peer sr-only"
+          />
+
+          <div
+            class="peer h-7 w-12 rounded-full bg-gray-300 transition after:absolute after:left-[4px] after:top-[4px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-5"
+          ></div>
+
+        </label>
+
+      </div>
+
+      <!-- RANDOM CONFIG -->
+      <div
+        *ngIf="examData.is_random"
+        class="grid grid-cols-1 gap-5 lg:grid-cols-3"
+      >
+
+        <!-- RANDOM COUNT -->
+        <div>
+
+          <label
+            class="mb-2 block text-sm font-semibold text-gray-700"
+          >
+            Số câu random
+          </label>
+
+          <input
+            type="number"
+            min="1"
+            [(ngModel)]="examData.random_question_count"
+            name="random_question_count"
+            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          />
+
+        </div>
+
+        <!-- SHUFFLE QUESTIONS -->
+        <div
+          class="rounded-xl border border-gray-200 bg-gray-50 p-4"
+        >
+
+          <label
+            class="flex items-center gap-3"
+          >
+
+            <input
+              type="checkbox"
+              [(ngModel)]="examData.shuffle_questions"
+              name="shuffle_questions"
+              class="h-5 w-5 rounded border-gray-300"
+            />
+
+            <span
+              class="text-sm font-medium text-gray-700"
+            >
+              Đảo thứ tự câu hỏi
+            </span>
+
+          </label>
+
+        </div>
+
+        <!-- SHUFFLE ANSWERS -->
+        <div
+          class="rounded-xl border border-gray-200 bg-gray-50 p-4"
+        >
+
+          <label
+            class="flex items-center gap-3"
+          >
+
+            <input
+              type="checkbox"
+              [(ngModel)]="examData.shuffle_answers"
+              name="shuffle_answers"
+              class="h-5 w-5 rounded border-gray-300"
+            />
+
+            <span
+              class="text-sm font-medium text-gray-700"
+            >
+              Đảo đáp án
+            </span>
+
+          </label>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- SYSTEM -->
+    <div
+      class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
+    >
+
+      <label
+        class="flex items-start gap-4"
+      >
+
+        <input
+          type="checkbox"
+          [(ngModel)]="examData.allow_system_integration"
+          name="allow_system_integration"
+          class="mt-1 h-5 w-5 rounded border-gray-300"
+        />
+
+        <div>
+
+          <div
+            class="font-semibold text-gray-800"
+          >
+            Cho phép tích hợp hệ thống
+          </div>
+
+          <div
+            class="mt-1 text-sm text-gray-500"
+          >
+            Đề thi có thể được dùng trong ngân hàng đề chung của hệ thống
+          </div>
+
+        </div>
+
+      </label>
+
+    </div>
+
+    <!-- ACTION -->
+    <div
+      class="flex flex-col gap-3 lg:flex-row lg:justify-end"
+    >
+
+      <button
+        type="button"
+        routerLink="/dashboard/exams"
+        class="rounded-xl border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition"
+      >
+        Huỷ
+      </button>
+
+      <button
+        type="submit"
+        [disabled]="saving"
+        class="rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow hover:bg-blue-700 transition disabled:opacity-50"
+      >
+
+        <span *ngIf="!saving">
+          Lưu thay đổi
+        </span>
+
+        <span *ngIf="saving">
+          Đang cập nhật...
+        </span>
+
+      </button>
+
+    </div>
+
+  </form>
+
+</div>
