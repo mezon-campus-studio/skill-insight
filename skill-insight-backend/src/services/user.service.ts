@@ -1,4 +1,3 @@
-
 // import bcrypt from "bcrypt";
 // import { Role } from "@prisma/client";
 // import { userRepository } from "../repositories/user.repository";
@@ -138,10 +137,6 @@
 // export const getUsersService = userService.getUsers;
 // export const createUserByAdmin = userService.createUserByAdmin;
 // export const setUserPassword = userService.setUserPassword;
-
-
-
-
 
 import bcrypt from "bcrypt";
 import { Role } from "@prisma/client";
@@ -401,9 +396,6 @@ export const userService = {
       role: role.toLowerCase() as Role // Lưu vào DB dạng chữ thường
     });
   },
-
-  
-
 };
 
 

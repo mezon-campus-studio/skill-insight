@@ -19,7 +19,6 @@ enum Role {
   student
 }
 
-<<<<<<< HEAD
 enum BatchStatus {
   PENDING
   APPROVED
@@ -165,29 +164,8 @@ model User {
   // MATERIAL
   materials Material[]
   AuditLog  AuditLog[]
-=======
-model User {
-  user_id     Int      @id @default(autoincrement())
-  full_name   String?  @db.VarChar(255)
-  email       String   @unique @db.VarChar(255)
-  password    String?  @db.VarChar(255)
 
-  role        Role?
 
-  provider_id String?  @db.VarChar(255)
-  status      Boolean  @default(true)
-
-  created_at  DateTime @default(now()) @map("created_at")
-  updated_at  DateTime @updatedAt @map("updated_at")
-
-  // relation
-  subjects    Subject[]
->>>>>>> 7831c51b0f00e6b70f4c2d7230e7bc7f04f9e0b5
-
-  @@map("users")
-}
-
-<<<<<<< HEAD
 //
 // ======================================================
 // SUBJECT
@@ -1118,27 +1096,3 @@ model PracticeHistory {
   @@index([student_id, created_at])
   @@map("practice_histories")
 }
-=======
-model Subject {
-  subject_id   Int      @id @default(autoincrement())
-
-  subject_name String   @db.VarChar(255)
-
-  description  String?  @db.Text
-
-  created_by   Int
-
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  // relation
-  user User @relation(fields: [created_by],references: [user_id])
-
-  // cùng teacher không được trùng môn
-  @@unique([subject_name, created_by])
-
-  @@index([created_by])
-
-  @@map("subjects")
-}
->>>>>>> 7831c51b0f00e6b70f4c2d7230e7bc7f04f9e0b5

@@ -1,4 +1,3 @@
-
 import express, { Request } from "express";
 
 import {
@@ -100,5 +99,4 @@ router.delete(
 
   deleteSubject
 );
-
 export default router;

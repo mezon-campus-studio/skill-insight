@@ -1,4 +1,3 @@
-
 import {
   Component,
   OnInit
@@ -95,7 +94,5 @@ export class ResultComponent
       this.result.correct_answers -
       this.result.total_questions
     ) * -1;
-
   }
-
 }

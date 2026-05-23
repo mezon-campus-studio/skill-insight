@@ -1,8 +1,7 @@
-
 import bcrypt from "bcrypt";
-import { userRepository } from "../repositories/user.repository";
 import { getAccessToken, getUserInfo } from "./mezon.service";
 import { AppError } from "../utils/appError";
+import { userRepository } from "../repositories/user.repository";
 
 export const authService = {
 

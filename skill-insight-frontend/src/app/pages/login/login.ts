@@ -1,4 +1,3 @@
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
@@ -140,11 +139,9 @@ ngOnInit(): void {
   goRegister(): void {
     this.router.navigate(['/register']);
   }
-
   goForgot(): void {
     alert('Chức năng quên mật khẩu hiện đang được phát triển');
   }
-
   get f() { return this.loginForm.controls; }
 
   togglePassword(): void {

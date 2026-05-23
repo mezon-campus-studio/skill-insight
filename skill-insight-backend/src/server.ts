@@ -1,4 +1,3 @@
-
 import "./types";
 import dotenv from "dotenv";
 import app from "./app";
@@ -52,5 +51,4 @@ async function startServer(): Promise<void> {
     }
   });
 }
-
 startServer();

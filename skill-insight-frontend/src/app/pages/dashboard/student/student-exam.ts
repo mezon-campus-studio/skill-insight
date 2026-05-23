@@ -1,4 +1,3 @@
-
 import {
   Component,
   OnInit,
@@ -244,11 +243,7 @@ export class StudentExamComponent
           this.submitting = false;
 
           alert("Nộp bài thất bại");
-
         }
-
       });
-
   }
-
 }

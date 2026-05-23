@@ -1,4 +1,3 @@
-
 import express from "express";
 import {
   login,
@@ -16,7 +15,6 @@ import {
   permanentlyDelete,
   toggleUserStatus
 } from "../controllers/auth.controller";
-
 
 const router = express.Router();
 console.log("AUTH ROUTES LOADED");
