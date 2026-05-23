@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 /* 1. THẺ THỐNG KÊ (STAT CARDS) */
 .stat-card {
   @apply bg-white p-5 rounded-2xl border border-slate-100 shadow-sm cursor-pointer 
@@ -172,4 +172,4 @@ select {
   background: #2563eb;
   color: white;
 }
->>>>>>> 7831c51b0f00e6b70f4c2d7230e7bc7f04f9e0b5
+
