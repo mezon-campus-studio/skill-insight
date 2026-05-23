@@ -136,8 +136,6 @@
 // app.use(errorHandler);
 
 // export default app;
-
-
 import express, {
   Application,
   Request,
@@ -354,7 +352,5 @@ app.all(
 
   }
 );
-
 app.use(errorHandler);
-
 export default app;
