@@ -140,7 +140,7 @@
 
 import bcrypt from "bcrypt";
 import { Role } from "@prisma/client";
-import { userRepository } from "../repositories/user.repository";
+import { userRepository } from "../repositories/user.repositories";
 import { AppError } from "../utils/appError";
 import prisma from "../lib/prisma";
 
