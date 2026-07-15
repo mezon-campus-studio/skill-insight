@@ -1,0 +1,599 @@
+<div class="min-h-screen bg-gray-50 p-4 md:p-6">
+
+  <!-- ========================================= -->
+  <!-- HEADER -->
+  <!-- ========================================= -->
+
+  <div
+    class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6"
+  >
+
+    <div>
+
+      <h1
+        class="text-3xl font-bold text-gray-900"
+      >
+        Thông báo hệ thống
+      </h1>
+
+      <p
+        class="text-gray-500 mt-1"
+      >
+        Quản lý toàn bộ thông báo, cảnh báo và hoạt động người dùng
+      </p>
+
+    </div>
+
+    <div
+      class="flex items-center gap-3 flex-wrap"
+    >
+
+      <button
+        class="px-5 py-3 rounded-xl bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-semibold transition"
+      >
+        Đánh dấu tất cả đã đọc
+      </button>
+
+      <button
+        class="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
+      >
+        + Tạo thông báo
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================= -->
+  <!-- STATS -->
+  <!-- ========================================= -->
+
+  <div
+    class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6"
+  >
+
+    <!-- TOTAL -->
+    <div
+      class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
+    >
+
+      <div
+        class="flex items-center justify-between"
+      >
+
+        <div>
+
+          <p
+            class="text-sm text-gray-500 font-medium"
+          >
+            Tổng thông báo
+          </p>
+
+          <h2
+            class="text-3xl font-bold text-gray-900 mt-2"
+          >
+            1,245
+          </h2>
+
+        </div>
+
+        <div
+          class="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center"
+        >
+
+          🔔
+
+        </div>
+
+      </div>
+
+      <div
+        class="mt-4 text-sm text-green-600 font-semibold"
+      >
+        +12 hôm nay
+      </div>
+
+    </div>
+
+    <!-- UNREAD -->
+    <div
+      class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
+    >
+
+      <div
+        class="flex items-center justify-between"
+      >
+
+        <div>
+
+          <p
+            class="text-sm text-gray-500 font-medium"
+          >
+            Chưa đọc
+          </p>
+
+          <h2
+            class="text-3xl font-bold text-red-600 mt-2"
+          >
+            86
+          </h2>
+
+        </div>
+
+        <div
+          class="w-14 h-14 rounded-2xl bg-red-100 flex items-center justify-center"
+        >
+
+          📩
+
+        </div>
+
+      </div>
+
+      <div
+        class="mt-4 text-sm text-red-500 font-semibold"
+      >
+        Cần xử lý
+      </div>
+
+    </div>
+
+    <!-- SYSTEM -->
+    <div
+      class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
+    >
+
+      <div
+        class="flex items-center justify-between"
+      >
+
+        <div>
+
+          <p
+            class="text-sm text-gray-500 font-medium"
+          >
+            Hệ thống
+          </p>
+
+          <h2
+            class="text-3xl font-bold text-gray-900 mt-2"
+          >
+            320
+          </h2>
+
+        </div>
+
+        <div
+          class="w-14 h-14 rounded-2xl bg-amber-100 flex items-center justify-center"
+        >
+
+          ⚙️
+
+        </div>
+
+      </div>
+
+      <div
+        class="mt-4 text-sm text-gray-500 font-semibold"
+      >
+        Hoạt động ổn định
+      </div>
+
+    </div>
+
+    <!-- USERS -->
+    <div
+      class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5"
+    >
+
+      <div
+        class="flex items-center justify-between"
+      >
+
+        <div>
+
+          <p
+            class="text-sm text-gray-500 font-medium"
+          >
+            Người dùng online
+          </p>
+
+          <h2
+            class="text-3xl font-bold text-green-600 mt-2"
+          >
+            542
+          </h2>
+
+        </div>
+
+        <div
+          class="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center"
+        >
+
+          👥
+
+        </div>
+
+      </div>
+
+      <div
+        class="mt-4 text-sm text-green-600 font-semibold"
+      >
+        Đang hoạt động
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================= -->
+  <!-- FILTER -->
+  <!-- ========================================= -->
+
+  <div
+    class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6"
+  >
+
+    <div
+      class="grid grid-cols-1 lg:grid-cols-4 gap-4"
+    >
+
+      <!-- SEARCH -->
+      <div
+        class="lg:col-span-2"
+      >
+
+        <label
+          class="block text-sm font-semibold text-gray-700 mb-2"
+        >
+          Tìm kiếm thông báo
+        </label>
+
+        <input
+          type="text"
+          placeholder="Nhập tiêu đề thông báo..."
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500"
+        />
+
+      </div>
+
+      <!-- TYPE -->
+      <div>
+
+        <label
+          class="block text-sm font-semibold text-gray-700 mb-2"
+        >
+          Loại thông báo
+        </label>
+
+        <select
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white outline-none"
+        >
+
+          <option>
+            Tất cả
+          </option>
+
+          <option>
+            Hệ thống
+          </option>
+
+          <option>
+            Người dùng
+          </option>
+
+          <option>
+            Cảnh báo
+          </option>
+
+        </select>
+
+      </div>
+
+      <!-- STATUS -->
+      <div>
+
+        <label
+          class="block text-sm font-semibold text-gray-700 mb-2"
+        >
+          Trạng thái
+        </label>
+
+        <select
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white outline-none"
+        >
+
+          <option>
+            Tất cả
+          </option>
+
+          <option>
+            Đã đọc
+          </option>
+
+          <option>
+            Chưa đọc
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================= -->
+  <!-- NOTIFICATIONS LIST -->
+  <!-- ========================================= -->
+
+  <div
+    class="space-y-4"
+  >
+
+    <!-- ITEM -->
+    <div
+      class="bg-white rounded-2xl border border-blue-200 shadow-sm p-5 hover:shadow-md transition"
+    >
+
+      <div
+        class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5"
+      >
+
+        <!-- LEFT -->
+        <div
+          class="flex gap-4"
+        >
+
+          <div
+            class="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center text-2xl"
+          >
+            🔔
+          </div>
+
+          <div>
+
+            <div
+              class="flex flex-wrap items-center gap-3 mb-2"
+            >
+
+              <h3
+                class="text-lg font-bold text-gray-900"
+              >
+                Hệ thống vừa được cập nhật phiên bản mới
+              </h3>
+
+              <span
+                class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold"
+              >
+                Hệ thống
+              </span>
+
+              <span
+                class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold"
+              >
+                Mới
+              </span>
+
+            </div>
+
+            <p
+              class="text-gray-600 leading-relaxed"
+            >
+              Phiên bản 2.5.0 đã được triển khai thành công với nhiều cải tiến hiệu năng và giao diện người dùng.
+            </p>
+
+            <div
+              class="flex items-center gap-5 mt-4 text-sm text-gray-400"
+            >
+
+              <span>
+                👤 Admin
+              </span>
+
+              <span>
+                🕒 10 phút trước
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ACTION -->
+        <div
+          class="flex items-center gap-2"
+        >
+
+          <button
+            class="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-semibold transition"
+          >
+            Xem
+          </button>
+
+          <button
+            class="px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-sm font-semibold transition"
+          >
+            Xóa
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ITEM -->
+    <div
+      class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition"
+    >
+
+      <div
+        class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5"
+      >
+
+        <div
+          class="flex gap-4"
+        >
+
+          <div
+            class="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center text-2xl"
+          >
+            👨‍🎓
+          </div>
+
+          <div>
+
+            <div
+              class="flex flex-wrap items-center gap-3 mb-2"
+            >
+
+              <h3
+                class="text-lg font-bold text-gray-900"
+              >
+                25 sinh viên mới đăng ký khóa học
+              </h3>
+
+              <span
+                class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold"
+              >
+                Người dùng
+              </span>
+
+            </div>
+
+            <p
+              class="text-gray-600 leading-relaxed"
+            >
+              Khóa học Angular Advanced đã có thêm 25 sinh viên đăng ký trong hôm nay.
+            </p>
+
+            <div
+              class="flex items-center gap-5 mt-4 text-sm text-gray-400"
+            >
+
+              <span>
+                👤 Teacher
+              </span>
+
+              <span>
+                🕒 1 giờ trước
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div
+          class="flex items-center gap-2"
+        >
+
+          <button
+            class="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-semibold transition"
+          >
+            Xem
+          </button>
+
+          <button
+            class="px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-sm font-semibold transition"
+          >
+            Xóa
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ITEM -->
+    <div
+      class="bg-white rounded-2xl border border-red-200 shadow-sm p-5 hover:shadow-md transition"
+    >
+
+      <div
+        class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5"
+      >
+
+        <div
+          class="flex gap-4"
+        >
+
+          <div
+            class="w-14 h-14 rounded-2xl bg-red-100 flex items-center justify-center text-2xl"
+          >
+            🚨
+          </div>
+
+          <div>
+
+            <div
+              class="flex flex-wrap items-center gap-3 mb-2"
+            >
+
+              <h3
+                class="text-lg font-bold text-gray-900"
+              >
+                Phát hiện đăng nhập bất thường
+              </h3>
+
+              <span
+                class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold"
+              >
+                Cảnh báo
+              </span>
+
+            </div>
+
+            <p
+              class="text-gray-600 leading-relaxed"
+            >
+              Hệ thống phát hiện nhiều lần đăng nhập thất bại từ IP lạ trong vòng 5 phút gần đây.
+            </p>
+
+            <div
+              class="flex items-center gap-5 mt-4 text-sm text-gray-400"
+            >
+
+              <span>
+                👤 Security System
+              </span>
+
+              <span>
+                🕒 2 giờ trước
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div
+          class="flex items-center gap-2"
+        >
+
+          <button
+            class="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-semibold transition"
+          >
+            Xem
+          </button>
+
+          <button
+            class="px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-sm font-semibold transition"
+          >
+            Xóa
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

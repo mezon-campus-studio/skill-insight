@@ -1,0 +1,121 @@
+<div class="min-h-screen bg-slate-50 p-4 md:p-8">
+
+  <div class="max-w-5xl mx-auto space-y-8">
+
+    <!-- HEADER -->
+    <div
+      class="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-[40px] p-8 md:p-12 text-white shadow-2xl relative overflow-hidden">
+
+      <div class="absolute top-0 right-0 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
+
+      <div class="relative z-10">
+
+        <p class="uppercase tracking-[4px] text-[11px] font-black opacity-70 mb-3">
+          Smart Practice System
+        </p>
+
+        <h1 class="text-4xl md:text-5xl font-black italic leading-none mb-4">
+          LUYỆN TẬP
+        </h1>
+
+        <p class="max-w-2xl text-sm md:text-base text-blue-100 leading-relaxed">
+          Tạo bài luyện tập ngẫu nhiên theo môn học và chủ đề bạn muốn học.
+        </p>
+
+      </div>
+    </div>
+
+    <!-- MAIN CARD -->
+    <div class="bg-white rounded-[32px] shadow-2xl border border-slate-100 overflow-hidden">
+
+      <!-- TOP -->
+      <div class="p-8 border-b border-slate-100">
+
+        <div class="flex items-center justify-between flex-wrap gap-4">
+
+          <div>
+            <p class="text-[11px] uppercase tracking-[3px] font-black text-indigo-500 mb-2">
+              Cấu hình luyện tập
+            </p>
+
+            <h2 class="text-2xl font-black italic text-slate-800">
+              Tạo đề luyện mới
+            </h2>
+          </div>
+
+          <div
+            class="px-5 py-3 rounded-2xl bg-indigo-50 text-indigo-600 text-xs font-black uppercase tracking-widest">
+            AI RANDOM QUESTION
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- FORM -->
+      <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+
+        <!-- SUBJECT -->
+        <div>
+
+          <label
+            class="block mb-3 text-[11px] uppercase tracking-widest font-black text-slate-400">
+            Subject
+          </label>
+
+          <select
+            class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 font-bold text-slate-700 outline-none focus:ring-4 focus:ring-blue-500/10">
+
+            <option>Java</option>
+            <option>NodeJS</option>
+            <option>Spring Boot</option>
+            <option>Angular</option>
+
+          </select>
+
+        </div>
+
+        <!-- TOPIC -->
+        <div>
+
+          <label
+            class="block mb-3 text-[11px] uppercase tracking-widest font-black text-slate-400">
+            Topic
+          </label>
+
+          <select
+            class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 font-bold text-slate-700 outline-none focus:ring-4 focus:ring-indigo-500/10">
+
+            <option>OOP</option>
+            <option>REST API</option>
+            <option>Authentication</option>
+            <option>Database</option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+      <!-- FOOTER -->
+      <div
+        class="px-8 py-6 bg-slate-50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+
+        <div class="text-sm text-slate-400 font-medium">
+          Hệ thống sẽ tự động sinh câu hỏi phù hợp với lựa chọn của bạn.
+        </div>
+
+        <button
+          class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl font-black uppercase italic tracking-widest text-sm shadow-xl shadow-blue-200 transition-all hover:scale-[1.02] active:scale-95">
+
+          Generate bài luyện tập
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

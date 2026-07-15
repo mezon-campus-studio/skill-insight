@@ -1,0 +1,518 @@
+<div class="p-6">
+
+    <!-- ====================================================== -->
+    <!-- HEADER -->
+    <!-- ====================================================== -->
+
+    <div class="flex items-center justify-between mb-6">
+
+        <div>
+
+            <h1 class="text-3xl font-bold text-gray-800">
+
+                Ngân hàng câu hỏi
+
+            </h1>
+
+            <p class="text-gray-500 mt-1">
+
+                Quản lý các bộ câu hỏi trong hệ thống
+
+            </p>
+
+        </div>
+
+        <button
+
+            (click)="createBatch()"
+
+            class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow">
+
+            + Tạo bộ câu hỏi
+
+        </button>
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- TAB -->
+    <!-- ====================================================== -->
+
+    <div class="flex gap-3 border-b mb-6">
+
+        <!-- Teacher -->
+
+        <ng-container *ngIf="isTeacher">
+
+            <button
+
+                (click)="changeTab('MY')"
+
+                [class.border-blue-600]="activeTab==='MY'"
+
+                [class.text-blue-600]="activeTab==='MY'"
+
+                class="pb-3 border-b-2 border-transparent">
+
+                Bộ câu hỏi của tôi
+
+            </button>
+
+            <button
+
+                (click)="changeTab('SYSTEM')"
+
+                [class.border-blue-600]="activeTab==='SYSTEM'"
+
+                [class.text-blue-600]="activeTab==='SYSTEM'"
+
+                class="pb-3 border-b-2 border-transparent">
+
+                Hệ thống
+
+            </button>
+
+        </ng-container>
+
+        <!-- Admin -->
+
+        <ng-container *ngIf="isAdmin">
+
+            <button
+
+                (click)="changeTab('ALL')"
+
+                [class.border-blue-600]="activeTab==='ALL'"
+
+                [class.text-blue-600]="activeTab==='ALL'"
+
+                class="pb-3 border-b-2 border-transparent">
+
+                Tất cả
+
+            </button>
+
+            <button
+
+                (click)="changeTab('SYSTEM')"
+
+                [class.border-blue-600]="activeTab==='SYSTEM'"
+
+                [class.text-blue-600]="activeTab==='SYSTEM'"
+
+                class="pb-3 border-b-2 border-transparent">
+
+                Hệ thống
+
+            </button>
+
+            <button
+
+                (click)="changeTab('TEACHER')"
+
+                [class.border-blue-600]="activeTab==='TEACHER'"
+
+                [class.text-blue-600]="activeTab==='TEACHER'"
+
+                class="pb-3 border-b-2 border-transparent">
+
+                Giáo viên
+
+            </button>
+
+        </ng-container>
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- TOOLBAR -->
+    <!-- ====================================================== -->
+
+    <div class="flex flex-wrap gap-3 mb-6">
+
+        <input
+
+            [(ngModel)]="searchKeyword"
+
+            (ngModelChange)="filterBatches()"
+
+            placeholder="Tìm theo tên bộ câu hỏi..."
+
+            class="border rounded-lg px-4 py-2 flex-1 min-w-[300px]">
+
+        <!-- <button
+
+            class="border rounded-lg px-4 py-2">
+
+            Upload Excel
+
+        </button>
+
+        <button
+
+            class="border rounded-lg px-4 py-2">
+
+            Download Template
+
+        </button> -->
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- LOADING -->
+    <!-- ====================================================== -->
+
+    <div *ngIf="loading">
+
+        <div
+
+            *ngFor="let item of [1,2,3,4,5]"
+
+            class="animate-pulse bg-gray-200 h-16 rounded mb-3">
+
+        </div>
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- EMPTY -->
+    <!-- ====================================================== -->
+
+    <div
+
+        *ngIf="!loading && filteredBatches.length===0"
+
+        class="text-center py-20">
+
+        <div class="text-6xl">
+
+            📚
+
+        </div>
+
+        <div class="text-xl font-semibold mt-3">
+
+            Chưa có bộ câu hỏi
+
+        </div>
+
+        <div class="text-gray-500 mt-2">
+
+            Hãy tạo bộ câu hỏi đầu tiên.
+
+        </div>
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- TABLE -->
+    <!-- ====================================================== -->
+
+    <div
+
+        *ngIf="!loading && filteredBatches.length"
+
+        class="overflow-x-auto rounded-lg border">
+
+        <table class="min-w-full">
+
+            <thead class="bg-gray-100">
+
+                <tr>
+
+                    <th class="p-3 text-left">
+
+                        Tên bộ
+
+                    </th>
+
+                    <th class="p-3 text-left">
+
+                        Môn học
+
+                    </th>
+
+                    <th class="p-3 text-center">
+
+                        Số câu
+
+                    </th>
+
+                    <th class="p-3 text-center">
+
+                        Nguồn
+
+                    </th>
+
+                    <th class="p-3 text-center">
+
+                        Trạng thái
+
+                    </th>
+
+                    <th class="p-3 text-center">
+
+                        Ngày tạo
+
+                    </th>
+
+                    <th class="p-3 text-center">
+
+                        Thao tác
+
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                <tr
+
+                    *ngFor="
+
+                        let batch of paginatedBatches;
+
+                        trackBy: trackByBatch
+
+                    "
+
+                    class="border-t hover:bg-gray-50">
+
+                    <!-- TITLE -->
+
+                    <td class="p-3">
+
+                        <div class="font-semibold">
+
+                            {{ batch.batch_name }}
+
+                        </div>
+
+                        <div class="text-sm text-gray-500">
+
+                            {{ batch.description }}
+
+                        </div>
+
+                    </td>
+
+                    <!-- SUBJECT -->
+
+                    <td class="p-3">
+
+                        {{ batch.subject?.subject_name }}
+
+                    </td>
+
+                    <!-- QUESTION -->
+
+                    <td class="text-center">
+
+                        {{ batch.total_questions }}
+
+                    </td>
+
+                    <!-- SOURCE -->
+
+                    <td class="text-center">
+
+                       {{ getSourceLabel(batch.visibility) }}
+
+                    </td>
+
+                    <!-- VISIBILITY -->
+
+                    <td class="text-center">
+
+                        <span
+
+                            class="px-2 py-1 rounded bg-gray-100">
+
+                            {{ getStatusLabel(batch.status) }}
+
+                        </span>
+
+                    </td>
+
+                    <!-- CREATED -->
+
+                    <td class="text-center">
+
+                        {{ batch.created_at | date:'dd/MM/yyyy' }}
+
+                    </td>
+
+                    <!-- ACTION -->
+
+                    <td>
+
+                        <div
+
+                            class="flex justify-center gap-2">
+
+                            <button
+
+                                (click)="viewBatch(batch.batch_id)"
+
+                                class="text-blue-600">
+
+                                Xem
+
+                            </button>
+
+                            <button
+
+                                (click)="editBatch(batch.batch_id)"
+
+                                class="text-green-600">
+
+                                Sửa
+
+                            </button>
+
+                            <button
+
+                                (click)="deleteBatch(batch.batch_id)"
+
+                                class="text-red-600">
+
+                                Xóa
+
+                            </button>
+
+                            <button
+
+                                *ngIf="isTeacher"
+
+                                (click)="toggleVisibility(batch)"
+
+                                class="text-orange-600">
+
+                                {{ batch.visibility==='PUBLIC'
+                                    ? 'Riêng tư'
+                                    : 'Công khai'
+                                }}
+
+                            </button>
+
+                            <button
+
+                                *ngIf="activeTab==='SYSTEM'"
+
+                                (click)="copyBatch(batch.batch_id)"
+
+                                class="text-purple-600">
+
+                                Sao chép
+
+                            </button>
+
+                            <button
+
+                                *ngIf="isAdmin && activeTab==='TEACHER'"
+
+                                (click)="integrateBatch(batch.batch_id)"
+
+                                class="text-indigo-600">
+
+                                Tích hợp
+
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- ====================================================== -->
+<!-- PAGINATION -->
+<!-- ====================================================== -->
+
+<div
+    *ngIf="!loading && totalPages > 1"
+    class="flex items-center justify-between mt-6">
+
+    <div class="text-sm text-gray-500">
+
+        Hiển thị
+
+        <span class="font-semibold">
+
+            {{ paginatedBatches.length }}
+
+        </span>
+
+        /
+
+        <span class="font-semibold">
+
+            {{ filteredBatches.length }}
+
+        </span>
+
+        bộ câu hỏi
+
+    </div>
+
+    <div class="flex items-center gap-2">
+
+        <!-- Previous -->
+
+        <button
+
+            (click)="previousPage()"
+
+            [disabled]="currentPage===1"
+
+            class="px-3 py-2 rounded border disabled:opacity-40">
+
+            ◀
+
+        </button>
+
+        <!-- Page Number -->
+
+        <button
+
+            *ngFor="let page of pages"
+
+            (click)="goToPage(page)"
+
+            class="px-3 py-2 rounded border"
+
+            [class.bg-blue-600]="page===currentPage"
+
+            [class.text-white]="page===currentPage">
+
+            {{ page }}
+
+        </button>
+
+        <!-- Next -->
+
+        <button
+
+            (click)="nextPage()"
+
+            [disabled]="currentPage===totalPages"
+
+            class="px-3 py-2 rounded border disabled:opacity-40">
+
+            ▶
+
+        </button>
+
+    </div>
+
+</div>
+
+</div>

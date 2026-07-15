@@ -1,0 +1,175 @@
+<div class="min-h-screen bg-gray-50 p-6">
+
+  <div
+    class="max-w-5xl mx-auto bg-white rounded-[40px] shadow-2xl p-8 md:p-10"
+  >
+
+    <div
+      *ngIf="loading"
+      class="flex justify-center items-center py-32"
+    >
+
+      <p
+        class="text-2xl font-bold text-gray-500"
+      >
+        Đang tải đề thi...
+      </p>
+
+    </div>
+
+    <div *ngIf="!loading && exam">
+
+      <div
+        class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 border-b pb-6 mb-10"
+      >
+
+        <div>
+
+          <h1
+            class="text-3xl font-black text-gray-800 uppercase"
+          >
+            {{ exam.title }}
+          </h1>
+
+          <p
+            class="text-gray-500 font-semibold mt-2"
+          >
+            Thời gian:
+            {{ exam.duration }} phút
+          </p>
+
+          <p
+            class="text-gray-400 text-sm mt-1"
+          >
+            Tổng số câu:
+            {{ exam.questions?.length || 0 }}
+          </p>
+
+        </div>
+
+        <div
+          class="px-6 py-4 bg-red-500 text-white rounded-2xl font-black text-2xl shadow-lg"
+        >
+          {{ formattedTime }}
+        </div>
+
+      </div>
+
+      <div class="space-y-8">
+
+        <div
+          *ngFor="
+            let question of exam.questions;
+            let i = index
+          "
+          class="p-6 rounded-[30px] bg-blue-50 border border-blue-100"
+        >
+
+          <div class="mb-6">
+
+            <h2
+              class="font-black text-lg text-gray-800"
+            >
+              Câu {{ i + 1 }}
+            </h2>
+
+            <p
+              class="mt-2 text-gray-700 font-semibold leading-relaxed"
+            >
+              {{ question.content }}
+            </p>
+
+          </div>
+
+          <div
+            class="grid grid-cols-1 gap-4"
+          >
+
+            <label
+              *ngFor="
+                let answer of question.answers
+              "
+              class="flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200"
+              [ngClass]="
+                isSelected(question.id, answer.id)
+                  ? 'border-blue-500 bg-blue-100'
+                  : 'border-transparent bg-white hover:border-blue-300'
+              "
+            >
+
+              <input
+                type="radio"
+                [name]="'question_' + question.id"
+                [checked]="
+                  isSelected(question.id, answer.id)
+                "
+                (change)="
+                  selectAnswer(
+                    question.id,
+                    answer.id
+                  )
+                "
+                class="w-5 h-5 accent-blue-600"
+              />
+
+              <span
+                class="font-semibold text-gray-700"
+              >
+                {{ answer.answerText }}
+              </span>
+
+            </label>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div
+        class="mt-10 flex flex-col md:flex-row gap-4"
+      >
+
+        <div
+          class="flex-1 bg-gray-100 rounded-2xl p-5"
+        >
+
+          <p
+            class="text-gray-600 font-semibold"
+          >
+            Đã trả lời:
+          </p>
+
+          <h3
+            class="text-2xl font-black text-blue-600 mt-1"
+          >
+            {{ answeredCount }}
+            /
+            {{
+              exam.questions?.length || 0
+            }}
+          </h3>
+
+        </div>
+
+        <button
+          (click)="submitExam()"
+          [disabled]="submitting"
+          class="flex-1 py-5 rounded-[25px] bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-xl font-black uppercase tracking-widest shadow-2xl shadow-blue-200 active:scale-95 transition-all"
+        >
+
+          {{
+            submitting
+              ? 'ĐANG NỘP BÀI...'
+              : 'NỘP BÀI THI'
+          }}
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

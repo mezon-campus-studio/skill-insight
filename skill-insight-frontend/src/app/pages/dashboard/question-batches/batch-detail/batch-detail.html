@@ -1,0 +1,588 @@
+<div class="p-6">
+
+    <!-- ====================================================== -->
+    <!-- HEADER -->
+    <!-- ====================================================== -->
+
+    <div
+        class="flex justify-between items-center mb-6">
+
+        <div>
+
+            <h1
+                class="text-3xl font-bold text-gray-800">
+
+                {{ batch?.batch_name }}
+
+            </h1>
+
+            <p
+                class="text-gray-500 mt-1">
+
+                {{ batch?.description }}
+
+            </p>
+
+        </div>
+
+        <div
+            class="flex gap-3">
+
+            <button
+
+                (click)="addQuestions()"
+
+                class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded">
+
+                + Thêm câu hỏi
+
+            </button>
+
+            <button
+
+                (click)="deleteBatch()"
+
+                class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded">
+
+                Xóa bộ
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- STATISTIC -->
+    <!-- ====================================================== -->
+
+    <div
+        class="grid grid-cols-4 gap-4 mb-6">
+
+        <div
+            class="bg-white rounded-lg shadow p-4">
+
+            <div class="text-sm text-gray-500">
+
+                Tổng số câu
+
+            </div>
+
+            <div
+                class="text-3xl font-bold mt-2">
+
+                {{ questions.length }}
+
+            </div>
+
+        </div>
+
+        <div
+            class="bg-green-50 rounded-lg shadow p-4">
+
+            <div class="text-green-600">
+
+                Dễ
+
+            </div>
+
+            <div
+                class="text-3xl font-bold">
+
+                {{ easyCount }}
+
+            </div>
+
+        </div>
+
+        <div
+            class="bg-yellow-50 rounded-lg shadow p-4">
+
+            <div class="text-yellow-600">
+
+                Trung bình
+
+            </div>
+
+            <div
+                class="text-3xl font-bold">
+
+                {{ mediumCount }}
+
+            </div>
+
+        </div>
+
+        <div
+            class="bg-red-50 rounded-lg shadow p-4">
+
+            <div class="text-red-600">
+
+                Khó
+
+            </div>
+
+            <div
+                class="text-3xl font-bold">
+
+                {{ hardCount }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- TOOLBAR -->
+    <!-- ====================================================== -->
+
+    <div
+        class="flex gap-3 mb-6">
+
+        <input
+
+            [(ngModel)]="searchKeyword"
+
+            (ngModelChange)="filterQuestions()"
+
+            placeholder="Tìm câu hỏi..."
+
+            class="flex-1 border rounded px-4 py-2">
+
+        <select
+
+            [(ngModel)]="selectedLevel"
+
+            (change)="filterQuestions()"
+
+            class="border rounded px-4 py-2">
+
+            <option value="">
+
+                Tất cả mức độ
+
+            </option>
+
+            <option value="EASY">
+
+                Dễ
+
+            </option>
+
+            <option value="MEDIUM">
+
+                Trung bình
+
+            </option>
+
+            <option value="HARD">
+
+                Khó
+
+            </option>
+
+        </select>
+
+        <label
+            class="bg-gray-100 px-4 py-2 rounded cursor-pointer">
+
+            Import Excel
+
+            <input
+
+                hidden
+
+                type="file"
+
+                accept=".xlsx,.xls,.csv"
+
+                (change)="importExcel($event)">
+
+        </label>
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- LOADING -->
+    <!-- ====================================================== -->
+
+    <div
+        *ngIf="loading">
+
+        <div
+
+            *ngFor="let item of [1,2,3,4]"
+
+            class="animate-pulse h-36 rounded bg-gray-200 mb-4">
+
+        </div>
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- EMPTY -->
+    <!-- ====================================================== -->
+
+    <div
+
+        *ngIf="!loading && filteredQuestions.length===0"
+
+        class="text-center py-20">
+
+        <div
+            class="text-6xl">
+
+            📄
+
+        </div>
+
+        <div
+            class="text-xl font-semibold mt-4">
+
+            Chưa có câu hỏi
+
+        </div>
+
+        <div
+            class="text-gray-500">
+
+            Hãy thêm câu hỏi đầu tiên.
+
+        </div>
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- QUESTION LIST -->
+    <!-- ====================================================== -->
+
+    <div
+
+        *ngIf="!loading"
+
+        class="space-y-6">
+
+        <div
+
+            *ngFor="
+
+                let q of filteredQuestions;
+
+                let i=index;
+
+                trackBy: trackByQuestion
+
+            "
+
+            class="bg-white border rounded-xl shadow p-6">
+
+            <!-- HEADER -->
+
+            <div
+
+                class="flex justify-between items-center mb-4">
+
+                <div
+                    class="font-bold text-lg">
+
+                    Câu {{ i+1 }}
+
+                </div>
+
+                <div
+                    class="flex items-center gap-3">
+
+                    <span
+
+                        [class]="getLevelClass(q.difficulty)"
+
+                        class="px-3 py-1 rounded-full text-sm">
+
+                        {{ getLevelLabel(q.difficulty) }}
+
+                    </span>
+
+                    <button
+
+                        (click)="deleteQuestion(q.question_id)"
+
+                        class="text-red-600">
+
+                        Xóa
+
+                    </button>
+
+                </div>
+
+            </div>
+
+                        <!-- ====================================================== -->
+            <!-- QUESTION -->
+            <!-- ====================================================== -->
+
+            <div class="mb-5">
+
+                <label class="block font-semibold mb-2">
+
+                    Nội dung câu hỏi
+
+                </label>
+
+                <textarea
+
+                    [(ngModel)]="q.question_text"
+
+                    (ngModelChange)="onContentChange(q)"
+
+                    rows="3"
+
+                    class="w-full border rounded-lg px-4 py-3">
+
+                </textarea>
+
+            </div>
+
+            <!-- ====================================================== -->
+            <!-- ANSWERS -->
+            <!-- ====================================================== -->
+
+            <div class="grid md:grid-cols-2 gap-4">
+
+                <!-- A -->
+
+                <div>
+
+                    <label class="font-semibold">
+
+                        Đáp án A
+
+                    </label>
+
+                    <div class="flex items-center gap-2 mt-2">
+
+                        <input
+
+                            type="radio"
+
+                            name="correct{{q.question_id}}"
+
+                            [checked]="q.correct_answer==='A'"
+
+                            (change)="setCorrectAnswer(q,'A')">
+
+                        <input
+
+                            [(ngModel)]="q.option_a"
+
+                            (ngModelChange)="onAnswerChange(q)"
+
+                            class="flex-1 border rounded px-3 py-2">
+
+                    </div>
+
+                </div>
+
+                <!-- B -->
+
+                <div>
+
+                    <label class="font-semibold">
+
+                        Đáp án B
+
+                    </label>
+
+                    <div class="flex items-center gap-2 mt-2">
+
+                        <input
+
+                            type="radio"
+
+                            name="correct{{q.question_id}}"
+
+                            [checked]="q.correct_answer==='B'"
+
+                            (change)="setCorrectAnswer(q,'B')">
+
+                        <input
+
+                            [(ngModel)]="q.option_b"
+
+                            (ngModelChange)="onAnswerChange(q)"
+
+                            class="flex-1 border rounded px-3 py-2">
+
+                    </div>
+
+                </div>
+
+                <!-- C -->
+
+                <div>
+
+                    <label class="font-semibold">
+
+                        Đáp án C
+
+                    </label>
+
+                    <div class="flex items-center gap-2 mt-2">
+
+                        <input
+
+                            type="radio"
+
+                            name="correct{{q.question_id}}"
+
+                            [checked]="q.correct_answer==='C'"
+
+                            (change)="setCorrectAnswer(q,'C')">
+
+                        <input
+
+                            [(ngModel)]="q.option_c"
+
+                            (ngModelChange)="onAnswerChange(q)"
+
+                            class="flex-1 border rounded px-3 py-2">
+
+                    </div>
+
+                </div>
+
+                <!-- D -->
+
+                <div>
+
+                    <label class="font-semibold">
+
+                        Đáp án D
+
+                    </label>
+
+                    <div class="flex items-center gap-2 mt-2">
+
+                        <input
+
+                            type="radio"
+
+                            name="correct{{q.question_id}}"
+
+                            [checked]="q.correct_answer==='D'"
+
+                            (change)="setCorrectAnswer(q,'D')">
+
+                        <input
+
+                            [(ngModel)]="q.option_d"
+
+                            (ngModelChange)="onAnswerChange(q)"
+
+                            class="flex-1 border rounded px-3 py-2">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ====================================================== -->
+            <!-- FOOTER -->
+            <!-- ====================================================== -->
+
+            <div class="grid md:grid-cols-2 gap-5 mt-6">
+
+                <!-- Difficulty -->
+
+                <div>
+
+                    <label class="block font-semibold mb-2">
+
+                        Mức độ
+
+                    </label>
+
+                    <select
+
+                        [(ngModel)]="q.difficulty"
+
+                        (change)="markDirty(q)"
+
+                        class="w-full border rounded-lg px-3 py-2">
+
+                        <option value="EASY">
+
+                            Dễ
+
+                        </option>
+
+                        <option value="MEDIUM">
+
+                            Trung bình
+
+                        </option>
+
+                        <option value="HARD">
+
+                            Khó
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- Explanation -->
+
+                <div>
+
+                    <label class="block font-semibold mb-2">
+
+                        Giải thích
+
+                    </label>
+
+                    <textarea
+
+                        [(ngModel)]="q.explanation"
+
+                        (ngModelChange)="onExplanationChange(q)"
+
+                        rows="3"
+
+                        class="w-full border rounded-lg px-3 py-2">
+
+                    </textarea>
+
+                </div>
+
+            </div>
+
+            <!-- ====================================================== -->
+            <!-- SAVE -->
+            <!-- ====================================================== -->
+
+            <div
+
+                class="flex justify-end mt-6">
+
+                <button
+
+                    *ngIf="isDirty(q)"
+
+                    (click)="saveQuestion(q)"
+
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+
+                    Lưu thay đổi
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

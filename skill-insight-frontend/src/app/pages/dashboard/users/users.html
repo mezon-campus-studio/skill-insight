@@ -1,0 +1,619 @@
+<!-- <div class="users-page">
+
+  <div class="page-header">
+    <h2>Quản lý người dùng</h2>
+    <p>Danh sách người dùng trong hệ thống</p>
+  </div>
+
+  <div class="create-user-box">
+
+    <h3>➕ Thêm người dùng</h3>
+
+    <input
+      type="text"
+      placeholder="Họ và tên"
+      [(ngModel)]="newUser.full_name"
+    />
+
+    <input
+      type="email"
+      placeholder="Email"
+      [(ngModel)]="newUser.email"
+    />
+
+    <input
+      type="password"
+      placeholder="Mật khẩu"
+      [(ngModel)]="newUser.password"
+    />
+
+    <select [(ngModel)]="newUser.role">
+      <option value="student">Student</option>
+      <option value="teacher">Teacher</option>
+      <option value="admin">Admin</option>
+    </select>
+
+    <button
+      (click)="createUser()"
+      [disabled]="creating"
+    >
+      {{ creating ? 'Đang tạo...' : 'Tạo user' }}
+    </button>
+
+  </div>
+
+  <div class="table-wrapper">
+
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="🔍 Tìm theo email hoặc tên..."
+        [(ngModel)]="searchKeyword"
+        (keyup.enter)="onSearch()"
+      />
+
+      <button (click)="onSearch()">
+        Tìm
+      </button>
+    </div>
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Họ và tên</th>
+          <th>Email</th>
+          <th>Vai trò hiện tại</th>
+          <th>Cấp quyền</th>
+          <th>Lưu</th>
+          <th>Xóa</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr *ngIf="!loading && users.length === 0">
+          <td colspan="7" class="empty-data">
+            Không có dữ liệu người dùng
+          </td>
+        </tr>
+
+        <tr *ngFor="let user of users; let i = index">
+
+          <td>
+            {{ (currentPage - 1) * limit + i + 1 }}
+          </td>
+
+          <td>{{ user.full_name }}</td>
+          <td>{{ user.email }}</td>
+
+          <td>
+            <span class="role-badge" [ngClass]="user.role">
+              {{ user.role }}
+            </span>
+          </td>
+
+          <td>
+            <select [(ngModel)]="user.role">
+              <option value="student">Student</option>
+              <option value="teacher">Teacher</option>
+              <option value="admin">Admin</option>
+            </select>
+          </td>
+
+          <td>
+            <button
+              class="save-btn"
+              (click)="saveRole(user)"
+              [disabled]="isSaving(user.user_id)"
+            >
+              <span *ngIf="!isSaving(user.user_id)">💾 Lưu</span>
+              <span *ngIf="isSaving(user.user_id)">⏳...</span>
+            </button>
+          </td>
+
+          <td>
+            <button
+              class="delete-btn"
+              (click)="deleteUser(user)"
+            >
+              ❌ Xóa
+            </button>
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <div class="pagination" *ngIf="totalPages > 1">
+
+    <button
+      class="nav-btn"
+      (click)="prevPage()"
+      [disabled]="currentPage === 1"
+    >
+      ⬅ Trang trước
+    </button>
+
+    <button
+      *ngFor="let page of pages"
+      class="page-btn"
+      [class.active]="page === currentPage"
+      (click)="changePage(page)"
+    >
+      {{ page }}
+    </button>
+
+    <button
+      class="nav-btn"
+      (click)="nextPage()"
+      [disabled]="currentPage === totalPages"
+    >
+      Trang sau ➡
+    </button>
+
+  </div>
+
+</div> -->
+
+
+
+
+
+
+
+
+
+
+<div class="min-h-screen bg-slate-50 p-4 md:p-8 font-sans">
+  <div class="max-w-7xl mx-auto space-y-6">
+    
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800">Quản trị Thành viên</h1>
+        <p class="text-slate-500 text-sm italic">Hệ thống phân quyền và quản lý tài khoản tập trung</p>
+      </div>
+
+      <!-- Thanh công cụ cấp quyền nhanh -->
+      <div class="flex flex-wrap items-center gap-2 bg-white p-2 rounded-2xl shadow-sm border border-slate-200 w-full lg:w-auto">
+        <div class="relative flex-1 lg:flex-none">
+          <input type="email" [(ngModel)]="quickGrant.email" (keyup.enter)="onQuickGrant()"
+                 placeholder="Email cấp tài khoản..." 
+                 class="w-full lg:w-64 pl-4 pr-4 py-2 text-sm bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all">
+        </div>
+        
+        <select [(ngModel)]="quickGrant.role" 
+                class="text-xs font-bold text-slate-600 bg-slate-50 border-none rounded-xl px-3 py-2 outline-none cursor-pointer focus:ring-0">
+          <option value="STUDENT">HỌC SINH</option>
+          <option value="TEACHER">GIÁO VIÊN</option>
+          <option value="ADMIN">ADMIN</option>
+        </select>
+
+        <button (click)="onQuickGrant()" [disabled]="isGranting"
+                class="bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white text-xs font-bold px-6 py-2.5 rounded-xl transition-all shadow-lg shadow-indigo-100 flex items-center gap-2">
+          <span *ngIf="isGranting" class="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          {{ isGranting ? 'ĐANG XỬ LÝ' : 'CẤP QUYỀN' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. STATISTICS CARDS (Thống kê nhanh) -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div (click)="setTab('ALL')" class="stat-card group" [class.active-stat]="activeTab === 'ALL'">
+        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Tổng số</p>
+        <p class="text-2xl font-black text-slate-800">{{stats.total}}</p>
+      </div>
+
+      <div (click)="setTab('admin')" class="stat-card group" [class.active-stat]="activeTab === 'admin'">
+        <p class="text-red-400 text-[10px] font-bold uppercase tracking-wider">Quản trị</p>
+        <p class="text-2xl font-black text-slate-800">{{stats.admin}}</p>
+      </div>
+
+      <div (click)="setTab('teacher')" class="stat-card group" [class.active-stat]="activeTab === 'teacher'">
+        <p class="text-blue-400 text-[10px] font-bold uppercase tracking-wider">Giáo viên</p>
+        <p class="text-2xl font-black text-slate-800">{{stats.teacher}}</p>
+      </div>
+
+      <div (click)="setTab('student')" class="stat-card group" [class.active-stat]="activeTab === 'student'">
+        <p class="text-emerald-400 text-[10px] font-bold uppercase tracking-wider">Học sinh</p>
+        <p class="text-2xl font-black text-slate-800">{{stats.student}}</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-white overflow-hidden">
+      
+      <div class="p-6 border-b border-slate-50 flex flex-col lg:flex-row justify-between items-center gap-6">
+        
+        <div class="flex bg-slate-100 p-1 rounded-2xl w-full lg:w-auto flex-shrink-0 shadow-inner">
+          <button (click)="setTab('ALL')" 
+                  [class.active-tab]="activeTab === 'ALL'" 
+                  class="tab-btn min-w-[80px]">Tất cả</button>
+          <button (click)="setTab('admin')" 
+                  [class.active-tab]="activeTab === 'admin'" 
+                  class="tab-btn min-w-[80px]">Admin</button>
+          <button (click)="setTab('teacher')" 
+                  [class.active-tab]="activeTab === 'teacher'" 
+                  class="tab-btn min-w-[80px]">Giáo viên</button>
+          <button (click)="setTab('student')" 
+                  [class.active-tab]="activeTab === 'student'" 
+                  class="tab-btn min-w-[80px]">Học sinh</button>
+          <button (click)="setTab('DELETED')" 
+                  [class.active-tab]="activeTab === 'DELETED'" 
+                  class="tab-btn min-w-[80px] text-red-500">
+            Thùng rác
+          </button>
+        </div>
+
+        <div class="relative w-full lg:max-w-md group">
+          <input type="text" 
+                [ngModel]="searchKeyword" 
+                (input)="onSearchInput($event)"
+                (keyup.enter)="onSearch()"
+                placeholder="Tìm theo tên, email..." 
+                class="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition-all outline-none font-medium text-slate-600 placeholder:text-slate-400">
+          
+          <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-focus-within:text-indigo-500">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+          </div>
+
+          <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+          </div>
+        </div>
+        
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="text-[11px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50">
+              <th class="px-8 py-4">Thành viên</th>
+              <th class="px-6 py-4">Vai trò hiện tại</th>
+              <th class="px-6 py-4">Thay đổi quyền</th>
+              <th class="px-6 py-4">Bảo mật</th>
+              <th class="px-8 py-4 text-right">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-50">
+            <!-- Loading State -->
+            <tr *ngIf="loading">
+              <td colspan="5" class="px-8 py-10 text-center text-slate-400 animate-pulse italic text-sm">Đang tải danh sách...</td>
+            </tr>
+
+            <!-- Empty State -->
+            <tr *ngIf="!loading && users.length === 0">
+              <td colspan="5" class="px-8 py-20 text-center text-slate-300 font-medium italic text-sm">
+                Không tìm thấy dữ liệu người dùng
+              </td>
+            </tr>
+
+            <!-- User Row -->
+            <tr *ngFor="let user of users" 
+                class="group transition-all"
+                [ngClass]="user.status === false ? 'bg-slate-50/50 opacity-60' : 'hover:bg-indigo-50/30'">
+              
+              <td class="px-8 py-5">
+                <div (click)="viewUserDetails(user)" class="flex items-center gap-4 cursor-pointer group/info">
+                  <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-indigo-100 transition-transform group-hover/info:scale-105">
+                    {{ (user.full_name?.charAt(0) || 'U') | uppercase }}
+                  </div>
+                  <div>
+                    <div class="text-sm font-bold text-slate-700 group-hover/info:text-indigo-600 transition-colors">{{ user.full_name || 'Người dùng mới' }}</div>
+                    <div class="text-[11px] text-slate-400 font-medium">{{ user.email }}</div>
+                  </div>
+                </div>
+              </td>
+
+              <td class="px-6 py-5">
+                <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border"
+                      [ngClass]="{
+                       'bg-red-50 text-red-600 border-red-100': user.role?.toUpperCase() === 'ADMIN' && user.status === true,
+                        'bg-blue-50 text-blue-600 border-blue-100': user.role?.toUpperCase() === 'TEACHER' && user.status === true,
+                        'bg-emerald-50 text-emerald-600 border-emerald-100': user.role?.toUpperCase() === 'STUDENT' && user.status === true,
+                        'bg-slate-100 text-slate-400 border-slate-200': user.status === false
+                      }">
+                  {{ user.status === false ? 'ĐÃ VÔ HIỆU' : (user.role || 'Chưa chọn') }}
+                </span>
+              </td>
+
+              <td class="px-6 py-5">
+                <select [ngModel]="user.role?.toUpperCase()" (ngModelChange)="updateRole(user, $event)"
+                        [disabled]="savingMap[user.user_id] || !user.status"
+                        class="text-[10px] font-bold bg-slate-100 border-none rounded-lg px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer disabled:opacity-30 transition-all">
+                  <option value="STUDENT">STUDENT</option>
+                  <option value="TEACHER">TEACHER</option>
+                  <option value="ADMIN">ADMIN</option>
+                </select>
+              </td>
+
+              <td class="px-6 py-5">
+                <!-- Hiển thị Trạng thái Đóng/Mở kết hợp Xác minh -->
+                <div class="flex flex-col gap-1">
+                  <div *ngIf="user.status === true" class="flex items-center gap-1.5 text-emerald-600 font-bold text-[9px]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> HOẠT ĐỘNG
+                  </div>
+                  <div *ngIf="user.status === false" class="flex items-center gap-1.5 text-slate-400 font-bold text-[9px]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span> ĐÃ ĐÓNG
+                  </div>
+                  <div class="text-[8px] font-black uppercase tracking-tighter" [class]="user.hasPassword ? 'text-blue-400' : 'text-amber-400'">
+                    {{ user.hasPassword ? '● Đã xác minh MK' : '● Chưa đặt MK' }}
+                  </div>
+                </div>
+              </td>
+
+              <td class="px-8 py-5 text-right">
+                <div class="flex justify-end gap-1">
+                  <!-- Nút xem chi tiết -->
+                  <button (click)="viewUserDetails(user)" title="Xem hồ sơ"
+                          class="p-2 text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                      <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </button>
+
+                  <!-- NÚT ĐÓNG (Hiện khi đang mở) -->
+                  <button *ngIf="user.status === true" (click)="openConfirm(user, 'DELETE')" title="Đóng tài khoản"
+                          class="p-2 text-slate-300 hover:text-amber-500 hover:bg-amber-50 rounded-xl transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                      <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </button>
+
+                  <!-- NÚT KHÔI PHỤC (Hiện khi đang đóng) -->
+                  <button *ngIf="user.status === false" (click)="openConfirm(user, 'RESTORE')" title="Mở lại tài khoản"
+                          class="p-2 text-slate-300 hover:text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                      <path d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+
+        </table>
+      </div>
+
+      <!-- 4. PAGINATION FOOTER -->
+      <div class="px-8 py-4 bg-slate-50/50 border-t border-slate-50 flex items-center justify-between">
+        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+          Trang {{ currentPage }} / {{ totalPages }}
+        </span>
+        <div class="flex gap-2">
+          <button (click)="changePage(currentPage - 1)" 
+                  [disabled]="currentPage === 1" 
+                  class="page-nav-btn">
+            Trước
+          </button>
+          
+          <div class="hidden md:flex gap-1">
+            <button *ngFor="let p of pages" 
+                    (click)="changePage(p)" 
+                    [class.active-page]="p === currentPage" 
+                    class="page-num-btn">
+              {{ p }}
+            </button>
+          </div>
+
+          <button (click)="changePage(currentPage + 1)" 
+                  [disabled]="currentPage === totalPages" 
+                  class="page-nav-btn">
+            Sau
+          </button>
+        </div>
+      </div>
+
+      <!-- MODAL CHI TIẾT NGƯỜI DÙNG -->
+  <div *ngIf="showDetailPopup() && !showConfirmPopup()">
+  <div (click)="closeDetail()" 
+       class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+    
+    <div (click)="$event.stopPropagation()" 
+         class="bg-white w-full max-w-sm rounded-[3rem] overflow-hidden shadow-2xl border border-white animate-in zoom-in-95 duration-200">
+      
+      <!-- 1. Header Gradient -->
+      <div class="h-28 bg-gradient-to-br from-blue-600 to-indigo-700 relative">
+        <button (click)="closeDetail()" class="absolute top-5 right-5 text-white/50 hover:text-white transition-colors">
+          <svg xmlns="http://w3.org" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="px-8 pb-10 -mt-12 text-center">
+        <!-- 2. Avatar nổi khối -->
+        <div class="inline-flex p-1.5 bg-white rounded-[2rem] shadow-xl mb-4 relative z-10">
+          <div class="w-20 h-20 rounded-[1.5rem] bg-slate-50 flex items-center justify-center text-3xl font-black text-blue-600 uppercase italic">
+            {{selectedUser()?.full_name?.charAt(0)}}
+          </div>
+        </div>
+
+        <h3 class="text-2xl font-black text-slate-800 uppercase italic tracking-tighter leading-none mb-1">
+          {{selectedUser()?.full_name}}
+        </h3>
+        <p class="text-blue-500 font-black text-[10px] uppercase tracking-[2px] mb-8">
+          {{selectedUser()?.role || 'Thành viên'}}
+        </p>
+
+        <!-- 3. Danh sách thông tin -->
+        <div class="space-y-3 text-left">
+          <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-100">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Địa chỉ Email</p>
+            <p class="text-sm font-bold text-slate-700 truncate">{{selectedUser()?.email}}</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-100">
+              <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Trạng thái</p>
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full" [ngClass]="selectedUser()?.status !== false ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'"></span>
+                <p class="text-[11px] font-black text-slate-700 uppercase">
+                  {{selectedUser()?.status !== false ? 'Hoạt động' : 'Đã đóng'}}
+                </p>
+              </div>
+            </div>
+
+            <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-100">
+              <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Quản lý bảo mật</p>
+              <div class="flex items-center justify-between">
+                <span [ngClass]="selectedUser()?.provider_id ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'" 
+                      class="px-2 py-0.5 rounded-md text-[8px] font-black uppercase">
+                  {{ selectedUser()?.provider_id ? 'Mezon' : 'Hệ thống' }}
+                </span>
+                <button (click)="resetUserPassword(selectedUser())" 
+                        class="text-[9px] font-black text-indigo-600 hover:text-indigo-800 uppercase underline decoration-indigo-200 underline-offset-4">
+                  Cấp Pass
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-100">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Ngày tham gia</p>
+            <p class="text-sm font-bold text-slate-700">{{selectedUser()?.created_at | date:'dd/MM/yyyy HH:mm'}}</p>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col gap-3">
+          <div class="flex gap-2">
+            <button
+              *ngIf="selectedUser()?.status !== false"
+              (click)="openConfirm(selectedUser(), 'DELETE')"
+              class="flex-1 py-3 bg-amber-50 text-amber-600 rounded-2xl font-black uppercase italic text-[10px] tracking-widest hover:bg-amber-100 transition-all border border-amber-200/50">
+              Đóng tài khoản
+            </button>
+
+            <button
+              *ngIf="selectedUser()?.status === false"
+              (click)="openConfirm(selectedUser(), 'RESTORE')"
+              class="flex-1 py-3 bg-emerald-50 text-emerald-600 rounded-2xl font-black uppercase italic text-[10px] tracking-widest hover:bg-emerald-100 transition-all border border-emerald-200/50">
+              Mở tài khoản
+            </button>
+
+            <button (click)="openConfirm(selectedUser(), 'HARD_DELETE')" 
+                    class="px-5 py-3 bg-red-50 text-red-500 rounded-2xl font-black uppercase italic text-[10px] tracking-widest hover:bg-red-500 hover:text-white transition-all border border-red-100">
+              Xóa
+            </button>
+            <button
+              *ngIf="activeTab === 'DELETED'"
+              (click)="permanentlyDelete(selectedUser())"
+              class="w-full py-3 bg-red-600 text-white rounded-2xl font-black uppercase italic text-[10px] tracking-widest hover:bg-red-700 transition-all">
+
+              Xóa vĩnh viễn
+
+            </button>
+          </div>
+          
+          <button (click)="closeDetail()" 
+                  class="w-full py-4 bg-[#0f172a] text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-800 transition-all active:scale-95 shadow-lg shadow-blue-900/20">
+            Đóng cửa sổ
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showConfirmPopup()">
+
+  <!-- BACKDROP -->
+  <div
+    class="fixed inset-0 z-[9998] bg-slate-900/40 backdrop-blur-md"
+    (click)="showConfirmPopup.set(false)">
+  </div>
+
+  <!-- MODAL -->
+  <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+
+    <div
+      class="bg-white rounded-[2.5rem] p-8 max-w-xs w-full text-center shadow-2xl border border-white">
+
+      <div
+        [ngClass]="{
+          'bg-amber-50 text-amber-500': confirmAction === 'DELETE',
+          'bg-emerald-50 text-emerald-500': confirmAction === 'RESTORE',
+          'bg-red-50 text-red-500': confirmAction === 'HARD_DELETE'
+        }"
+        class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+
+        <span *ngIf="confirmAction === 'DELETE'">🔒</span>
+        <span *ngIf="confirmAction === 'RESTORE'">🔓</span>
+        <span *ngIf="confirmAction === 'HARD_DELETE'">🗑️</span>
+
+      </div>
+
+      <h3 class="text-lg font-black text-slate-800 uppercase italic tracking-tighter mb-2">
+
+        <span *ngIf="confirmAction === 'DELETE'">
+          Đóng tài khoản?
+        </span>
+
+        <span *ngIf="confirmAction === 'RESTORE'">
+          Mở lại tài khoản?
+        </span>
+
+        <span *ngIf="confirmAction === 'HARD_DELETE'">
+          Chuyển vào thùng rác?
+        </span>
+
+      </h3>
+
+      <p class="text-slate-400 text-[11px] font-medium mb-8 leading-relaxed px-2">
+
+        <span *ngIf="confirmAction === 'DELETE'">
+          Người dùng sẽ không thể đăng nhập vào hệ thống tạm thời.
+        </span>
+
+        <span *ngIf="confirmAction === 'RESTORE'">
+          Kích hoạt lại quyền truy cập cho người dùng ngay lập tức.
+        </span>
+
+        <span *ngIf="confirmAction === 'HARD_DELETE'">
+          Người dùng sẽ được chuyển vào thùng rác và có thể khôi phục lại.
+        </span>
+
+      </p>
+
+      <div class="flex gap-3">
+
+        <button
+          (click)="showConfirmPopup.set(false)"
+          class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-black text-[9px] uppercase tracking-widest">
+          Hủy bỏ
+        </button>
+
+        <button
+          type="button"
+          (click)="executeAction()"
+          [ngClass]="{
+            'bg-amber-500': confirmAction === 'DELETE',
+            'bg-emerald-500': confirmAction === 'RESTORE',
+            'bg-red-600': confirmAction === 'HARD_DELETE'
+          }"
+          class="flex-1 py-3 text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-lg">
+
+          Xác nhận
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+    </div>
+  </div>
+</div>
