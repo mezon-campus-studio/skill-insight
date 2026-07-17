@@ -413,7 +413,6 @@ export class ExamDetail implements OnInit {
           this.router.navigate([
             '/dashboard/exams'
           ]);
-
         },
 
         error: (err: any) => {

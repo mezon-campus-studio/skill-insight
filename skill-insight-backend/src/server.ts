@@ -51,5 +51,4 @@ async function startServer(): Promise<void> {
     }
   });
 }
-
 startServer();

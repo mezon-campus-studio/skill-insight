@@ -365,4 +365,3 @@ async getSubjectsByCreator(
     return prisma.subject.deleteMany({});
   },
 };
-

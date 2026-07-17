@@ -46,7 +46,18 @@ export class LoginComponent implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit(): void {
+  // ngOnInit(): void {
+  //   // Tự động kiểm tra nếu đã đăng nhập thì vào Dashboard luôn
+  //   this.auth.getMe().subscribe({
+  //     next: (res: any) => {
+  //       if (res?.success && res?.user) {
+  //         this.auth.saveUser(res.user);
+  //         this.navigateToNextStep(res.user);
+  //       }
+  //     },
+  //     error: () => console.log("Hệ thống sẵn sàng cho đăng nhập mới.")
+  //   });
+  // }
 
     const token =
       localStorage.getItem('accessToken');

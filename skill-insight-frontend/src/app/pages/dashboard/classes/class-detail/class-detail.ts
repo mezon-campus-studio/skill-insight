@@ -53,41 +53,7 @@ export class ClassDetail implements OnInit {
   loading = false;
 
   classId = 0;
-
-  showAnnouncementModal = false;
-
-  announcement = {
-    title: '',
-    content: '',
-    pinned: false,
-    allowComment: true,
-    sendEmail: false
-  };
-
-  selectedFiles: File[] = [];
-
-  openAnnouncementModal() {
-    this.showAnnouncementModal = true;
-  }
-
-  closeAnnouncementModal() {
-    this.showAnnouncementModal = false;
-  }
-
-  onFileSelected(event: any) {
-    this.selectedFiles = Array.from(event.target.files);
-    console.log(this.selectedFiles);
-  }
-
-  createAnnouncement() {
-    console.log(this.announcement);
-    console.log(this.selectedFiles);
-
-    // TODO: gọi API
-
-    this.closeAnnouncementModal();
-  }
-
+  
   // =========================
   // CONSTRUCTOR
   // =========================

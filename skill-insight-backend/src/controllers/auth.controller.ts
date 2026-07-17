@@ -2,7 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
 import { authService } from "../services/auth.service";
 import { userService } from "../services/user.service";
-import { generateToken, verifyToken } from "../utils/jwt";
+import {
+  generateAccessToken,
+  verifyAccessToken
+} from "../utils/jwt";
 import { AppError } from "../utils/appError";
 import {
   disableUserService,

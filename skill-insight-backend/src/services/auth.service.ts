@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
-import { userRepository } from "../repositories/user.repository";
 import { getAccessToken, getUserInfo } from "./mezon.service";
 import { AppError } from "../utils/appError";
+import { userRepository } from "../repositories/user.repositories";
 
 export const authService = {
 
@@ -95,7 +95,6 @@ async validateUserSession(userId: number) {
   };
 },
 
-
   // 4. Cập nhật mật khẩu (Hàm còn thiếu khiến Controller báo lỗi)
   async updateUserPassword(userId: number, pass: string) {
     const hashedPassword = await bcrypt.hash(pass, 10);
@@ -110,3 +109,4 @@ async validateUserSession(userId: number) {
   }
 
 };
+

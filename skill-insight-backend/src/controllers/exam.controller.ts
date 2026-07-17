@@ -583,7 +583,6 @@ export const createExam = async (
       success: true,
 
       data: exam
-
     });
 
   } catch (error: any) {

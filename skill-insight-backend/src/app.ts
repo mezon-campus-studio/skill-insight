@@ -215,6 +215,98 @@ app.all(
   }
 );
 
+app.use(
+  "/api/exams",
+  examRoutes
+);
+
+app.use(
+  "/api/submissions",
+  submissionRoutes
+);
+
+app.use(
+  "/api/results",
+  resultRoutes
+);
+
+app.use(
+  "/api/subjects",
+  subjectRoutes
+);
+
+app.use(
+  "/api/topics",
+  topicRoutes
+);
+
+app.use(
+  "/api/questions",
+  questionRoutes
+);
+app.get(
+  "/",
+  (
+    req: Request,
+    res: Response
+  ) => {
+
+    res.status(200).json({
+
+      success: true,
+
+      message:
+        "Skill Insight Backend API đang hoạt động 🚀",
+
+    });
+
+  }
+);
+
+app.get(
+  "/health",
+  (
+    req: Request,
+    res: Response
+  ) => {
+
+    res.status(200).json({
+
+      success: true,
+
+      message:
+        "Server is healthy",
+
+      timestamp:
+        new Date().toISOString(),
+
+    });
+
+  }
+);
+
+app.all(
+  "*",
+  (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+
+    next(
+
+      new AppError(
+
+        `Không tìm thấy đường dẫn ${req.originalUrl} trên máy chủ này!`,
+
+        404
+
+      )
+
+    );
+
+  }
+);
 app.use(errorHandler);
 
 export default app;
