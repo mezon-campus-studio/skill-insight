@@ -1,0 +1,213 @@
+<div class="p-6 max-w-5xl mx-auto">
+
+  <div
+    class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8"
+  >
+
+    <div>
+
+      <h1
+        class="text-3xl font-bold text-gray-800"
+      >
+        Chỉnh sửa câu hỏi
+      </h1>
+
+      <p
+        class="text-gray-500 mt-1"
+      >
+        Cập nhật thông tin câu hỏi trong hệ thống
+      </p>
+
+    </div>
+
+    <button
+      routerLink="/dashboard/questions"
+      class="px-5 py-3 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 transition"
+    >
+      Quay lại
+    </button>
+
+  </div>
+
+  <div
+    *ngIf="loading"
+    class="flex justify-center items-center py-20"
+  >
+
+    <div
+      class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"
+    ></div>
+
+  </div>
+
+  <form
+    *ngIf="!loading"
+    (ngSubmit)="submitForm()"
+    class="bg-white rounded-3xl border border-gray-100 shadow-sm p-8"
+  >
+
+    <div class="mb-8">
+
+      <label
+        class="block text-sm font-semibold text-gray-700 mb-3"
+      >
+        Nội dung câu hỏi
+      </label>
+
+      <textarea
+        [(ngModel)]="questionData.content"
+        name="content"
+        rows="5"
+        placeholder="Nhập nội dung câu hỏi..."
+        class="w-full border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+      ></textarea>
+
+    </div>
+
+    <div class="mb-8">
+
+      <label
+        class="block text-sm font-semibold text-gray-700 mb-3"
+      >
+        Mức độ
+      </label>
+
+      <select
+        [(ngModel)]="questionData.level"
+        name="level"
+        class="w-full h-[54px] border border-gray-300 rounded-2xl px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+
+        <option value="EASY">
+          Dễ
+        </option>
+
+        <option value="MEDIUM">
+          Trung bình
+        </option>
+
+        <option value="HARD">
+          Khó
+        </option>
+
+      </select>
+
+    </div>
+
+    <div class="mb-8">
+
+      <div
+        class="flex items-center justify-between mb-5"
+      >
+
+        <h2
+          class="text-lg font-bold text-gray-800"
+        >
+          Danh sách đáp án
+        </h2>
+
+        <button
+          type="button"
+          (click)="addAnswer()"
+          class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition"
+        >
+          + Thêm đáp án
+        </button>
+
+      </div>
+
+      <div
+        *ngFor="
+          let answer of questionData.answers;
+          let i = index
+        "
+        class="border border-gray-200 rounded-2xl p-5 mb-5"
+      >
+
+        <div
+          class="flex items-center justify-between mb-4"
+        >
+
+          <div
+            class="font-semibold text-gray-700"
+          >
+            Đáp án {{ i + 1 }}
+          </div>
+
+          <button
+            type="button"
+            (click)="removeAnswer(i)"
+            class="text-red-500 hover:text-red-700 font-medium"
+          >
+            Xóa
+          </button>
+
+        </div>
+
+        <textarea
+          [(ngModel)]="answer.answer_text"
+          [name]="'answer_' + i"
+          rows="3"
+          placeholder="Nhập nội dung đáp án..."
+          class="w-full border border-gray-300 rounded-2xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+        ></textarea>
+
+        <label
+          class="flex items-center gap-3 cursor-pointer"
+        >
+
+          <input
+            type="radio"
+            name="correctAnswer"
+            [checked]="answer.is_correct"
+            (change)="selectCorrectAnswer(i)"
+            class="w-5 h-5"
+          />
+
+          <span
+            class="text-sm font-medium text-gray-700"
+          >
+            Đánh dấu là đáp án đúng
+          </span>
+
+        </label>
+
+      </div>
+
+    </div>
+
+    <div class="mb-8">
+
+      <label
+        class="block text-sm font-semibold text-gray-700 mb-3"
+      >
+        Giải thích đáp án
+      </label>
+
+      <textarea
+        [(ngModel)]="questionData.explanation"
+        name="explanation"
+        rows="5"
+        placeholder="Nhập giải thích đáp án..."
+        class="w-full border border-gray-300 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+      ></textarea>
+
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="saving"
+      class="w-full h-[58px] rounded-2xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-lg transition"
+    >
+
+      {{
+        saving
+          ? 'Đang cập nhật...'
+          : 'Cập nhật câu hỏi'
+      }}
+
+    </button>
+
+  </form>
+
+</div>

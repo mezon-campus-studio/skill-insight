@@ -1,5 +1,7 @@
 # Node modules
 node_modules/
+skill-insight-frontend/node_modules/
+skill-insight-backend/node_modules/
 
 # Build output
 dist/

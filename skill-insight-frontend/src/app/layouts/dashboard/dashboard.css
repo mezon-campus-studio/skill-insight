@@ -32,3 +32,18 @@
 .animate-fade-in-down {
   animation: fadeInDown 0.3s ease-out;
 }
+
+.resize-handle{
+    position:absolute;
+    top:0;
+    right:0;
+    width:6px;
+    height:100%;
+    cursor:ew-resize;
+    user-select:none;
+    background:transparent;
+}
+
+.resize-handle:hover{
+    background:#2563eb;
+}

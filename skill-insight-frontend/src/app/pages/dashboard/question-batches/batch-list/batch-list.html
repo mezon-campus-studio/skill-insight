@@ -1,0 +1,497 @@
+<div class="min-h-screen bg-slate-50 p-4 md:p-8">
+
+  <!-- HEADER -->
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+
+    <div>
+
+      <h1 class="text-3xl font-black text-slate-900 uppercase tracking-tight italic">
+        Bộ câu hỏi
+      </h1>
+
+      <p class="text-slate-500 font-medium mt-2">
+        Quản lý bộ câu hỏi trong hệ thống
+      </p>
+
+    </div>
+
+    <!-- ACTION -->
+    <div class="flex flex-wrap items-center gap-3">
+
+      <!-- DELETE SELECTED -->
+      @if (selectedBatchIds.length > 0) {
+
+        <button
+          (click)="deleteSelectedBatches()"
+          class="h-12 px-5 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-black uppercase tracking-wider shadow-lg shadow-red-200 transition-all">
+
+          Xóa đã chọn ({{ selectedBatchIds.length }})
+
+        </button>
+
+      }
+
+      <!-- DELETE ALL -->
+      @if (
+        currentUserRole === 'admin' &&
+        batches.length > 0
+      ) {
+
+        <button
+          (click)="deleteAllBatches()"
+          class="h-12 px-5 rounded-2xl bg-black hover:bg-slate-800 text-white font-black uppercase tracking-wider shadow-lg transition-all">
+
+          Xóa tất cả
+
+        </button>
+
+      }
+
+      <!-- CREATE -->
+      <button
+        (click)="createBatch()"
+        class="h-12 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-wider shadow-lg shadow-blue-200 transition-all">
+
+        + Tạo Bộ Câu Hỏi
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- FILTER -->
+  <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm mb-6">
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+
+      <!-- SEARCH -->
+      <div>
+
+        <label class="block text-xs font-black uppercase text-slate-500 mb-2">
+          Tìm kiếm
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="searchKeyword"
+          (input)="filterBatches()"
+          placeholder="Tên bộ câu hỏi..."
+          class="w-full h-12 px-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+      </div>
+
+      <!-- SUBJECT -->
+      <div>
+
+        <label class="block text-xs font-black uppercase text-slate-500 mb-2">
+          Môn học
+        </label>
+
+        <ng-select
+          [items]="subjects"
+          bindLabel="subject_name"
+          bindValue="subject_id"
+          [(ngModel)]="selectedSubject"
+          (change)="onSubjectChange()"
+          placeholder="Chọn môn học"
+          class="custom-ng-select">
+        </ng-select>
+
+      </div>
+
+      <!-- TOPIC -->
+      <div>
+
+        <label class="block text-xs font-black uppercase text-slate-500 mb-2">
+          Chủ đề
+        </label>
+
+        <ng-select
+          [items]="filteredTopics"
+          bindLabel="topic_name"
+          bindValue="topic_id"
+          [(ngModel)]="selectedTopic"
+          (change)="filterBatches()"
+          placeholder="Chọn chủ đề"
+          class="custom-ng-select">
+        </ng-select>
+
+      </div>
+
+      <!-- STATUS -->
+      <div>
+
+        <label class="block text-xs font-black uppercase text-slate-500 mb-2">
+          Trạng thái
+        </label>
+
+        <ng-select
+          [items]="statusOptions"
+          bindLabel="label"
+          bindValue="value"
+          [(ngModel)]="selectedStatus"
+          (change)="filterBatches()"
+          placeholder="Trạng thái"
+          class="custom-ng-select">
+        </ng-select>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- TABLE -->
+  <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+
+    <!-- LOADING -->
+    @if (loading) {
+
+      <div class="p-10 text-center">
+
+        <div class="w-14 h-14 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+
+        <p class="font-bold text-slate-500 uppercase tracking-wider">
+          Đang tải dữ liệu...
+        </p>
+
+      </div>
+
+    }
+
+    <!-- TABLE DATA -->
+    @if (!loading) {
+
+      <div class="overflow-x-auto">
+
+        <table class="w-full">
+
+          <!-- HEAD -->
+          <thead class="bg-slate-100 border-b border-slate-200">
+
+            <tr>
+
+              <!-- CHECKBOX -->
+              <th class="px-6 py-4 text-center w-16">
+
+                <input
+                  type="checkbox"
+                  [checked]="selectAll"
+                  (change)="toggleSelectAll()"
+                  class="w-5 h-5 rounded border-slate-300">
+
+              </th>
+
+              <!-- STT -->
+              <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-slate-500">
+                STT
+              </th>
+
+              <!-- BATCH -->
+              <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-slate-500">
+                Bộ câu hỏi
+              </th>
+
+              <!-- SUBJECT -->
+              <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-slate-500">
+                Môn học
+              </th>
+
+              <!-- TOPIC -->
+              <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-slate-500">
+                Chủ đề
+              </th>
+
+              <!-- TOTAL -->
+              <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-slate-500">
+                Số câu
+              </th>
+
+              <!-- STATUS -->
+              <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-wider text-slate-500">
+                Trạng thái
+              </th>
+
+              <!-- ACTION -->
+              <th class="px-6 py-4 text-center text-xs font-black uppercase tracking-wider text-slate-500">
+                Hành động
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <!-- BODY -->
+          <tbody>
+
+            @for (
+              batch of paginatedBatches;
+              track trackByBatchId($index, batch);
+              let i = $index
+            ) {
+
+              <tr class="border-b border-slate-100 hover:bg-slate-50 transition-all">
+
+                <!-- CHECKBOX -->
+                <td class="px-6 py-5 text-center">
+
+                  <input
+                    type="checkbox"
+                    [checked]="selectedBatchIds.includes(batch.batch_id)"
+                    (change)="toggleSelectBatch(batch.batch_id)"
+                    class="w-5 h-5 rounded border-slate-300">
+
+                </td>
+
+                <!-- STT -->
+                <td class="px-6 py-5">
+
+                  <span class="font-black text-slate-700">
+
+                    {{ getRowNumber(i) }}
+
+                  </span>
+
+                </td>
+
+                <!-- NAME -->
+                <td class="px-6 py-5">
+
+                  <div>
+
+                    <h3 class="font-black text-slate-800">
+                      {{ batch.batch_name }}
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-1">
+                      Mã batch #{{ batch.batch_id }}
+                    </p>
+
+                  </div>
+
+                </td>
+
+                <!-- SUBJECT -->
+                <td class="px-6 py-5">
+
+                  <span class="font-bold text-slate-700">
+
+                    {{ getSubjectName(batch.subject_id) }}
+
+                  </span>
+
+                </td>
+
+                <!-- TOPIC -->
+                <td class="px-6 py-5">
+
+                  <span class="font-bold text-slate-700">
+
+                    {{ getTopicName(batch.topic_id) }}
+
+                  </span>
+
+                </td>
+
+                <!-- COUNT -->
+                <td class="px-6 py-5">
+
+                  <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-black text-xs">
+
+                    {{
+                      batch.total_questions ||
+                      batch._count?.questions ||
+                      0
+                    }} câu
+
+                  </span>
+
+                </td>
+
+                <!-- STATUS -->
+                <td class="px-6 py-5">
+
+                  @if (batch.status === 'APPROVED') {
+
+                    <span class="inline-flex px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-black uppercase tracking-wider">
+
+                      Đã duyệt
+
+                    </span>
+
+                  }
+
+                  @if (batch.status === 'PENDING') {
+
+                    <span class="inline-flex px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-black uppercase tracking-wider">
+
+                      Chờ duyệt
+
+                    </span>
+
+                  }
+
+                </td>
+
+                <!-- ACTION -->
+                <td class="px-6 py-5">
+
+                  <div class="flex items-center justify-center gap-2 flex-wrap">
+
+                    <!-- DETAIL -->
+                    <button
+                      (click)="viewDetail(batch.batch_id)"
+                      class="px-4 h-10 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-black uppercase tracking-wider transition-all">
+
+                      Chi tiết
+
+                    </button>
+
+                    <!-- REVIEW -->
+                    @if (
+                      currentUserRole === 'admin' &&
+                      batch.status === 'PENDING'
+                    ) {
+
+                      <button
+                        (click)="reviewBatch(batch.batch_id)"
+                        class="px-4 h-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-wider transition-all">
+
+                        Review
+
+                      </button>
+
+                    }
+
+                    <!-- APPROVE -->
+                    @if (
+                      currentUserRole === 'admin' &&
+                      batch.status === 'PENDING'
+                    ) {
+
+                      <button
+                        (click)="approveBatch(batch.batch_id)"
+                        class="px-4 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider transition-all">
+
+                        Duyệt
+
+                      </button>
+
+                    }
+
+                    <!-- DELETE -->
+                    @if (
+                      currentUserRole === 'admin' ||
+                      batch.status !== 'APPROVED'
+                    ) {
+
+                      <button
+                        (click)="deleteBatch(batch.batch_id)"
+                        [disabled]="deletingId === batch.batch_id"
+                        class="px-4 h-10 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-xs font-black uppercase tracking-wider transition-all">
+
+                        @if (deletingId === batch.batch_id) {
+
+                          Đang xoá...
+
+                        } @else {
+
+                          Xoá
+
+                        }
+
+                      </button>
+
+                    }
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <!-- EMPTY -->
+      @if (paginatedBatches.length === 0) {
+
+        <div class="p-14 text-center">
+
+          <div class="text-6xl mb-4">
+            📦
+          </div>
+
+          <h3 class="text-xl font-black text-slate-800 uppercase">
+            Không có bộ câu hỏi nào
+          </h3>
+
+          <p class="text-slate-500 mt-2">
+            Hãy tạo bộ câu hỏi đầu tiên
+          </p>
+
+        </div>
+
+      }
+
+    }
+
+  </div>
+
+  <!-- PAGINATION -->
+  @if (totalPages > 1) {
+
+    <div class="flex items-center justify-center gap-2 mt-8 flex-wrap">
+
+      <!-- PREVIOUS -->
+      <button
+        (click)="previousPage()"
+        [disabled]="currentPage === 1"
+        class="h-11 px-5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-100 disabled:opacity-40 font-black uppercase text-xs tracking-wider transition-all">
+
+        Trước
+
+      </button>
+
+      <!-- PAGE -->
+      @for (page of pages; track page) {
+
+        <button
+          (click)="goToPage(page)"
+          class="w-11 h-11 rounded-2xl font-black text-sm transition-all"
+          [class.bg-blue-600]="currentPage === page"
+          [class.text-white]="currentPage === page"
+          [class.shadow-lg]="currentPage === page"
+          [class.shadow-blue-200]="currentPage === page"
+          [class.bg-white]="currentPage !== page"
+          [class.border]="currentPage !== page"
+          [class.border-slate-200]="currentPage !== page"
+          [class.hover:bg-slate-100]="currentPage !== page">
+
+          {{ page }}
+
+        </button>
+
+      }
+
+      <!-- NEXT -->
+      <button
+        (click)="nextPage()"
+        [disabled]="currentPage === totalPages"
+        class="h-11 px-5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-100 disabled:opacity-40 font-black uppercase text-xs tracking-wider transition-all">
+
+        Sau
+
+      </button>
+
+    </div>
+
+  }
+
+</div>

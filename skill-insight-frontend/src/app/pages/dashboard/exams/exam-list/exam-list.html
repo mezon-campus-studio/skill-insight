@@ -1,0 +1,675 @@
+<div class="min-h-screen bg-gray-50 p-6">
+
+    <!-- ====================================================== -->
+    <!-- HEADER -->
+    <!-- ====================================================== -->
+
+    <div class="flex items-center justify-between mb-6">
+
+        <div>
+
+            <h1 class="text-3xl font-bold text-gray-800">
+                Quản lý đề thi
+            </h1>
+
+            <p class="text-gray-500 mt-1">
+                Quản lý ngân hàng đề thi và giao bài
+            </p>
+
+        </div>
+
+        <div class="flex gap-3">
+
+            <button
+                *ngIf="isTeacher || isAdmin"
+                (click)="createExam()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow">
+
+                + Tạo đề thi
+
+            </button>
+
+            <button
+                *ngIf="isTeacher && selectedExamIds.size > 0"
+                (click)="deleteSelected()"
+                class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg shadow">
+
+                Xóa đã chọn ({{ selectedExamIds.size }})
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- TAB -->
+    <!-- ====================================================== -->
+
+    <div class="flex gap-3 border-b mb-6">
+
+        <!-- Teacher -->
+
+        <ng-container *ngIf="isTeacher">
+
+            <button
+                (click)="changeTab('MY')"
+                [class.border-blue-600]="activeTab==='MY'"
+                [class.text-blue-600]="activeTab==='MY'"
+                class="pb-3 border-b-2 border-transparent">
+
+                Đề của tôi
+
+            </button>
+
+            <button
+                (click)="changeTab('SYSTEM')"
+                [class.border-blue-600]="activeTab==='SYSTEM'"
+                [class.text-blue-600]="activeTab==='SYSTEM'"
+                class="pb-3 border-b-2 border-transparent">
+
+                Ngân hàng hệ thống
+
+            </button>
+
+        </ng-container>
+
+        <!-- Admin -->
+
+        <ng-container *ngIf="isAdmin">
+
+            <button
+                (click)="changeTab('ALL')"
+                [class.border-blue-600]="activeTab==='ALL'"
+                [class.text-blue-600]="activeTab==='ALL'"
+                class="pb-3 border-b-2 border-transparent">
+
+                Tất cả
+
+            </button>
+
+            <button
+                (click)="changeTab('SYSTEM')"
+                [class.border-blue-600]="activeTab==='SYSTEM'"
+                [class.text-blue-600]="activeTab==='SYSTEM'"
+                class="pb-3 border-b-2 border-transparent">
+
+                Hệ thống
+
+            </button>
+
+            <button
+                (click)="changeTab('TEACHER')"
+                [class.border-blue-600]="activeTab==='TEACHER'"
+                [class.text-blue-600]="activeTab==='TEACHER'"
+                class="pb-3 border-b-2 border-transparent">
+
+                Giáo viên
+
+            </button>
+
+        </ng-container>
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- FILTER -->
+    <!-- ====================================================== -->
+
+    <div class="flex flex-wrap gap-3 mb-6">
+
+        <!-- Search -->
+
+        <input
+            type="text"
+            [(ngModel)]="searchText"
+            (ngModelChange)="applyFilter()"
+            placeholder="Tìm theo tên đề thi..."
+            class="border rounded-lg px-4 py-2 flex-1 min-w-[280px]">
+
+        <!-- Subject -->
+
+        <select
+            [(ngModel)]="selectedSubject"
+            (change)="onSubjectChange()"
+            class="border rounded-lg px-4 py-2">
+
+            <option value="">Tất cả môn</option>
+
+            <option
+                *ngFor="let subject of subjects"
+                [value]="subject.subject_id">
+
+                {{ subject.subject_name }}
+
+            </option>
+
+        </select>
+
+        <!-- Topic -->
+
+        <select
+            [(ngModel)]="selectedTopic"
+            (change)="applyFilter()"
+            class="border rounded-lg px-4 py-2">
+
+            <option value="">Tất cả chủ đề</option>
+
+            <option
+                *ngFor="let topic of topics"
+                [value]="topic.topic_id">
+
+                {{ topic.topic_name }}
+
+            </option>
+
+        </select>
+
+        <!-- Sort -->
+
+        <select
+            [(ngModel)]="sortBy"
+            (change)="applyFilter()"
+            class="border rounded-lg px-4 py-2">
+
+            <option value="newest">
+                Mới nhất
+            </option>
+
+            <option value="oldest">
+                Cũ nhất
+            </option>
+
+            <option value="question_desc">
+                Nhiều câu hỏi
+            </option>
+
+            <option value="random">
+                Chỉ đề Random
+            </option>
+
+        </select>
+
+    </div>
+
+    <!-- ====================================================== -->
+    <!-- TABLE -->
+    <!-- ====================================================== -->
+
+    <div
+        *ngIf="!isEmpty"
+        class="overflow-x-auto rounded-lg border">
+
+        <table class="min-w-full">
+
+            <thead class="bg-gray-100">
+
+                <tr>
+
+                    <th class="p-3 w-12 text-center">
+
+                        <input
+                            type="checkbox"
+                            [(ngModel)]="selectAll"
+                            (change)="toggleSelectAll()">
+
+                    </th>
+
+                    <th class="p-3 text-left">
+
+                        Tên đề
+
+                    </th>
+
+                    <th class="p-3 text-left">
+
+                        Môn học
+
+                    </th>
+
+                    <th class="p-3 text-center">
+
+                        Số câu
+
+                    </th>
+
+                    <th class="p-3 text-center">
+
+                        Nguồn
+
+                    </th>
+
+                    <th class="p-3 text-center">
+
+                        Trạng thái
+
+                    </th>
+
+                    <th class="p-3 text-center">
+
+                        Ngày tạo
+
+                    </th>
+
+                    <th class="p-3 text-center">
+
+                        Thao tác
+
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+            <tbody>
+
+    <tr
+        *ngFor="let exam of paginatedExams; trackBy: trackByExam"
+        class="border-t hover:bg-gray-50">
+
+        <!-- CHECKBOX -->
+
+        <td class="text-center">
+
+            <input
+                type="checkbox"
+                [checked]="selectedExamIds.has(exam.exam_id)"
+                (change)="toggleExam(exam.exam_id)">
+
+        </td>
+
+        <!-- TITLE -->
+
+        <td class="p-3">
+
+            <div class="font-semibold">
+
+                {{ exam.title }}
+
+            </div>
+
+            <div class="text-sm text-gray-500">
+
+                {{ exam.description || 'Không có mô tả' }}
+
+            </div>
+
+        </td>
+
+        <!-- SUBJECT -->
+
+        <td class="p-3">
+
+            {{ getSubjectLabel(exam) }}
+
+        </td>
+
+        <!-- QUESTION -->
+
+        <td class="text-center">
+
+            {{ getQuestionCount(exam) }}
+
+            <span
+                *ngIf="exam.is_random"
+                class="ml-2 rounded bg-blue-100 px-2 py-1 text-xs text-blue-700">
+
+                Random
+
+            </span>
+
+        </td>
+
+        <!-- SOURCE -->
+
+        <td class="text-center">
+
+            {{ exam.source === 'SYSTEM' ? 'Hệ thống' : 'Giáo viên' }}
+
+        </td>
+
+        <!-- STATUS -->
+
+       <td class="text-center">
+
+        <span
+            class="px-3 py-1 rounded-full text-xs font-semibold"
+            [ngClass]="{
+                'bg-yellow-100 text-yellow-700': exam.status_exam==='PENDING',
+                'bg-green-100 text-green-700': exam.status_exam==='APPROVED',
+                'bg-red-100 text-red-700': exam.status_exam==='REJECTED'
+            }">
+
+            {{ getStatusLabel(exam.status_exam) }}
+
+        </span>
+
+        <div
+            *ngIf="exam.status_exam==='REJECTED' && exam.rejected_reason"
+            class="mt-2">
+
+            <button
+                (click)="showRejectReason(exam.rejected_reason)"
+                class="text-xs text-blue-600 hover:underline">
+
+                Xem lý do
+
+            </button>
+
+        </div>
+
+    </td>
+
+        <!-- CREATED -->
+
+        <td class="text-center">
+
+            {{ exam.created_at | date:'dd/MM/yyyy' }}
+
+        </td>
+
+        <!-- ACTION -->
+
+        <td>
+
+            <div class="flex justify-center gap-2 flex-wrap">
+
+                <!-- VIEW -->
+
+                <button
+                    (click)="viewExam(exam.exam_id)"
+                    class="text-blue-600">
+
+                    Xem
+
+                </button>
+
+                <!-- Detail -->
+
+               <button
+                    *ngIf="
+                        (
+                            isTeacher &&
+                            activeTab==='MY' &&
+                            (
+                                exam.status_exam==='DRAFT' ||
+                                exam.status_exam==='PENDING'
+                            )
+                        )
+                        ||
+                        (
+                            isAdmin &&
+                            exam.source==='SYSTEM' &&
+                            exam.status_exam==='APPROVED'
+                        )
+                    "
+                    (click)="detailExam(exam.exam_id)"
+                    class="text-green-600">
+
+                    Sửa
+
+                </button>
+
+                <!-- DELETE -->
+
+                <button
+                    *ngIf="
+                        (
+                            isTeacher &&
+                            activeTab==='MY' &&
+                            exam.status_exam==='DRAFT' &&
+                            !exam.is_copy
+                        )
+                        ||
+                        (
+                            isAdmin &&
+                            exam.status_exam==='APPROVED'
+                        ) || (isTeacher &&
+                            activeTab==='MY' )
+                    "
+                    (click)="deleteExam(exam.exam_id)"
+                    class="text-red-600">
+
+                    Xóa
+
+                </button>
+
+                <!-- ASSIGN -->
+
+                <button
+                    *ngIf="isTeacher && activeTab==='MY'"
+                    [routerLink]="['/dashboard/assignments/create', exam.exam_id]"
+                    class="text-emerald-600">
+
+                    Giao bài
+
+                </button>
+
+                <!-- COPY -->
+
+                <button
+                    *ngIf="
+                        isTeacher &&
+                        (activeTab==='SYSTEM' )&&
+                        exam.status_exam==='APPROVED'
+                    "
+                    (click)="copyExam(exam.exam_id)"
+                    class="text-purple-600">
+
+                    Sao chép
+
+                </button>
+
+                <!-- REQUEST -->
+
+                <button
+                    *ngIf="
+                        isTeacher &&
+                        activeTab==='MY' &&
+                        exam.status_exam==='DRAFT' &&
+                        !exam.is_copy
+                    "
+                    (click)="requestIntegrate(exam)"
+                    class="text-orange-600">
+
+                    Tích hợp
+
+                </button>
+
+                <!-- CANCEL -->
+
+                <button
+                    *ngIf="
+                    isTeacher &&
+                    activeTab==='MY' &&
+                    exam.status_exam==='PENDING'
+                    "
+                    (click)="cancelIntegrate(exam)"
+                    class="text-red-600">
+
+                    Hủy
+
+                </button>
+
+                <!-- APPROVE -->
+
+                <button
+                    *ngIf="
+                        isAdmin &&
+                        (activeTab==='TEACHER' || activeTab==='ALL') &&
+                        exam.status_exam==='PENDING'
+                    "
+                    (click)="approveExam(exam.exam_id)"
+                    class="text-green-600">
+
+                    Duyệt
+
+                </button>
+
+                <!-- REJECT -->
+
+                <button
+                    *ngIf="
+                        isAdmin &&
+                        (activeTab==='TEACHER' || activeTab==='ALL') &&
+                        exam.status_exam==='PENDING'
+                    "
+                    (click)="rejectExam(exam.exam_id)"
+                    class="text-red-600">
+
+                    Từ chối
+
+                </button>
+
+            </div>
+
+        </td>
+
+    </tr>
+
+    <!-- EMPTY -->
+
+    <tr *ngIf="isEmpty">
+
+        <td
+            colspan="8"
+            class="py-10 text-center text-gray-500">
+
+            Không có dữ liệu.
+
+        </td>
+
+    </tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+<!-- ====================================================== -->
+<!-- PAGINATION -->
+<!-- ====================================================== -->
+
+<div
+    *ngIf="!isEmpty && totalPages > 1"
+    class="flex items-center justify-between mt-6">
+
+    <div class="text-sm text-gray-500">
+
+        Hiển thị
+
+        <span class="font-semibold">
+
+            {{ paginatedExams.length }}
+
+        </span>
+
+        /
+
+        <span class="font-semibold">
+
+            {{ filteredExams.length }}
+
+        </span>
+
+        đề thi
+
+    </div>
+
+    <div class="flex items-center gap-2">
+
+        <button
+            (click)="previousPage()"
+            [disabled]="currentPage===1"
+            class="px-3 py-2 rounded border disabled:opacity-40">
+
+            ◀
+
+        </button>
+
+        <button
+            *ngFor="let page of pages"
+            (click)="goToPage(page)"
+            class="px-3 py-2 rounded border"
+            [class.bg-blue-600]="page===currentPage"
+            [class.text-white]="page===currentPage">
+
+            {{ page }}
+
+        </button>
+
+        <button
+            (click)="nextPage()"
+            [disabled]="currentPage===totalPages"
+            class="px-3 py-2 rounded border disabled:opacity-40">
+
+            ▶
+
+        </button>
+
+    </div>
+
+</div>
+<!-- ====================================== -->
+<!-- REJECT REASON MODAL -->
+<!-- ====================================== -->
+
+<div
+    *ngIf="showRejectModal"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+
+    <div class="w-full max-w-lg rounded-2xl bg-white shadow-xl">
+
+        <!-- Header -->
+
+        <div class="flex items-center justify-between border-b px-6 py-4">
+
+            <h2 class="text-lg font-semibold text-red-600">
+
+                Lý do từ chối
+
+            </h2>
+
+            <button
+                (click)="closeRejectModal()"
+                class="text-2xl text-gray-400 hover:text-gray-700">
+
+                ×
+
+            </button>
+
+        </div>
+
+        <!-- Body -->
+
+        <div class="max-h-80 overflow-y-auto px-6 py-5">
+
+            <p class="whitespace-pre-wrap text-gray-700">
+
+                {{ rejectReason }}
+
+            </p>
+
+        </div>
+
+        <!-- Footer -->
+
+        <div class="flex justify-end border-t px-6 py-4">
+
+            <button
+                (click)="closeRejectModal()"
+                class="rounded-lg bg-blue-600 px-5 py-2 text-white hover:bg-blue-700">
+
+                Đóng
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>

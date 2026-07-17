@@ -1,7 +1,52 @@
-testName,aliceStart,hansStart,deposit,withdraw,expectedAlice,expectedHans
-case1,1000000,10000000,500000,0,500000,10500000
-case2,1000000,10000000,0,100000,900000,10000000
-case3,2000000,5000000,300000,0,300000,5300000
-case4,1500000,8000000,0,200000,1300000,8000000
-case5,500000,2000000,1000000,0,1000000,3000000
-case6,3000000,1000000,750000,0,750000,1750000
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+# Environment variables
+.env
+environment.ts
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/mcp.json
+.history/*
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+__screenshots__/
+
+# System files
+.DS_Store
+Thumbs.db
+# Angular build
+dist/
+.angular/
+node_modules/
+
+*.js

@@ -1,0 +1,587 @@
+<!-- ======================================= -->
+<!-- LOADING -->
+<!-- ======================================= -->
+
+<div
+    *ngIf="loading"
+    class="flex justify-center py-20">
+
+    <div
+        class="text-lg animate-pulse text-gray-500">
+
+        Đang tải đề thi...
+
+    </div>
+
+</div>
+
+<!-- ======================================= -->
+<!-- CONTENT -->
+<!-- ======================================= -->
+
+<div
+    *ngIf="!loading && exam"
+    class="mx-auto min-h-screen max-w-6xl bg-gray-100 p-8">
+
+    <!-- ======================================= -->
+    <!-- HEADER -->
+    <!-- ======================================= -->
+
+    <div
+        class="overflow-hidden rounded-2xl border bg-white shadow">
+
+        <!-- TITLE -->
+
+        <div class="border-b p-8">
+
+            <div
+                class="flex items-start justify-between gap-6">
+
+                <div class="flex-1">
+
+                    <label
+                        class="mb-2 block text-sm font-semibold text-gray-600">
+
+                        Tên đề thi
+
+                    </label>
+
+                    <input
+                        [(ngModel)]="exam.title"
+                        (ngModelChange)="markChanged()"
+                        type="text"
+                        class="w-full rounded-xl border px-5 py-3 text-3xl font-bold outline-none transition focus:border-blue-500">
+
+                    <label
+                        class="mt-6 mb-2 block text-sm font-semibold text-gray-600">
+
+                        Mô tả
+
+                    </label>
+
+                    <textarea
+                        [(ngModel)]="exam.description"
+                        (ngModelChange)="markChanged()"
+                        rows="3"
+                        class="w-full rounded-xl border px-5 py-3 outline-none transition focus:border-blue-500"
+                        placeholder="Nhập mô tả đề thi...">
+
+                    </textarea>
+
+                </div>
+
+                <!-- ACTION -->
+
+                <div
+                    *ngIf="canEdit"
+                    class="flex gap-3">
+
+                    <button
+                        (click)="editExam()"
+                        class="rounded-xl border border-gray-300 bg-white px-6 py-3 transition hover:bg-gray-100">
+
+                        ⚙️ Cài đặt
+
+                    </button>
+
+                    <button
+                        (click)="deleteExam()"
+                        class="rounded-xl bg-red-500 px-6 py-3 font-semibold text-white transition hover:bg-red-600">
+
+                        🗑️ Xóa đề
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- INFO -->
+
+        <div
+            class="grid grid-cols-2 gap-6 p-6 text-sm md:grid-cols-4">
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Môn học
+
+                </div>
+
+                <div class="mt-2 font-semibold">
+
+                    {{ exam.subject?.subject_name }}
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Chủ đề
+
+                </div>
+
+                <div class="mt-2 font-semibold">
+
+                    {{ exam.topic?.topic_name || '---' }}
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Giáo viên
+
+                </div>
+
+                <div class="mt-2 font-semibold">
+
+                    {{ exam.teacher?.full_name }}
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Thời gian
+
+                </div>
+
+                <div class="mt-2 font-semibold">
+
+                    {{ exam.duration }} phút
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Điểm đạt
+
+                </div>
+
+                <div class="mt-2 font-semibold">
+
+                    {{ exam.pass_score }}
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Tổng câu hỏi
+
+                </div>
+
+                <div class="mt-2 font-semibold">
+
+                    {{ questions.length }}
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Trạng thái
+
+                </div>
+
+                <div class="mt-2">
+
+                    <span
+                        class="rounded-full px-3 py-1 text-xs font-semibold"
+                        [ngClass]="{
+                            'bg-gray-100 text-gray-700': exam.status_exam==='DRAFT',
+                            'bg-yellow-100 text-yellow-700': exam.status_exam==='PENDING',
+                            'bg-green-100 text-green-700': exam.status_exam==='APPROVED',
+                            'bg-red-100 text-red-700': exam.status_exam==='REJECTED'
+                        }">
+
+                        {{ getStatusLabel(exam.status_exam) }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Ngày tạo
+
+                </div>
+
+                <div class="mt-2 font-semibold">
+
+                    {{ exam.created_at | date:'dd/MM/yyyy HH:mm' }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ======================================= -->
+    <!-- QUESTION HEADER -->
+    <!-- ======================================= -->
+
+    <div
+        class="mt-8 mb-5 flex items-center justify-between">
+
+        <div>
+
+            <h2
+                class="text-2xl font-bold text-gray-800">
+
+                Danh sách câu hỏi
+
+            </h2>
+
+            <p
+                class="mt-1 text-gray-500">
+
+                Chỉnh sửa trực tiếp toàn bộ câu hỏi trong đề thi
+
+            </p>
+
+        </div>
+
+        <button
+            *ngIf="canEdit"
+            (click)="addQuestion()"
+            class="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700">
+
+            + Thêm câu hỏi
+
+        </button>
+
+    </div>
+        <!-- ======================================= -->
+    <!-- QUESTION LIST -->
+    <!-- ======================================= -->
+
+    <div class="space-y-8">
+
+        <div
+            *ngFor="let item of questions; let i = index"
+            class="rounded-2xl border bg-white p-8 shadow">
+
+            <!-- HEADER -->
+
+            <div class="mb-6 flex items-center justify-between">
+
+                <h2 class="text-3xl font-bold">
+
+                    Câu {{ i + 1 }}
+
+                </h2>
+
+                <div class="flex items-center gap-4">
+
+                    <span
+                        class="rounded-full px-4 py-2 text-sm font-semibold"
+                        [ngClass]="{
+                            'bg-green-100 text-green-700': item.difficulty==='EASY',
+                            'bg-yellow-100 text-yellow-700': item.difficulty==='MEDIUM',
+                            'bg-red-100 text-red-700': item.difficulty==='HARD'
+                        }">
+
+                        {{ getLevelLabel(item.difficulty) }}
+
+                    </span>
+
+                    <button
+                        *ngIf="canEdit"
+                        (click)="removeQuestion(i)"
+                        class="font-medium text-red-500 hover:text-red-700">
+
+                        Xóa
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- CONTENT -->
+
+            <label
+                class="mb-2 block text-xl font-semibold">
+
+                Nội dung câu hỏi
+
+            </label>
+
+            <textarea
+
+                [(ngModel)]="item.content"
+                (ngModelChange)="markChanged()"
+
+                rows="4"
+
+                class="w-full rounded-xl border px-5 py-4 outline-none transition focus:border-blue-500">
+
+            </textarea>
+
+            <!-- ANSWERS -->
+
+            <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+
+                <!-- A -->
+
+                <div>
+
+                    <label class="mb-2 block text-xl font-semibold">
+
+                        Đáp án A
+
+                    </label>
+
+                    <div class="flex items-center gap-3">
+
+                        <input
+                            type="radio"
+                            name="correct{{i}}"
+                            value="A"
+                            [(ngModel)]="item.correct_answer"
+                            (change)="markChanged()">
+
+                        <input
+                            [(ngModel)]="item.answer_a"
+                            (ngModelChange)="markChanged()"
+                            class="flex-1 rounded-xl border px-4 py-3">
+
+                    </div>
+
+                </div>
+
+                <!-- B -->
+
+                <div>
+
+                    <label class="mb-2 block text-xl font-semibold">
+
+                        Đáp án B
+
+                    </label>
+
+                    <div class="flex items-center gap-3">
+
+                        <input
+                            type="radio"
+                            name="correct{{i}}"
+                            value="B"
+                            [(ngModel)]="item.correct_answer"
+                            (change)="markChanged()">
+
+                        <input
+                            [(ngModel)]="item.answer_b"
+                            (ngModelChange)="markChanged()"
+                            class="flex-1 rounded-xl border px-4 py-3">
+
+                    </div>
+
+                </div>
+
+                <!-- C -->
+
+                <div>
+
+                    <label class="mb-2 block text-xl font-semibold">
+
+                        Đáp án C
+
+                    </label>
+
+                    <div class="flex items-center gap-3">
+
+                        <input
+                            type="radio"
+                            name="correct{{i}}"
+                            value="C"
+                            [(ngModel)]="item.correct_answer"
+                            (change)="markChanged()">
+
+                        <input
+                            [(ngModel)]="item.answer_c"
+                            (ngModelChange)="markChanged()"
+                            class="flex-1 rounded-xl border px-4 py-3">
+
+                    </div>
+
+                </div>
+
+                <!-- D -->
+
+                <div>
+
+                    <label class="mb-2 block text-xl font-semibold">
+
+                        Đáp án D
+
+                    </label>
+
+                    <div class="flex items-center gap-3">
+
+                        <input
+                            type="radio"
+                            name="correct{{i}}"
+                            value="D"
+                            [(ngModel)]="item.correct_answer"
+                            (change)="markChanged()">
+
+                        <input
+                            [(ngModel)]="item.answer_d"
+                            (ngModelChange)="markChanged()"
+                            class="flex-1 rounded-xl border px-4 py-3">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- LEVEL + EXPLANATION -->
+
+            <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+
+                <!-- LEVEL -->
+
+                <div>
+
+                    <label
+                        class="mb-2 block text-xl font-semibold">
+
+                        Mức độ
+
+                    </label>
+
+                    <select
+
+                        [(ngModel)]="item.difficulty"
+                        (change)="markChanged()"
+
+                        class="w-full rounded-xl border px-4 py-3">
+
+                        <option value="EASY">
+
+                            Dễ
+
+                        </option>
+
+                        <option value="MEDIUM">
+
+                            Trung bình
+
+                        </option>
+
+                        <option value="HARD">
+
+                            Khó
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- EXPLANATION -->
+
+                <div>
+
+                    <label
+                        class="mb-2 block text-xl font-semibold">
+
+                        Giải thích
+
+                    </label>
+
+                    <textarea
+
+                        [(ngModel)]="item.explanation"
+                        (ngModelChange)="markChanged()"
+
+                        rows="4"
+
+                        class="w-full rounded-xl border px-4 py-3">
+
+                    </textarea>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+        <!-- ======================================= -->
+    <!-- FOOTER -->
+    <!-- ======================================= -->
+
+    <div class="mt-10 flex items-center justify-between">
+
+        <!-- LEFT -->
+
+        <button
+            (click)="back()"
+            class="rounded-xl border border-gray-300 bg-white px-6 py-3 transition hover:bg-gray-100">
+
+            ← Quay lại
+
+        </button>
+
+        <!-- RIGHT -->
+
+        <div class="flex items-center gap-4">
+
+            <!-- UPDATE -->
+
+            <button
+                *ngIf="hasChanged"
+                (click)="updateExam()"
+                class="rounded-xl bg-green-600 px-6 py-3 font-semibold text-white transition hover:bg-green-700">
+
+                💾 Cập nhật
+
+            </button>
+
+            <!-- ASSIGN -->
+
+            <button
+                (click)="assignExam()"
+                class="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700">
+
+                📤 Giao đề
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>

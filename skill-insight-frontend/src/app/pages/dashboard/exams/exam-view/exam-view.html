@@ -1,0 +1,319 @@
+<div *ngIf="loading" class="flex justify-center py-20">
+
+    <div class="text-lg text-gray-500 animate-pulse">
+
+        Đang tải đề thi...
+
+    </div>
+    <div
+          *ngIf="exam.exam_questions.length === 0"
+          class="mt-8 rounded-xl border bg-white p-8 text-center text-gray-500">
+
+          Đề thi này hiện chưa có câu hỏi.
+
+     </div>
+</div>
+
+<div
+    *ngIf="!loading && exam"
+    class="max-w-5xl mx-auto p-8 bg-gray-100 min-h-screen">
+
+    <!-- ================================ -->
+    <!-- HEADER -->
+    <!-- ================================ -->
+
+    <div class="bg-white rounded-xl shadow border">
+
+        <div class="border-b p-8 text-center">
+
+            <h1 class="text-3xl font-bold text-gray-800 uppercase">
+
+                {{ exam.title }}
+
+            </h1>
+
+            <p class="text-gray-500 mt-3">
+
+                {{ exam.description || 'Không có mô tả.' }}
+
+            </p>
+
+        </div>
+
+        <!-- INFO -->
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 p-6 text-sm">
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Môn học
+
+                </div>
+
+                <div class="font-semibold">
+
+                    {{ exam.subject?.subject_name }}
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Chủ đề
+
+                </div>
+
+                <div class="font-semibold">
+
+                    {{ exam.topic?.topic_name || '---' }}
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Giáo viên
+
+                </div>
+
+                <div class="font-semibold">
+
+                    {{ exam.teacher?.full_name }}
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Thời gian
+
+                </div>
+
+                <div class="font-semibold">
+
+                    {{ exam.duration }} phút
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Điểm đạt
+
+                </div>
+
+                <div class="font-semibold">
+
+                    {{ exam.pass_score }}
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Số câu
+
+                </div>
+
+                <div class="font-semibold">
+
+                    {{ exam.exam_questions.length }}
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Trạng thái
+
+                </div>
+
+                <span
+                    class="px-3 py-1 rounded-full text-xs font-semibold"
+                    [ngClass]="{
+                         'bg-gray-100 text-gray-700': exam.status_exam === 'DRAFT',
+                         'bg-yellow-100 text-yellow-700': exam.status_exam === 'PENDING',
+                         'bg-green-100 text-green-700': exam.status_exam === 'APPROVED',
+                         'bg-red-100 text-red-700': exam.status_exam === 'REJECTED'
+                    }">
+
+                    {{ getStatusLabel(exam.status_exam) }}
+
+               </span>
+
+            </div>
+
+            <div>
+
+                <div class="text-gray-500">
+
+                    Ngày tạo
+
+                </div>
+
+                <div class="font-semibold">
+
+                    {{ exam.created_at | date:'dd/MM/yyyy HH:mm' }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================================ -->
+    <!-- QUESTION -->
+    <!-- ================================ -->
+
+    <div class="mt-8 space-y-8">
+
+        <div
+            *ngFor="let item of exam.exam_questions; let i=index"
+            class="bg-white rounded-xl shadow border p-7">
+
+            <!-- Question -->
+
+            <div class="flex items-start gap-3">
+
+                <div
+                    class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+
+                    {{ i+1 }}
+
+                </div>
+
+                <div class="flex-1">
+
+                    <h3
+                        class="font-semibold text-lg text-gray-800 leading-relaxed">
+
+                        {{ item.question.content }}
+
+                    </h3>
+
+                </div>
+                <div class="mt-2 text-sm text-gray-500">
+                    Mức Độ: {{ getLevelLabel(item.question.level) }}
+               </div>
+            </div>
+
+            <!-- Answers -->
+
+            <div class="mt-6 space-y-3">
+
+                <div
+                    *ngFor="let answer of item.question.answers; let j = index"
+                    class="border rounded-lg p-4 flex items-center gap-4"
+                    [ngClass]="{
+                         'border-green-500 bg-green-50': answer.is_correct
+                    }">
+
+                    <div
+                         class="w-9 h-9 rounded-full border flex items-center justify-center font-bold">
+
+                         {{ ['A','B','C','D'][j] }}
+
+                    </div>
+
+                    <div class="flex-1">
+                         {{ answer.answer_text }}
+                    </div>
+
+                    <div
+                         *ngIf="answer.is_correct"
+                         class="text-green-600 font-semibold">
+
+                         ✓ Đáp án đúng
+
+                    </div>
+
+                    </div>
+
+               </div>
+
+            <!-- Explanation -->
+
+            <div
+                *ngIf="item.question.explanation"
+                class="mt-6 rounded-lg bg-yellow-50 border border-yellow-200 p-5">
+
+                <div class="font-semibold text-yellow-700">
+
+                    Giải thích
+
+                </div>
+
+                <div class="mt-2 text-gray-700">
+
+                    {{ item.question.explanation }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================================ -->
+    <!-- FOOTER -->
+    <!-- ================================ -->
+    <div class="mt-10 flex items-center justify-between">
+
+    <!-- LEFT -->
+
+    <button
+        (click)="back()"
+        class="rounded-xl border border-gray-300 bg-white px-6 py-3 transition hover:bg-gray-100">
+
+        ← Quay lại
+
+    </button>
+
+    <!-- RIGHT -->
+
+    <div class="flex gap-4">
+
+        <button
+            (click)="detailExam()"
+            class="rounded-xl border border-gray-300 bg-white px-6 py-3 transition hover:bg-gray-100">
+
+            ✏ Sửa đề
+
+        </button>
+
+        <button
+            (click)="assignExam()"
+            class="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700">
+
+            📚 Giao bài
+
+        </button>
+
+    </div>
+
+</div>
+    
+</div>

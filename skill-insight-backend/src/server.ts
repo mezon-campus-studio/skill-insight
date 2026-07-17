@@ -1,3 +1,4 @@
+import "./types";
 import dotenv from "dotenv";
 import app from "./app";
 // BƯỚC 1: Import instance prisma duy nhất từ file lib (Singleton)

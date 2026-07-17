@@ -13,23 +13,7 @@
       <a routerLink="/register" class="register">Đăng ký</a>
     </div>
 
-    <!-- đã login -->
-    <!-- <div class="auth" *ngIf="user">
-      <div class="user-menu" (click)="toggleDropdown()">
-        <img src="https://i.pravatar.cc/40" class="avatar">
-        <span>Xin chào, {{user.name}} ▼</span>
-      </div>
-
-      <div class="dropdown" *ngIf="isOpen">
-        <a href="#">Thông tin cá nhân</a>
-        <a href="#">Đổi mật khẩu</a>
-
-        <a *ngIf="user.role === 'admin'" routerLink="/admin">Quản trị</a>
-        <a *ngIf="user.role === 'teacher'" routerLink="/teacher">Tổng quan GV</a>
-        <a *ngIf="user.role === 'student'" routerLink="/student">Tổng quan SV</a>
-
-        <a (click)="logout()">Đăng xuất</a>
-      </div>
-    </div> -->
+    <div class="auth" *ngIf="user">
+    </div>
   </div>
 </header>

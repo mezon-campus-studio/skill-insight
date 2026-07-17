@@ -8,6 +8,7 @@ const userSafeSelect = Prisma.validator<Prisma.UserSelect>()({
   role: true,
   provider_id: true,
   created_at: true,
+  skip_set_password: true,
 });
 
 export const userRepository = {
@@ -59,5 +60,18 @@ export const userRepository = {
       select: { user_id: true }
     });
     return !!user;
-  }
+  },
+  
+  async skipSetPassword(userId: number) {
+  return prisma.user.update({
+    where: {
+      user_id: userId,
+    },
+    data: {
+      skip_set_password: true,
+    },
+  });
+},
+
 };
+

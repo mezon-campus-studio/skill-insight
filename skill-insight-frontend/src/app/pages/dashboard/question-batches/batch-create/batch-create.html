@@ -1,0 +1,673 @@
+<div class="min-h-screen bg-slate-50 p-4 md:p-8">
+
+  <!-- HEADER -->
+  <div class="max-w-7xl mx-auto mb-6">
+
+    <div
+      class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
+    >
+
+      <div>
+
+        <h1 class="text-3xl font-black text-slate-900">
+          Tạo bộ câu hỏi
+        </h1>
+
+        <p class="text-slate-500 mt-1">
+          Tạo thủ công hoặc import Excel / CSV
+        </p>
+
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+
+        <!-- IMPORT -->
+        <input
+          type="file"
+          accept=".xlsx,.csv"
+          class="hidden"
+          #fileInput
+          (change)="onFileSelected($event)"
+        />
+
+        <button
+          type="button"
+          (click)="fileInput.click()"
+          class="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition"
+        >
+          ⬆ Import Excel / CSV
+        </button>
+
+        <!-- TEMPLATE -->
+        <button
+          type="button"
+          (click)="downloadTemplate()"
+          class="px-5 py-3 rounded-2xl border border-slate-300 hover:bg-slate-100 font-bold transition"
+        >
+          ⬇ File mẫu
+        </button>
+
+        <!-- BACK -->
+        <button
+          routerLink="/dashboard/question-batches"
+          class="px-5 py-3 rounded-2xl border border-slate-300 hover:bg-slate-100 font-bold transition"
+        >
+          ← Quay lại
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- MAIN -->
+  <div
+    class="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-3 gap-6"
+  >
+
+    <!-- LEFT -->
+    <div class="xl:col-span-2 space-y-6">
+
+      <!-- BATCH INFO -->
+      <div
+        class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 md:p-8"
+      >
+
+        <div
+          class="flex items-center justify-between mb-6"
+        >
+
+          <div>
+
+            <h2 class="text-2xl font-black text-slate-900">
+              Thông tin bộ câu hỏi
+            </h2>
+
+            <p class="text-slate-500 mt-1">
+              Nhập thông tin chung cho bộ câu hỏi
+            </p>
+
+          </div>
+
+        </div>
+
+        <!-- IMPORT MODE NOTICE -->
+        <div
+          *ngIf="isImported"
+          class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4"
+        >
+
+          <div class="flex items-start gap-3">
+
+            <div class="text-emerald-600 text-xl">
+              ✔
+            </div>
+
+            <div>
+
+              <div class="font-black text-emerald-800">
+                Đang ở chế độ Import
+              </div>
+
+              <div class="text-sm text-emerald-700 mt-1">
+                Hệ thống đã tự đọc dữ liệu từ file Excel / CSV
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+
+          <!-- SUBJECT -->
+          <div>
+
+            <label
+              class="block text-sm font-bold text-slate-700 mb-2"
+            >
+              Môn học
+            </label>
+
+            <ng-select
+              [items]="subjects"
+              bindLabel="subject_name"
+              bindValue="subject_id"
+              [(ngModel)]="formData.subject_id"
+              name="subject_id"
+              placeholder="Chọn môn học"
+              (change)="onSubjectChange()"
+              [searchable]="true"
+              [clearable]="true"
+            >
+            </ng-select>
+
+            <div
+              class="text-center text-slate-400 text-sm my-2"
+            >
+              hoặc
+            </div>
+
+            <input
+              type="text"
+              [(ngModel)]="manualSubject"
+              name="manualSubject"
+              placeholder="Nhập môn học mới..."
+              class="w-full px-4 py-3 rounded-2xl border border-slate-300"
+            />
+
+          </div>
+
+          <!-- TOPIC -->
+          <div>
+
+            <label
+              class="block text-sm font-bold text-slate-700 mb-2"
+            >
+              Chủ đề
+            </label>
+
+            <ng-select
+              [items]="filteredTopics"
+              bindLabel="topic_name"
+              bindValue="topic_id"
+              [(ngModel)]="formData.topic_id"
+              name="topic_id"
+              placeholder="Chọn chủ đề"
+              [searchable]="true"
+              [clearable]="true"
+            >
+            </ng-select>
+
+            <div
+              class="text-center text-slate-400 text-sm my-2"
+            >
+              hoặc
+            </div>
+
+            <input
+              type="text"
+              [(ngModel)]="manualTopic"
+              name="manualTopic"
+              placeholder="Nhập chủ đề mới..."
+              class="w-full px-4 py-3 rounded-2xl border border-slate-300"
+            />
+
+          </div>
+
+        </div>
+
+        <!-- NAME -->
+        <div class="mt-6">
+
+          <label
+            class="block text-sm font-bold text-slate-700 mb-2"
+          >
+            Tên bộ câu hỏi
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="formData.batch_name"
+            name="batch_name"
+            placeholder="Ví dụ: Java OOP Chapter 1"
+            class="w-full px-4 py-3 rounded-2xl border border-slate-300"
+          />
+
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="mt-6">
+
+          <label
+            class="block text-sm font-bold text-slate-700 mb-2"
+          >
+            Mô tả
+          </label>
+
+          <textarea
+            rows="4"
+            [(ngModel)]="formData.description"
+            name="description"
+            placeholder="Nhập mô tả..."
+            class="w-full px-4 py-3 rounded-2xl border border-slate-300 resize-none"
+          ></textarea>
+
+        </div>
+
+        <!-- CONTRIBUTION -->
+        <div
+          *ngIf="currentUser?.role === 'teacher'"
+          class="mt-6 rounded-2xl border border-indigo-200 bg-indigo-50 p-5"
+        >
+
+          <label
+            class="flex items-start gap-4 cursor-pointer"
+          >
+
+            <input
+              type="checkbox"
+              [(ngModel)]="formData.contribute_system"
+              name="contribute_system"
+              class="mt-1 w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+            />
+
+            <div>
+
+              <div
+                class="font-black text-slate-900"
+              >
+                Cho phép đóng góp vào ngân hàng hệ thống
+              </div>
+
+              <div
+                class="text-sm text-slate-600 mt-1 leading-relaxed"
+              >
+                Bộ câu hỏi này sẽ được đưa vào
+                ngân hàng chung để giáo viên
+                khác có thể sử dụng.
+              </div>
+
+            </div>
+
+          </label>
+
+        </div>
+
+      </div>
+
+      <!-- QUESTIONS -->
+      <div
+        *ngIf="questions.length > 0"
+        class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6"
+      >
+
+        <div
+          class="flex items-center justify-between mb-5"
+        >
+
+          <div>
+
+            <h2 class="text-2xl font-black text-slate-900">
+              Danh sách câu hỏi
+            </h2>
+
+            <p class="text-slate-500 mt-1">
+              Tổng:
+              {{ questions.length }}
+              câu hỏi
+            </p>
+
+          </div>
+
+          <button
+            type="button"
+            (click)="addQuestion()"
+            class="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition"
+          >
+            + Thêm câu hỏi
+          </button>
+
+        </div>
+
+        <div class="space-y-4">
+
+          <div
+            *ngFor="let q of questions; let i = index"
+            class="border border-slate-200 rounded-2xl p-5"
+          >
+
+            <div
+              class="flex items-center justify-between mb-4"
+            >
+
+              <h3
+                class="font-black text-slate-800"
+              >
+                Câu hỏi {{ i + 1 }}
+              </h3>
+
+              <button
+                type="button"
+                (click)="removeQuestion(i)"
+                class="px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-bold transition"
+              >
+                Xoá
+              </button>
+
+            </div>
+
+            <!-- QUESTION -->
+            <textarea
+              rows="3"
+              [(ngModel)]="q.question_text"
+              placeholder="Nhập nội dung câu hỏi..."
+              class="w-full px-4 py-3 rounded-2xl border border-slate-300 resize-none mb-4"
+            ></textarea>
+
+            <!-- OPTIONS -->
+            <div
+              class="grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
+
+              <input
+                type="text"
+                [(ngModel)]="q.option_a"
+                placeholder="Đáp án A"
+                class="px-4 py-3 rounded-2xl border border-slate-300"
+              />
+
+              <input
+                type="text"
+                [(ngModel)]="q.option_b"
+                placeholder="Đáp án B"
+                class="px-4 py-3 rounded-2xl border border-slate-300"
+              />
+
+              <input
+                type="text"
+                [(ngModel)]="q.option_c"
+                placeholder="Đáp án C"
+                class="px-4 py-3 rounded-2xl border border-slate-300"
+              />
+
+              <input
+                type="text"
+                [(ngModel)]="q.option_d"
+                placeholder="Đáp án D"
+                class="px-4 py-3 rounded-2xl border border-slate-300"
+              />
+
+            </div>
+
+            <!-- CORRECT -->
+            <div class="mt-5">
+
+              <label
+                class="block text-sm font-bold text-slate-700 mb-2"
+              >
+                Đáp án đúng
+              </label>
+
+              <select
+                [(ngModel)]="q.correct_answer"
+                class="w-full px-4 py-3 rounded-2xl border border-slate-300"
+              >
+
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+
+              </select>
+
+            </div>
+
+            <!-- DIFFICULTY -->
+            <div class="mt-5">
+
+              <label
+                class="block text-sm font-bold text-slate-700 mb-2"
+              >
+                Độ khó
+              </label>
+
+              <select
+                [(ngModel)]="q.difficulty"
+                class="w-full px-4 py-3 rounded-2xl border border-slate-300"
+              >
+
+                <option value="EASY">
+                  Dễ
+                </option>
+
+                <option value="MEDIUM">
+                  Trung bình
+                </option>
+
+                <option value="HARD">
+                  Khó
+                </option>
+
+              </select>
+
+            </div>
+
+            <!-- EXPLANATION -->
+            <div class="mt-5">
+
+              <label
+                class="block text-sm font-bold text-slate-700 mb-2"
+              >
+                Giải thích
+              </label>
+
+              <textarea
+                rows="3"
+                [(ngModel)]="q.explanation"
+                placeholder="Nhập giải thích..."
+                class="w-full px-4 py-3 rounded-2xl border border-slate-300 resize-none"
+              ></textarea>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="space-y-6">
+
+      <!-- QUICK ADD -->
+      <div
+        class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6"
+      >
+
+        <h3
+          class="text-xl font-black text-slate-900 mb-4"
+        >
+          Thêm nhanh câu hỏi
+        </h3>
+
+        <div class="space-y-4">
+
+          <input
+            type="number"
+            min="1"
+            [(ngModel)]="questionCount"
+            class="w-full px-4 py-3 rounded-2xl border border-slate-300"
+          />
+
+          <button
+            type="button"
+            (click)="addMultipleQuestions()"
+            class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition"
+          >
+            + Thêm nhiều câu hỏi
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- IMPORT INFO -->
+      <div
+        class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6"
+      >
+
+        <h3
+          class="text-xl font-black text-slate-900 mb-4"
+        >
+          Hướng dẫn Import
+        </h3>
+
+        <div
+          class="space-y-3 text-sm text-slate-600"
+        >
+
+          <div class="flex items-start gap-3">
+            <span>✔</span>
+            <span>
+              Hỗ trợ file CSV và Excel
+            </span>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <span>✔</span>
+            <span>
+              Tự tạo môn học nếu chưa tồn tại
+            </span>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <span>✔</span>
+            <span>
+              Tự tạo chủ đề nếu chưa tồn tại
+            </span>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <span>✔</span>
+            <span>
+              Tự bỏ qua dữ liệu trùng
+            </span>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- FILE STRUCTURE -->
+      <div
+        class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6"
+      >
+
+        <h3
+          class="text-xl font-black text-slate-900 mb-4"
+        >
+          Cấu trúc file import
+        </h3>
+
+        <div
+          class="overflow-auto rounded-2xl border border-slate-200"
+        >
+
+          <table class="w-full text-sm">
+
+            <thead class="bg-slate-100">
+
+              <tr>
+
+                <th
+                  class="text-left px-4 py-3 font-black"
+                >
+                  Cột
+                </th>
+
+                <th
+                  class="text-left px-4 py-3 font-black"
+                >
+                  Bắt buộc
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr class="border-t">
+                <td class="px-4 py-3">subject_name</td>
+                <td class="px-4 py-3">✔</td>
+              </tr>
+
+              <tr class="border-t">
+                <td class="px-4 py-3">topic_name</td>
+                <td class="px-4 py-3">✔</td>
+              </tr>
+
+              <tr class="border-t">
+                <td class="px-4 py-3">batch_name</td>
+                <td class="px-4 py-3">✔</td>
+              </tr>
+
+              <tr class="border-t">
+                <td class="px-4 py-3">question_text</td>
+                <td class="px-4 py-3">✔</td>
+              </tr>
+
+              <tr class="border-t">
+                <td class="px-4 py-3">answer_1</td>
+                <td class="px-4 py-3">✔</td>
+              </tr>
+
+              <tr class="border-t">
+                <td class="px-4 py-3">answer_2</td>
+                <td class="px-4 py-3">✔</td>
+              </tr>
+
+              <tr class="border-t">
+                <td class="px-4 py-3">answer_3</td>
+                <td class="px-4 py-3">✔</td>
+              </tr>
+
+              <tr class="border-t">
+                <td class="px-4 py-3">answer_4</td>
+                <td class="px-4 py-3">✔</td>
+              </tr>
+
+              <tr class="border-t">
+                <td class="px-4 py-3">correct_index</td>
+                <td class="px-4 py-3">✔</td>
+              </tr>
+
+              <tr class="border-t">
+                <td class="px-4 py-3">difficulty</td>
+                <td class="px-4 py-3">✔</td>
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+      <!-- SAVE -->
+      <div
+        class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6"
+      >
+
+        <button
+          type="button"
+          (click)="submitAll()"
+          [disabled]="submitting"
+          class="w-full py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black transition disabled:opacity-50"
+        >
+
+          <span *ngIf="!submitting">
+             Lưu bộ câu hỏi
+          </span>
+
+          <span *ngIf="submitting">
+            Đang lưu...
+          </span>
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

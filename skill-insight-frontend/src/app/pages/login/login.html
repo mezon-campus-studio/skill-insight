@@ -32,44 +32,72 @@
 
       <div>
         <label class="text-sm font-medium text-gray-600">Mật khẩu</label>
+
         <div class="relative mt-1">
           <input
             [type]="showPassword ? 'text' : 'password'"
             formControlName="password"
             placeholder="••••••••"
             autocomplete="current-password"
-            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition"
+            class="w-full px-4 py-3 pr-14 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none transition"
             [class.border-red-500]="f.password.touched && f.password.invalid"
           />
 
-          <span
-  class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-blue-500 transition"
-  (click)="togglePassword()"
->
-  @if (!showPassword) {
+          <button
+            type="button"
+            (click)="togglePassword()"
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
+          >
+            <svg
+              *ngIf="!showPassword"
+              viewBox="0 0 24 24"
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path
+                d="M3 3L21 21M10.58 10.58A2 2 0 0013.42 13.42M9.88 5.09A9.77 9.77 0 0112 5c5 0 9.27 3.11 11 7a11.94 11.94 0 01-4.53 4.02M6.71 6.72A11.94 11.94 0 012 12c1.73 3.89 6 7 10 7 1.61 0 3.14-.35 4.53-.98"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
 
-    <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor">
-      <path d="M3 3L21 21" stroke-width="2" stroke-linecap="round"/>
-      <path d="M10.58 10.58A2 2 0 0013.42 13.42" stroke-width="2"/>
-      <path d="M9.88 5.09A9.77 9.77 0 0112 5c5 0 9.27 3.11 11 7" stroke-width="2"/>
-      <path d="M6.71 6.72C4.68 8.07 3.16 9.94 2 12c1.73 3.89 6 7 10 7 1.61 0 3.14-.35 4.53-.98" stroke-width="2"/>
-    </svg>
-  } @else {
-
-    <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor">
-      <path d="M2 12S5.5 5 12 5s10 7 10 7-3.5 7-10 7S2 12 2 12z" stroke-width="2"/>
-      <circle cx="12" cy="12" r="3" stroke-width="2"></circle>
-    </svg>
-  }
-</span>
+            <svg
+              *ngIf="showPassword"
+              viewBox="0 0 24 24"
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path
+                d="M2 12S5.5 5 12 5s10 7 10 7-3.5 7-10 7S2 12 2 12z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <circle
+                cx="12"
+                cy="12"
+                r="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              ></circle>
+            </svg>
+          </button>
         </div>
 
-        <p *ngIf="f.password.touched && f.password.errors?.['required']"
-           class="text-xs text-red-500 mt-1">
+        <p
+          *ngIf="f.password.touched && f.password.errors?.['required']"
+          class="text-xs text-red-500 mt-1"
+        >
           Vui lòng nhập mật khẩu
         </p>
-        <p *ngIf="f.password.touched && f.password.errors?.['minlength']"
-           class="text-xs text-red-500 mt-1">
+
+        <p
+          *ngIf="f.password.touched && f.password.errors?.['minlength']"
+          class="text-xs text-red-500 mt-1"
+        >
           Tối thiểu 8 ký tự
         </p>
       </div>

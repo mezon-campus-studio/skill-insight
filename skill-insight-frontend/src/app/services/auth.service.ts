@@ -1,126 +1,412 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { environment } from '@env/environment';
+
+import {
+  HttpClient
+} from '@angular/common/http';
+
+import {
+  Observable,
+  tap,
+  throwError
+} from 'rxjs';
+
+import {
+  catchError
+} from 'rxjs/operators';
+
+import {
+  environment
+} from '@env/environment';
+
+import {
+  Router
+} from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private readonly AUTH_API = `${environment.apiUrl}/auth`;
+  private readonly AUTH_API =
+    environment.api.auth;
 
-  constructor(private http: HttpClient) {}
-  
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
+
+  //
+  // LOGIN
+  //
   login(data: any): Observable<any> {
-    return this.http.post(`${this.AUTH_API}/login`, data, {
-      withCredentials: true
-    }).pipe(
-      tap((res: any) => {
-        if (res?.success && res?.user) {
-          this.saveUser(res.user);
-         
-          if (res.token) localStorage.setItem('access_token', res.token);
-        }
-      })
-    );
-  }
 
-  register(data: any): Observable<any> {
-    return this.http.post(`${this.AUTH_API}/register`, data, {
-      withCredentials: true
-    });
-  }
+    return this.http.post(
+      `${this.AUTH_API}/login`,
+      data
+    ).pipe(
 
-  getMe(): Observable<any> {
-    return this.http.get(`${this.AUTH_API}/me`, {
-      withCredentials: true
-    }).pipe(
       tap((res: any) => {
-        if (res?.success && res?.user) {
-          this.saveUser(res.user);
-        }
-      }),
-      catchError(err => {
-        
-        if (err.status === 401) {
+
+        console.log(
+          'LOGIN RESPONSE:',
+          res
+        );
+
+        if (
+          res?.success &&
+          res?.user
+        ) {
+
+          this.saveUser(
+            res.user
+          );
+
+          const token =
+            res.accessToken ||
+            res.token;
+
+          if (token) {
+
+            localStorage.setItem(
+              'accessToken',
+              token
+            );
+
+            console.log(
+              'TOKEN SAVED'
+            );
+
+          } else {
+
+            this.clearUser();
+
+            this.router.navigate([
+              '/login'
+            ]);
+
+          }
+
+        } else {
+
           this.clearUser();
-          localStorage.removeItem('access_token');
+
+          this.router.navigate([
+            '/login'
+          ]);
+
         }
-       
-        return throwError(() => err);
+
+      }),
+
+      catchError(err => {
+
+        this.clearUser();
+
+        this.router.navigate([
+          '/login'
+        ]);
+
+        return throwError(
+          () => err
+        );
+
       })
+
     );
+
   }
 
-  getMezonUrl(): Observable<any> {
-    return this.http.get(`${this.AUTH_API}/mezon`, {
-      withCredentials: true
-    });
+  //
+  // REGISTER
+  //
+  register(
+    data: any
+  ): Observable<any> {
+
+    return this.http.post(
+      `${this.AUTH_API}/register`,
+      data
+    );
+
   }
 
-  updateRole(data: { userId: number; role: string }): Observable<any> {
-    return this.http.post(`${this.AUTH_API}/update-role`, data, {
-      withCredentials: true
-    }).pipe(
+  //
+  // GET CURRENT USER
+  //
+  getMe(): Observable<any> {
+
+    const token =
+      localStorage.getItem(
+        'accessToken'
+      );
+
+    if (
+      !token ||
+      token === 'null' ||
+      token === 'undefined'
+    ) {
+
+      this.clearUser();
+
+      this.router.navigate([
+        '/login'
+      ]);
+
+      return throwError(
+        () => new Error(
+          'No token'
+        )
+      );
+
+    }
+
+    return this.http.get(
+      `${this.AUTH_API}/me`
+    ).pipe(
+
       tap((res: any) => {
-        if (res?.success && res?.user) {
-          this.saveUser(res.user);
+
+        console.log(
+          'GET ME RESPONSE:',
+          res
+        );
+
+        if (
+          res?.success &&
+          res?.user
+        ) {
+
+          this.saveUser(
+            res.user
+          );
+
+        } else {
+
+          this.clearUser();
+
+          this.router.navigate([
+            '/login'
+          ]);
+
         }
+
+      }),
+
+      catchError(err => {
+
+        console.error(
+          'GET ME ERROR:',
+          err
+        );
+
+        this.clearUser();
+
+        this.router.navigate([
+          '/login'
+        ]);
+
+        return throwError(
+          () => err
+        );
+
       })
+
     );
+
   }
 
-  updateProfile(data: any): Observable<any> {
-    return this.http.put(`${this.AUTH_API}/profile`, data, {
-      withCredentials: true
-    }).pipe(
+  //
+  // MEZON URL
+  //
+  getMezonUrl():
+  Observable<any> {
+
+    return this.http.get(
+      `${this.AUTH_API}/mezon`
+    );
+
+  }
+
+  //
+  // UPDATE ROLE
+  //
+  updateRole(
+    data: {
+      userId: number;
+      role: string;
+    }
+  ): Observable<any> {
+
+    return this.http.put(
+      `${this.AUTH_API}/users/${data.userId}/role`,
+      {
+        role: data.role
+      }
+    ).pipe(
+
       tap((res: any) => {
-        if (res?.success && res?.user) {
-          this.saveUser(res.user);
+
+        if (
+          res?.success &&
+          res?.user
+        ) {
+
+          this.saveUser(
+            res.user
+          );
+
         }
+
+      }),
+
+      catchError(err => {
+
+        return throwError(
+          () => err
+        );
+
       })
+
     );
+
   }
 
+  //
+  // GET USER
+  //
   getUser(): any {
-    const user = localStorage.getItem('user');
+
+    const user =
+      localStorage.getItem(
+        'user'
+      );
+
     try {
-      return user ? JSON.parse(user) : null;
-    } catch (e) {
+
+      return user
+        ? JSON.parse(user)
+        : null;
+
+    } catch {
+
       return null;
+
     }
+
   }
 
-  saveUser(user: any): void {
+  skipSetPassword() {
+    return this.http.post(
+      `${this.AUTH_API}/skip-set-password`,
+      {}
+    );
+  }
+
+  //
+  // CURRENT USER
+  //
+  getCurrentUser() {
+
+    return JSON.parse(
+      localStorage.getItem(
+        'user'
+      ) || '{}'
+    );
+
+  }
+
+  //
+  // SAVE USER
+  //
+  saveUser(
+    user: any
+  ): void {
+
     if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
+
+      localStorage.setItem(
+        'user',
+        JSON.stringify(user)
+      );
+
     }
+
   }
 
+  //
+  // CLEAR USER
+  //
   clearUser(): void {
-    localStorage.removeItem('user');
-    localStorage.removeItem('access_token');
+
+    localStorage.removeItem(
+      'user'
+    );
+
+    localStorage.removeItem(
+      'accessToken'
+    );
+
   }
 
-  logout(): void {
-    this.http.post(`${this.AUTH_API}/logout`, {}, {
-      withCredentials: true
-    }).subscribe({
-      next: () => this.handleLocalLogout(),
-      error: () => this.handleLocalLogout()
-    });
-  }
+  //
+  // LOGOUT
+  //
+  logout():
+  Observable<any> {
 
-  private handleLocalLogout(): void {
     this.clearUser();
-    window.location.href = '/login';
+
+    this.router.navigate(
+      ['/login'],
+      {
+        replaceUrl: true
+      }
+    );
+
+    return this.http.post(
+      `${this.AUTH_API}/logout`,
+      {}
+    );
+
   }
 
-  deleteAccount(): Observable<any> {
-    return this.http.delete(`${this.AUTH_API}/me`, {
-      withCredentials: true
-    });
+  //
+  // UPDATE PROFILE
+  //
+  updateProfile(
+    data: any
+  ): Observable<any> {
+
+    return this.http.put(
+      `${this.AUTH_API}/profile`,
+      data
+    ).pipe(
+
+      tap((res: any) => {
+
+        if (
+          res?.success &&
+          res?.user
+        ) {
+
+          this.saveUser(
+            res.user
+          );
+
+        }
+
+      }),
+
+      catchError(err => {
+
+        return throwError(
+          () => err
+        );
+
+      })
+
+    );
+
   }
+
 }

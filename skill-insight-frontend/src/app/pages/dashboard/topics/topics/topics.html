@@ -1,0 +1,659 @@
+<div class="min-h-screen bg-gray-50 p-4 md:p-6">
+
+  <div class="max-w-7xl mx-auto">
+
+    <!-- ========================================= -->
+    <!-- HEADER -->
+    <!-- ========================================= -->
+
+    <div
+      class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 md:p-6 mb-6"
+    >
+
+      <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
+      >
+
+        <!-- LEFT -->
+        <div>
+
+          <h1
+            class="text-2xl md:text-3xl font-bold text-gray-900"
+          >
+            Quản lý Chủ Đề
+          </h1>
+
+          <p
+            class="text-sm text-gray-500 mt-1"
+          >
+            Tổng cộng:
+            <span class="font-semibold text-blue-600">
+              {{ totalItems }}
+            </span>
+            chủ đề
+          </p>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div
+          class="flex flex-wrap items-center gap-3"
+        >
+
+          <!-- CREATE -->
+          <a
+            routerLink="/dashboard/topics/create"
+            class="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition"
+          >
+            + Tạo chủ đề
+          </a>
+
+          <!-- DELETE SELECTED -->
+          <button
+            type="button"
+            (click)="deleteSelectedTopics()"
+            [disabled]="selectedTopics.length === 0 || loading"
+            class="px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition disabled:opacity-50"
+          >
+            Xóa đã chọn
+            ({{ selectedTopics.length }})
+          </button>
+
+          <!-- DELETE ALL -->
+          <button
+            type="button"
+            (click)="deleteAllTopics()"
+            [disabled]="totalItems === 0 || loading"
+            class="px-5 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition disabled:opacity-50"
+          >
+            Xóa toàn bộ
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================= -->
+    <!-- FILTER -->
+    <!-- ========================================= -->
+
+    <div
+      class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 md:p-6 mb-6"
+    >
+
+      <div
+        class="grid grid-cols-1 lg:grid-cols-3 gap-4"
+      >
+
+        <!-- SEARCH -->
+        <div>
+
+          <label
+            class="block text-sm font-semibold text-gray-700 mb-2"
+          >
+            Tìm kiếm chủ đề
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="searchKeyword"
+            (input)="filterTopics()"
+            placeholder="Nhập tên chủ đề..."
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition"
+          />
+
+        </div>
+
+        <!-- SUBJECT -->
+        <div>
+
+          <label
+            class="block text-sm font-semibold text-gray-700 mb-2"
+          >
+            Lọc theo môn học
+          </label>
+
+          <select
+            [(ngModel)]="selectedSubject"
+            (change)="filterTopics()"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition bg-white"
+          >
+
+            <option value="">
+              Tất cả môn học
+            </option>
+
+            <option
+              *ngFor="let subject of subjects"
+              [value]="subject.subject_id"
+            >
+              {{ subject.subject_name }}
+            </option>
+
+          </select>
+
+        </div>
+
+        <!-- ITEMS -->
+        <div>
+
+          <label
+            class="block text-sm font-semibold text-gray-700 mb-2"
+          >
+            Số dòng mỗi trang
+          </label>
+
+          <select
+            [(ngModel)]="itemsPerPage"
+            (change)="filterTopics()"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition bg-white"
+          >
+
+            <option [value]="5">5 dòng</option>
+
+            <option [value]="10">10 dòng</option>
+
+            <option [value]="20">20 dòng</option>
+
+            <option [value]="50">50 dòng</option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ========================================= -->
+    <!-- TABLE -->
+    <!-- ========================================= -->
+
+    <div
+      class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+    >
+
+      <!-- TABLE DESKTOP -->
+      <div class="hidden lg:block overflow-x-auto">
+
+        <table class="w-full">
+
+          <!-- HEAD -->
+          <thead
+            class="bg-gray-50 border-b border-gray-200"
+          >
+
+            <tr>
+
+              <!-- CHECK -->
+              <th
+                class="px-5 py-4 w-[60px]"
+              >
+
+                <input
+                  type="checkbox"
+                  [checked]="isAllSelected"
+                  (change)="toggleSelectAll($event)"
+                  class="w-4 h-4 rounded border-gray-300 text-blue-600"
+                />
+
+              </th>
+
+              <!-- STT -->
+              <th
+                class="px-5 py-4 text-left text-xs font-bold text-gray-500 uppercase"
+              >
+                STT
+              </th>
+
+              <!-- TOPIC -->
+              <th
+                class="px-5 py-4 text-left text-xs font-bold text-gray-500 uppercase"
+              >
+                Chủ đề
+              </th>
+
+              <!-- SUBJECT -->
+              <th
+                class="px-5 py-4 text-left text-xs font-bold text-gray-500 uppercase"
+              >
+                Môn học
+              </th>
+
+              <!-- DESCRIPTION -->
+              <th
+                class="px-5 py-4 text-left text-xs font-bold text-gray-500 uppercase"
+              >
+                Mô tả
+              </th>
+
+              <!-- ACTION -->
+              <th
+                class="px-5 py-4 text-right text-xs font-bold text-gray-500 uppercase"
+              >
+                Hành động
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <!-- BODY -->
+          <tbody
+            class="divide-y divide-gray-100"
+          >
+
+            <tr
+              *ngFor="
+                let topic of topics;
+                let i = index;
+                trackBy: trackByTopicId
+              "
+              class="hover:bg-gray-50 transition"
+            >
+
+              <!-- CHECK -->
+              <td class="px-5 py-4">
+
+                <input
+                  type="checkbox"
+                  [checked]="isChecked(topic.topic_id)"
+                  (change)="toggleTopic(topic.topic_id)"
+                  class="w-4 h-4 rounded border-gray-300 text-blue-600"
+                />
+
+              </td>
+
+              <!-- STT -->
+              <td
+                class="px-5 py-4 text-sm font-semibold text-gray-700"
+              >
+
+                {{
+                  ((currentPage - 1) * itemsPerPage)
+                  + i + 1
+                }}
+
+              </td>
+
+              <!-- TOPIC -->
+              <td class="px-5 py-4">
+
+                <div
+                  class="font-semibold text-gray-800"
+                >
+                  {{ topic.topic_name }}
+                </div>
+
+              </td>
+
+              <!-- SUBJECT -->
+              <td class="px-5 py-4">
+
+                <span
+                  class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold"
+                >
+
+                  {{
+                    getSubjectName(
+                      topic.subject_id
+                    )
+                  }}
+
+                </span>
+
+              </td>
+
+              <!-- DESCRIPTION -->
+              <td class="px-5 py-4">
+
+                <div
+                  class="text-sm text-gray-500 max-w-sm line-clamp-2"
+                >
+
+                  {{
+                    topic.description ||
+                    'Không có mô tả'
+                  }}
+
+                </div>
+
+              </td>
+
+              <!-- ACTION -->
+              <td
+                class="px-5 py-4 text-right"
+              >
+
+                <div
+                  class="flex items-center justify-end gap-2"
+                >
+
+                  <!-- EDIT -->
+                  <button
+                    type="button"
+                    (click)="editTopic(topic.topic_id)"
+                    class="px-4 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-semibold transition"
+                  >
+                    Sửa
+                  </button>
+
+                  <!-- DELETE -->
+                  <button
+                    type="button"
+                    (click)="deleteTopic(topic.topic_id)"
+                    [disabled]="deletingId === topic.topic_id"
+                    class="px-4 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold transition disabled:opacity-50"
+                  >
+                    Xóa
+                  </button>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <!-- ========================================= -->
+      <!-- MOBILE CARD -->
+      <!-- ========================================= -->
+
+      <div
+        class="lg:hidden divide-y divide-gray-100"
+      >
+
+        <div
+          *ngFor="
+            let topic of topics;
+            let i = index
+          "
+          class="p-4"
+        >
+
+          <!-- TOP -->
+          <div
+            class="flex items-start justify-between gap-3"
+          >
+
+            <div
+              class="flex items-start gap-3"
+            >
+
+              <input
+                type="checkbox"
+                [checked]="isChecked(topic.topic_id)"
+                (change)="toggleTopic(topic.topic_id)"
+                class="mt-1 w-4 h-4 rounded border-gray-300 text-blue-600"
+              />
+
+              <div>
+
+                <div
+                  class="font-bold text-gray-800"
+                >
+                  {{
+                    ((currentPage - 1)
+                    * itemsPerPage)
+                    + i + 1
+                  }}.
+                  {{ topic.topic_name }}
+                </div>
+
+                <div
+                  class="mt-2"
+                >
+
+                  <span
+                    class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold"
+                  >
+
+                    {{
+                      getSubjectName(
+                        topic.subject_id
+                      )
+                    }}
+
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- DESCRIPTION -->
+          <div
+            class="mt-3 text-sm text-gray-500"
+          >
+
+            {{
+              topic.description ||
+              'Không có mô tả'
+            }}
+
+          </div>
+
+          <!-- ACTION -->
+          <div
+            class="flex items-center gap-2 mt-4"
+          >
+
+            <button
+              type="button"
+              (click)="editTopic(topic.topic_id)"
+              class="flex-1 px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 text-sm font-semibold transition"
+            >
+              Sửa
+            </button>
+
+            <button
+              type="button"
+              (click)="deleteTopic(topic.topic_id)"
+              class="flex-1 px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 text-sm font-semibold transition"
+            >
+              Xóa
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ========================================= -->
+      <!-- EMPTY -->
+      <!-- ========================================= -->
+
+      <div
+        *ngIf="topics.length === 0 && !loading"
+        class="py-20 px-6 text-center"
+      >
+
+        <div
+          class="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-5"
+        >
+
+          <svg
+            class="w-12 h-12 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.8"
+              d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+
+          </svg>
+
+        </div>
+
+        <h3
+          class="text-lg font-bold text-gray-700"
+        >
+          Không có dữ liệu
+        </h3>
+
+        <p
+          class="text-sm text-gray-400 mt-2"
+        >
+          Hiện chưa có chủ đề nào phù hợp
+        </p>
+
+      </div>
+
+      <!-- ========================================= -->
+      <!-- PAGINATION -->
+      <!-- ========================================= -->
+
+      <div
+        *ngIf="totalPages > 1"
+        class="flex flex-col md:flex-row items-center justify-between gap-4 px-5 py-5 border-t border-gray-100"
+      >
+
+        <!-- LEFT -->
+        <div
+          class="text-sm text-gray-500"
+        >
+
+          Hiển thị
+
+          <span class="font-semibold text-gray-700">
+            {{
+              ((currentPage - 1)
+              * itemsPerPage)
+              + 1
+            }}
+          </span>
+
+          -
+
+          <span class="font-semibold text-gray-700">
+            {{
+              Math.min(
+                currentPage
+                * itemsPerPage,
+                totalItems
+              )
+            }}
+          </span>
+
+          /
+          {{ totalItems }}
+
+        </div>
+
+        <!-- RIGHT -->
+        <div
+          class="flex items-center gap-2 flex-wrap justify-center"
+        >
+
+          <!-- PREV -->
+          <button
+            (click)="previousPage()"
+            [disabled]="currentPage === 1"
+            class="px-4 py-2 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 transition disabled:opacity-50"
+          >
+            ←
+          </button>
+
+          <!-- PAGE -->
+          <button
+            *ngFor="
+              let page of getPageNumbers()
+            "
+            (click)="goToPage(page)"
+            class="w-11 h-11 rounded-xl text-sm font-semibold transition"
+            [ngClass]="
+              currentPage === page
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+            "
+          >
+            {{ page }}
+          </button>
+
+          <!-- NEXT -->
+          <button
+            (click)="nextPage()"
+            [disabled]="currentPage === totalPages"
+            class="px-4 py-2 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 transition disabled:opacity-50"
+          >
+            →
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ========================================= -->
+<!-- LOADING -->
+<!-- ========================================= -->
+
+<div
+  *ngIf="loading"
+  class="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center"
+>
+
+  <div
+    class="bg-white rounded-2xl p-6 shadow-2xl flex flex-col items-center w-[90%] max-w-sm"
+  >
+
+    <!-- SPINNER -->
+    <svg
+      class="animate-spin h-10 w-10 text-blue-600 mb-4"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      ></circle>
+
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+      ></path>
+
+    </svg>
+
+    <h3
+      class="font-bold text-gray-800 text-lg"
+    >
+      Đang xử lý dữ liệu
+    </h3>
+
+    <p
+      class="text-sm text-gray-500 mt-2 text-center"
+    >
+      Vui lòng chờ trong giây lát...
+    </p>
+
+  </div>
+
+</div>
