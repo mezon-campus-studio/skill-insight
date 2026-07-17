@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import {
+  ActivatedRoute,
   Router,
   RouterModule
 } from '@angular/router';
@@ -20,6 +21,8 @@ import {
 import {
   ClassService
 } from '../../../../services/class.service';
+
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-assignment-create',
@@ -80,22 +83,19 @@ implements OnInit {
   // =========================
   loading = false;
 
+  role = '';
+  isTeacher = false;
+
   // =========================
   // CONSTRUCTOR
   // =========================
   constructor(
-
-    private assignmentService:
-      AssignmentService,
-
-    private examService:
-      ExamService,
-
-    private classService:
-      ClassService,
-
+    private assignmentService: AssignmentService,
+    private examService: ExamService,
+    private classService: ClassService,
+    private authService: AuthService,
+    private route: ActivatedRoute,
     private router: Router
-
   ) {}
 
   // =========================
@@ -103,9 +103,26 @@ implements OnInit {
   // =========================
   ngOnInit(): void {
 
+    const user = this.authService.getCurrentUser();
+
+    this.role = user?.role || '';
+
+    this.isTeacher = this.role === 'teacher';
+
+    this.route.queryParams.subscribe(params => {
+
+      if (params['classId']) {
+
+        this.assignmentData.class_id = String(params['classId']);
+
+      }
+
+    });
+
     this.loadExams();
 
     this.loadClasses();
+
   }
 
   // =========================
@@ -113,29 +130,28 @@ implements OnInit {
   // =========================
   loadExams(): void {
 
-    this.examService
-      .getExams()
-      .subscribe({
+    const request = this.isTeacher
+      ? this.examService.getMyExams()
+      : this.examService.getAllExams();
 
-        next: (res: any) => {
+    request.subscribe({
 
-          console.log(
-            'EXAMS:',
-            res
-          );
+      next: (res: any) => {
 
-          this.exams =
-            res?.data || [];
-        },
+        this.exams = res?.data || [];
 
-        error: (err: any) => {
+        console.log('EXAMS:', this.exams);
 
-          console.error(
-            'Load exams failed',
-            err
-          );
-        }
-      });
+      },
+
+      error: (err: any) => {
+
+        console.error(err);
+
+      }
+
+    });
+
   }
 
   // =========================
@@ -143,30 +159,29 @@ implements OnInit {
   // =========================
   loadClasses(): void {
 
-    this.classService
-      .getClasses()
-      .subscribe({
+  this.classService
+    .getMyClasses()
+    .subscribe({
 
-        next: (res: any) => {
+      next: (res: any) => {
 
-          console.log(
-            'CLASSES:',
-            res
-          );
+        console.log("MY CLASSES =", res);
 
-          this.classes =
-            res?.data || [];
-        },
+        this.classes = res?.data || res || [];
 
-        error: (err: any) => {
+        console.log(this.classes);
 
-          console.error(
-            'Load classes failed',
-            err
-          );
-        }
-      });
-  }
+      },
+
+      error: err => {
+
+        console.error(err);
+
+      }
+
+    });
+
+}
 
   // =========================
   // EXAM CHANGE

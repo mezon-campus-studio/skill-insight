@@ -400,116 +400,123 @@ export const getQuestionDetail =
 // UPDATE QUESTION
 // ======================================================
 
-export const updateQuestion =
-  async (
+export const updateQuestion = async (
     req: Request,
     res: Response
   ) => {
     try {
-      const id = Number(
-        req.params.id
-      );
 
-      const role =
-        (req as any).user?.role ||
-        "teacher";
-
-      const isAdmin =
-        role === "admin";
+      const id = Number(req.params.id);
 
       const {
         content,
-        level,
         explanation,
+        level,
         question_type,
         visibility,
         is_active,
+        answers
       } = req.body;
 
-      let content_hash:
-        | string
-        | undefined =
-        undefined;
+      const oldQuestion = await prisma.question.findUnique({
 
-      if (content) {
-        content_hash =
-          generateHash(content);
-      }
+        where: {
+          question_id: id
+        }
 
-      const existingQuestion =
-        await prisma.question.findUnique({
-          where: {
-            question_id: id,
-          },
-        });
+      });
 
-      if (!existingQuestion) {
+      if (!oldQuestion) {
+
         return res.status(404).json({
+
           success: false,
-          message:
-            "Question not found",
+          message: "Question not found"
+
         });
+
       }
 
-      // ======================================================
-      // CHECK OWNER
-      // ======================================================
+      const question = await prisma.question.update({
 
-      if (
-        !isAdmin &&
-        existingQuestion.created_by !==
-          Number(
-            (req as any).user
-              ?.userId
-          )
-      ) {
-        return res.status(403).json({
-          success: false,
+        where: {
+          question_id: id
+        },
 
-          message:
-            "Bạn không có quyền sửa câu hỏi này",
-        });
-      }
+        data: {
 
-      const question =
-        await prisma.question.update({
-          where: {
-            question_id: id,
-          },
+          content,
 
-          data: {
-            content,
+          content_hash: generateHash(content),
 
-            content_hash,
+          explanation,
 
-            level: level
-              ? level.toUpperCase()
-              : undefined,
+          level,
 
-            explanation,
+          question_type,
 
-            question_type,
+          visibility,
 
-            visibility,
+          is_active,
 
-            is_active,
-          },
-        });
+          answers: {
 
-      return res.status(200).json({
+            deleteMany: {},
+
+            create: (answers || []).map((a: any) => ({
+
+              answer_text: a.answer_text,
+
+              answer_hash: generateHash(a.answer_text),
+
+              answer_order: a.answer_order,
+
+              is_correct: a.is_correct
+
+            }))
+
+          }
+
+        },
+
+        include: {
+
+          answers: true,
+
+          subject: true,
+
+          topic: true,
+
+          creator: true
+
+        }
+
+      });
+
+      return res.json({
+
         success: true,
 
-        message:
-          "Question updated successfully",
+        data: question
 
-        data: question,
       });
-    } catch (error: any) {
-      return res.status(500).json({
-        success: false,
-        message: error.message,
-      });
+
     }
+
+    catch (err: any) {
+
+      console.error(err);
+
+      return res.status(500).json({
+
+        success: false,
+
+        message: err.message
+
+      });
+
+    }
+
   };
 
 // ======================================================

@@ -240,7 +240,7 @@ implements OnInit {
     this.loading = true;
 
     this.batchService
-      .getQuestionBatches()
+      .getAllBatches()
       .subscribe({
 
         next: (res: any) => {

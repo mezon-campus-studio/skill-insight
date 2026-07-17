@@ -64,23 +64,20 @@
             </label>
 
             <select
-              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              [(ngModel)]="assignmentData.exam_id"
+              (change)="onExamChange()"
+              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3"
             >
 
               <option value="">
                 -- Chọn đề thi --
               </option>
 
-              <option>
-                Đề thi Java Core
-              </option>
-
-              <option>
-                Đề thi Angular
-              </option>
-
-              <option>
-                Đề thi MySQL
+              <option
+                *ngFor="let exam of exams"
+                [value]="exam.exam_id"
+              >
+                {{ exam.title }}
               </option>
 
             </select>
@@ -97,19 +94,20 @@
             </label>
 
             <select
-              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              [(ngModel)]="assignmentData.class_id"
+              name="class_id"
+              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3"
             >
 
               <option value="">
                 -- Chọn lớp --
               </option>
 
-              <option>
-                CNTT K17A
-              </option>
-
-              <option>
-                Lập trình Web 01
+              <option
+                *ngFor="let c of classes"
+                [value]="c.class_id"
+              >
+                {{ c.class_name }}
               </option>
 
             </select>
@@ -127,9 +125,10 @@
 
             <input
               type="number"
-              value="1"
               min="1"
-              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              [(ngModel)]="assignmentData.max_attempts"
+              name="max_attempts"
+              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3"
             />
 
           </div>
@@ -145,7 +144,9 @@
 
             <input
               type="datetime-local"
-              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              [(ngModel)]="assignmentData.start_time"
+              name="start_time"
+              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3"
             />
 
           </div>
@@ -161,7 +162,9 @@
 
             <input
               type="datetime-local"
-              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              [(ngModel)]="assignmentData.end_time"
+              name="end_time"
+              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3"
             />
 
           </div>
@@ -177,8 +180,10 @@
 
             <input
               type="number"
+              [(ngModel)]="assignmentData.duration_override"
+              name="duration_override"
               placeholder="Để trống = dùng thời gian đề thi"
-              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3"
             />
 
           </div>
@@ -194,8 +199,10 @@
 
             <input
               type="text"
+              [(ngModel)]="assignmentData.password"
+              name="password"
               placeholder="Không bắt buộc"
-              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3"
             />
 
           </div>
@@ -230,8 +237,8 @@
 
             <input
               type="checkbox"
-              checked
-              class="mt-1 h-5 w-5 rounded border-gray-300"
+              [(ngModel)]="assignmentData.require_fullscreen"
+              name="require_fullscreen"
             />
 
             <div>
@@ -255,8 +262,8 @@
 
             <input
               type="checkbox"
-              checked
-              class="mt-1 h-5 w-5 rounded border-gray-300"
+              [(ngModel)]="assignmentData.detect_tab_switch"
+              name="detect_tab_switch"
             />
 
             <div>
@@ -280,8 +287,8 @@
 
             <input
               type="checkbox"
-              checked
-              class="mt-1 h-5 w-5 rounded border-gray-300"
+              [(ngModel)]="assignmentData.block_copy"
+              name="block_copy"
             />
 
             <div>
@@ -326,9 +333,7 @@
               Đề thi
             </span>
 
-            <span class="font-semibold text-gray-800">
-              Angular Final Test
-            </span>
+            {{ selectedExam?.title || '-- Chưa chọn --' }}
 
           </div>
 
@@ -340,9 +345,7 @@
               Số câu
             </span>
 
-            <span class="font-semibold text-gray-800">
-              40 câu
-            </span>
+           {{ selectedExam?._count?.exam_questions || 0 }} câu
 
           </div>
 
@@ -370,9 +373,7 @@
               Thời gian thi
             </span>
 
-            <span class="font-semibold text-gray-800">
-              60 phút
-            </span>
+            {{ selectedExam?.duration || 0 }} phút
 
           </div>
 
@@ -380,9 +381,11 @@
 
         <!-- BUTTON -->
         <button
-          class="mt-6 w-full rounded-xl bg-blue-600 px-5 py-4 text-sm font-semibold text-white shadow hover:bg-blue-700 transition"
+          (click)="createAssignment()"
+          [disabled]="loading"
+          class="mt-6 w-full rounded-xl bg-blue-600 px-5 py-4 text-sm font-semibold text-white"
         >
-          Giao đề thi
+          {{ loading ? 'Đang giao...' : 'Giao đề thi' }}
         </button>
 
       </div>

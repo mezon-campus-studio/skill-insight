@@ -99,8 +99,14 @@ async validateUserSession(userId: number) {
   async updateUserPassword(userId: number, pass: string) {
     const hashedPassword = await bcrypt.hash(pass, 10);
     return await userRepository.update(userId, {
-      password: hashedPassword
+      password: hashedPassword,
+      skip_set_password: true
     });
+  },
+
+   async skipSetPassword(userId: number) {
+    return await userRepository.skipSetPassword(userId);
   }
+
 };
 

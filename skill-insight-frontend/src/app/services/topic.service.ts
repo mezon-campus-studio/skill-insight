@@ -13,6 +13,8 @@ import {
   Observable
 } from 'rxjs';
 
+import { environment } from '../../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -30,8 +32,7 @@ export class TopicService {
   // API
   // =====================================
 
-  private apiUrl =
-    'http://localhost:3000/api/topics';
+  private apiUrl = environment.api.topics;
 
   // =====================================
   // GET TOPICS

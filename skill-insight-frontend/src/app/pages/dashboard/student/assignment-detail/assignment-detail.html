@@ -1,0 +1,696 @@
+<!-- ========================================== -->
+<!-- BACK -->
+<!-- ========================================== -->
+
+<div class="mb-6">
+
+    <button
+
+        (click)="goBack()"
+
+        class="rounded-xl border border-gray-300 px-5 py-2 hover:bg-gray-100">
+
+        ← Quay lại
+
+    </button>
+
+</div>
+
+<!-- ========================================== -->
+<!-- LOADING -->
+<!-- ========================================== -->
+
+<div
+    *ngIf="loading"
+    class="py-20 text-center">
+
+    Đang tải...
+
+</div>
+
+<!-- ========================================== -->
+<!-- CONTENT -->
+<!-- ========================================== -->
+
+<div
+    *ngIf="!loading && assignment"
+    class="grid gap-8 lg:grid-cols-12">
+
+    <!-- ====================================== -->
+    <!-- LEFT -->
+    <!-- ====================================== -->
+
+    <div
+        class="space-y-8 lg:col-span-8">
+
+        <!-- HEADER -->
+
+        <div
+            class="rounded-2xl border border-gray-200 bg-white p-8 shadow">
+
+            <div
+                class="flex items-start gap-5">
+
+                <!-- ICON -->
+
+                <div
+                    class="flex h-16 w-16 items-center justify-center rounded-full bg-orange-100">
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-9 w-9 text-orange-700"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor">
+
+                        <path
+
+                            stroke-linecap="round"
+
+                            stroke-linejoin="round"
+
+                            stroke-width="2"
+
+                            d="M9 3h6a2 2 0 012 2v1h1a2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h1V5a2 2 0 012-2zm0 3h6V5H9v1zm0 5h6m-6 4h6m-6-8h6"/>
+
+                    </svg>
+
+                </div>
+
+                <!-- TITLE -->
+
+                <div class="flex-1">
+
+                    <h1
+                        class="text-3xl font-bold">
+
+                        {{ assignment.title }}
+
+                    </h1>
+
+                    <div
+                        class="mt-3 text-gray-500">
+
+                        {{ assignment.teacher?.full_name }}
+
+                        •
+
+                        {{ assignment.created_at | date:'dd/MM/yyyy HH:mm' }}
+
+                    </div>
+
+                    <div
+                        class="mt-4 flex flex-wrap gap-4 text-sm">
+
+                        <span>
+
+                            {{ assignment.total_points }}
+
+                            điểm
+
+                        </span>
+
+                        <span>
+
+                            |
+
+                        </span>
+
+                        <span>
+
+                            Đến hạn
+
+                            {{ assignment.end_at | date:'dd/MM/yyyy HH:mm' }}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- DESCRIPTION -->
+
+        <div
+            class="rounded-2xl border border-gray-200 bg-white p-8 shadow">
+
+            <h2
+                class="mb-4 text-xl font-bold">
+
+                Mô tả
+
+            </h2>
+
+            <div
+                class="leading-8 text-gray-700">
+
+                {{ assignment.description }}
+
+            </div>
+
+        </div>
+
+        <!-- FILE GIÁO VIÊN -->
+
+        <div
+            *ngIf="!isExam"
+            class="rounded-2xl border border-gray-200 bg-white p-8 shadow">
+
+            <h2
+                class="mb-5 text-xl font-bold">
+
+                Tài liệu giáo viên
+
+            </h2>
+
+            <div
+                class="flex items-center gap-5 rounded-xl border p-5">
+
+                <div class="text-4xl">
+
+                    📄
+
+                </div>
+
+                <div>
+
+                    <div
+                        class="font-semibold">
+
+                        {{ assignment.attachment.file_name }}
+
+                    </div>
+
+                    <div
+                        class="text-sm text-gray-500">
+
+                        {{ assignment.attachment.type }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+                <!-- ===================================== -->
+        <!-- BÀI TẬP -->
+        <!-- ===================================== -->
+
+        <div
+            *ngIf="!isExam"
+            class="rounded-2xl border border-gray-200 bg-white p-8 shadow">
+
+            <h2
+                class="mb-6 text-xl font-bold">
+
+                Bài nộp của bạn
+
+            </h2>
+
+            <!-- Chưa chọn file -->
+
+            <div
+                *ngIf="!selectedFile && !submitted"
+                class="rounded-xl border-2 border-dashed border-gray-300 p-10 text-center">
+
+                <div class="text-5xl">
+
+                    📤
+
+                </div>
+
+                <p
+                    class="mt-4 text-gray-500">
+
+                    Chọn tệp để nộp bài.
+
+                </p>
+
+                <input
+
+                    type="file"
+
+                    (change)="chooseFile($event)"
+
+                    class="mt-6 block w-full">
+
+            </div>
+
+            <!-- Đã chọn file -->
+
+            <div
+                *ngIf="selectedFile && !submitted"
+                class="rounded-xl border p-5">
+
+                <div
+                    class="flex items-center justify-between">
+
+                    <div
+                        class="flex items-center gap-4">
+
+                        <div class="text-4xl">
+
+                            📄
+
+                        </div>
+
+                        <div>
+
+                            <div
+                                class="font-semibold">
+
+                                {{ selectedFile.name }}
+
+                            </div>
+
+                            <div
+                                class="text-sm text-gray-500">
+
+                                Chưa nộp
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <button
+
+                        (click)="selectedFile=null"
+
+                        class="rounded-lg bg-red-100 px-4 py-2 text-red-600 hover:bg-red-200">
+
+                        Xóa
+
+                    </button>
+
+                </div>
+
+                <button
+
+                    (click)="submitAssignment()"
+
+                    class="mt-6 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700">
+
+                    Nộp bài
+
+                </button>
+
+            </div>
+
+            <!-- Đã nộp -->
+
+            <div
+                *ngIf="submitted"
+                class="rounded-xl border border-green-200 bg-green-50 p-5">
+
+                <div
+                    class="flex items-center justify-between">
+
+                    <div
+                        class="flex items-center gap-4">
+
+                        <div class="text-4xl">
+
+                            ✅
+
+                        </div>
+
+                        <div>
+
+                            <div
+                                class="font-semibold">
+
+                                {{ selectedFile?.name }}
+
+                            </div>
+
+                            <div
+                                class="text-sm text-green-700">
+
+                                Đã nộp
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <button
+
+                        (click)="removeSubmission()"
+
+                        class="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600">
+
+                        Hủy nộp bài
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ===================================== -->
+        <!-- ĐỀ KIỂM TRA -->
+        <!-- ===================================== -->
+
+        <div
+            *ngIf="isExam"
+            class="rounded-2xl border border-gray-200 bg-white p-8 shadow">
+
+            <h2
+                class="mb-6 text-xl font-bold">
+
+                Thông tin đề kiểm tra
+
+            </h2>
+
+            <div
+                class="grid gap-6 md:grid-cols-2">
+
+                <div>
+
+                    <div
+                        class="text-sm text-gray-500">
+
+                        Thời lượng
+
+                    </div>
+
+                    <div
+                        class="mt-2 text-lg font-semibold">
+
+                        {{ assignment.duration }} phút
+
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <div
+                        class="text-sm text-gray-500">
+
+                        Trạng thái
+
+                    </div>
+
+                    <span
+
+                        class="mt-2 inline-block rounded-full px-3 py-1 text-sm font-semibold"
+
+                        [ngClass]="statusClass">
+
+                        {{ status }}
+
+                    </span>
+
+                </div>
+
+                <div>
+
+                    <div
+                        class="text-sm text-gray-500">
+
+                        Mở đề
+
+                    </div>
+
+                    <div
+                        class="mt-2 font-semibold">
+
+                        {{ assignment.start_at | date:'dd/MM/yyyy HH:mm' }}
+
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <div
+                        class="text-sm text-gray-500">
+
+                        Đóng đề
+
+                    </div>
+
+                    <div
+                        class="mt-2 font-semibold">
+
+                        {{ assignment.end_at | date:'dd/MM/yyyy HH:mm' }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <button
+
+                (click)="startExam()"
+
+                [disabled]="status!=='Đang diễn ra'"
+
+                class="mt-8 rounded-xl bg-blue-600 px-8 py-3 font-semibold text-white hover:bg-blue-700 disabled:bg-gray-300">
+
+                Làm bài
+
+            </button>
+
+        </div>
+                <!-- ===================================== -->
+        <!-- NHẬN XÉT LỚP HỌC -->
+        <!-- ===================================== -->
+
+        <div
+            class="rounded-2xl border border-gray-200 bg-white p-8 shadow">
+
+            <h2
+                class="mb-5 text-xl font-bold">
+
+                Nhận xét lớp học
+
+            </h2>
+
+            <textarea
+
+                [(ngModel)]="comment"
+
+                rows="4"
+
+                placeholder="Thêm nhận xét..."
+
+                class="w-full rounded-xl border border-gray-300 p-4 focus:border-blue-500 focus:outline-none">
+
+            </textarea>
+
+            <button
+
+                (click)="addComment()"
+
+                class="mt-4 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700">
+
+                Thêm nhận xét
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- ====================================== -->
+    <!-- RIGHT -->
+    <!-- ====================================== -->
+
+    <div
+        class="space-y-6 lg:col-span-4">
+
+        <!-- =============================== -->
+        <!-- BÀI TẬP CỦA BẠN -->
+        <!-- =============================== -->
+
+        <div
+            class="rounded-2xl border border-gray-200 bg-gray-50 p-6 shadow">
+
+            <div
+                class="flex items-center justify-between">
+
+                <h2
+                    class="text-2xl font-bold">
+
+                    {{ isExam ? 'Đề kiểm tra' : 'Bài tập của bạn' }}
+
+                </h2>
+
+                <span
+
+                    class="font-semibold"
+
+                    [class.text-green-700]="submitted"
+
+                    [class.text-orange-600]="!submitted">
+
+                    {{ submitted ? 'Đã nộp' : 'Chưa nộp' }}
+
+                </span>
+
+            </div>
+
+            <!-- FILE -->
+
+            <div
+                *ngIf="selectedFile"
+                class="mt-6 rounded-xl border bg-white p-4">
+
+                <div
+                    class="flex items-center gap-3">
+
+                    <div class="text-3xl">
+
+                        📄
+
+                    </div>
+
+                    <div>
+
+                        <div
+                            class="font-semibold break-all">
+
+                            {{ selectedFile.name }}
+
+                        </div>
+
+                        <div
+                            class="text-sm text-gray-500">
+
+                            File đã chọn
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- CHƯA CÓ FILE -->
+
+            <div
+                *ngIf="!selectedFile && !isExam"
+                class="mt-6 rounded-xl border border-dashed p-6 text-center text-gray-400">
+
+                Chưa có bài nộp
+
+            </div>
+
+            <!-- ĐỀ KIỂM TRA -->
+
+            <div
+                *ngIf="isExam"
+                class="mt-6">
+
+                <div
+                    class="rounded-xl border bg-white p-5">
+
+                    <div
+                        class="mb-2 text-sm text-gray-500">
+
+                        Trạng thái
+
+                    </div>
+
+                    <span
+
+                        class="rounded-full px-3 py-1 text-sm font-semibold"
+
+                        [ngClass]="statusClass">
+
+                        {{ status }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <!-- BUTTON -->
+
+            <button
+
+                *ngIf="!isExam && submitted"
+
+                (click)="removeSubmission()"
+
+                class="mt-6 w-full rounded-xl border border-red-200 bg-white py-3 font-semibold text-red-600 hover:bg-red-50">
+
+                Hủy nộp bài
+
+            </button>
+
+            <button
+
+                *ngIf="isExam"
+
+                (click)="startExam()"
+
+                [disabled]="status !== 'Đang diễn ra'"
+
+                class="mt-6 w-full rounded-xl bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700 disabled:bg-gray-300">
+
+                Làm bài
+
+            </button>
+
+            <div
+                *ngIf="!isExam"
+                class="mt-4 text-center text-sm text-gray-500">
+
+                Không thể nộp bài sau ngày đến hạn.
+
+            </div>
+
+        </div>
+
+        <!-- =============================== -->
+        <!-- NHẬN XÉT RIÊNG -->
+        <!-- =============================== -->
+
+        <div
+            class="rounded-2xl border border-gray-200 bg-gray-50 p-6 shadow">
+
+            <h2
+                class="text-xl font-bold">
+
+                Nhận xét riêng
+
+            </h2>
+
+            <textarea
+
+                rows="4"
+
+                placeholder="Viết nhận xét riêng cho giáo viên..."
+
+                class="mt-5 w-full rounded-xl border border-gray-300 p-4 focus:border-blue-500 focus:outline-none">
+
+            </textarea>
+
+            <button
+
+                class="mt-4 w-full rounded-xl bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700">
+
+                Gửi nhận xét
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>

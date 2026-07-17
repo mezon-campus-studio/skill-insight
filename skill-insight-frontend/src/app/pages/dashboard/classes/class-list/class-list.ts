@@ -98,30 +98,18 @@ export class ClassList implements OnInit {
 
         next: (res: any) => {
 
-          this.loading = false;
+  this.loading = false;
 
-          console.log(
-            'CLASSES:',
-            res
-          );
+  console.log('CLASSES:', res);
 
-          const allClasses =
-            res?.data || [];
+  const allClasses = Array.isArray(res)
+    ? res
+    : res?.data ?? [];
 
-          // =================================
-          // CHỈ HIỆN LỚP CỦA GIÁO VIÊN
-          // =================================
-          this.classes =
-            allClasses.filter(
-              (c: any) =>
-                Number(
-                  c.teacher_id
-                ) ===
-                this.currentTeacherId
-            );
+  this.classes = allClasses;
 
-          this.applyFilter();
-        },
+  this.applyFilter();
+},
 
         error: (err: any) => {
 

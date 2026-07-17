@@ -9,8 +9,8 @@ import { environment } from '@env/environment';
 })
 export class UserService {
 
-  private readonly API = `${environment.apiUrl}/auth/users`;
-
+  private readonly API = environment.api.users;
+  
   constructor(private http: HttpClient) {}
 
   // 1. Lấy danh sách + Lọc + Thống kê
@@ -140,4 +140,5 @@ export class UserService {
       }
     );
   }
+
 }

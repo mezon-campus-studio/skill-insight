@@ -1,42 +1,93 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit
+} from '@angular/core';
 
-import { CommonModule } from '@angular/common';
+import {
+  CommonModule
+} from '@angular/common';
 
-import { FormsModule } from '@angular/forms';
+import {
+  FormsModule
+} from '@angular/forms';
 
-import { RouterModule } from '@angular/router';
+import {
+  Router,
+  RouterModule
+} from '@angular/router';
 
-import { ExamService } from '../../../../services/exam.service';
+import {
+  ExamService
+} from '../../../../services/exam.service';
+
+import {
+  Exam
+} from '../../../../models/exam.model';
 
 @Component({
+
   selector: 'app-exam-list',
 
   standalone: true,
 
   imports: [
+
     CommonModule,
+
     FormsModule,
+
     RouterModule
+
   ],
 
   templateUrl: './exam-list.html',
 
-  styleUrl: './exam-list.css',
+  styleUrl: './exam-list.css'
+
 })
+
 export class ExamList implements OnInit {
 
-  // =========================
+  // ======================================================
+  // USER
+  // ======================================================
+
+  role = '';
+
+  isTeacher = false;
+
+  isAdmin = false;
+
+  // ======================================================
   // DATA
-  // =========================
-  exams: any[] = [];
+  // ======================================================
 
-  filteredExams: any[] = [];
+  exams: Exam[] = [];
 
-  paginatedExams: any[] = [];
+  filteredExams: Exam[] = [];
 
-  // =========================
+  paginatedExams: Exam[] = [];
+
+  loading = false;
+  showRejectModal = false;
+
+  rejectReason = '';
+
+  // ======================================================
+  // TAB
+  // ======================================================
+
+  activeTab:
+    | 'MY'
+    | 'SYSTEM'
+    | 'ALL'
+    | 'TEACHER'
+    = 'MY';
+
+  // ======================================================
   // FILTER
-  // =========================
+  // ======================================================
+
   searchText = '';
 
   selectedSubject = '';
@@ -45,118 +96,216 @@ export class ExamList implements OnInit {
 
   sortBy = 'newest';
 
-  // =========================
-  // SUBJECT / TOPIC
-  // =========================
   subjects: any[] = [];
 
   topics: any[] = [];
 
-  // =========================
+  // ======================================================
   // CHECKBOX
-  // =========================
-  selectedExamIds: Set<number> =
-    new Set();
+  // ======================================================
+
+  selectedExamIds =
+    new Set<number>();
 
   selectAll = false;
 
-  // =========================
+  // ======================================================
   // PAGINATION
-  // =========================
+  // ======================================================
+
   currentPage = 1;
 
-  itemsPerPage = 5;
+  itemsPerPage = 10;
 
   totalPages = 1;
 
-  // =========================
-  // UI
-  // =========================
-  loading = false;
+  pages: number[] = [];
 
-  // =========================
-  // CONSTRUCTOR
-  // =========================
   constructor(
-    private examService: ExamService
+
+    private examService: ExamService,
+
+    private router: Router
+
   ) {}
 
-  // =========================
+  // ======================================================
   // INIT
-  // =========================
+  // ======================================================
+
   ngOnInit(): void {
+
+    const user = JSON.parse(
+
+      localStorage.getItem('user') || '{}'
+
+    );
+
+    this.role = user.role;
+
+    this.isTeacher =
+      this.role === 'teacher';
+
+    this.isAdmin =
+      this.role === 'admin';
+
+    if (this.isTeacher) {
+
+      this.activeTab = 'MY';
+
+    }
+
+    if (this.isAdmin) {
+
+      this.activeTab = 'ALL';
+
+    }
 
     this.loadSubjects();
 
     this.loadExams();
+
   }
 
-  // =========================
+  // ======================================================
   // LOAD EXAMS
-  // =========================
+  // ======================================================
+
   loadExams(): void {
 
     this.loading = true;
 
-    this.examService
-      .getExams()
-      .subscribe({
+    let request;
 
-        next: (res: any) => {
+    switch (this.activeTab) {
 
-          console.log(
-            'EXAMS:',
-            res
-          );
+      case 'MY':
 
-          this.exams =
-            res?.data || [];
+        request =
+          this.examService
+            .getMyExams();
 
-          this.loading = false;
+        break;
 
-          this.applyFilter();
-        },
+      case 'SYSTEM':
 
-        error: (err) => {
+        request =
+          this.examService
+            .getSystemExams();
 
-          this.loading = false;
+        break;
 
-          console.error(
-            'Load exams failed',
-            err
-          );
-        }
-      });
+      case 'TEACHER':
+
+        request =
+          this.examService
+            .getTeacherExams();
+
+        break;
+
+      case 'ALL':
+
+      default:
+
+        request =
+          this.examService
+            .getAllExams();
+
+        break;
+
+    }
+
+    request.subscribe({
+
+      next: (res: any) => {
+
+        this.exams =
+          res?.data || [];
+
+          console.log(this.exams);
+          
+        this.filteredExams =
+          [...this.exams];
+
+        this.currentPage = 1;
+
+        this.updatePagination();
+
+        this.loading = false;
+
+      },
+
+      error: err => {
+
+        console.error(err);
+
+        this.loading = false;
+
+      }
+
+    });
+
   }
 
-  // =========================
-  // LOAD SUBJECTS
-  // =========================
+  // ======================================================
+  // CHANGE TAB
+  // ======================================================
+
+  changeTab(
+
+    tab:
+      | 'MY'
+      | 'SYSTEM'
+      | 'ALL'
+      | 'TEACHER'
+
+  ): void {
+
+    if (this.activeTab === tab) {
+
+      return;
+
+    }
+
+    this.activeTab = tab;
+
+    this.searchText = '';
+
+    this.selectedSubject = '';
+
+    this.selectedTopic = '';
+
+    this.loadExams();
+
+  }
+
+  // ======================================================
+  // SUBJECT
+  // ======================================================
+
   loadSubjects(): void {
 
     this.examService
+
       .getSubjects()
+
       .subscribe({
 
         next: (res: any) => {
 
           this.subjects =
             res?.data || [];
-        },
 
-        error: (err) => {
-
-          console.error(
-            'Load subjects failed',
-            err
-          );
         }
+
       });
+
   }
 
-  // =========================
-  // LOAD TOPICS
-  // =========================
+  // ======================================================
+  // TOPIC
+  // ======================================================
+
   onSubjectChange(): void {
 
     this.selectedTopic = '';
@@ -168,12 +317,17 @@ export class ExamList implements OnInit {
       this.applyFilter();
 
       return;
+
     }
 
     this.examService
+
       .getTopics(
+
         Number(this.selectedSubject)
+
       )
+
       .subscribe({
 
         next: (res: any) => {
@@ -182,80 +336,100 @@ export class ExamList implements OnInit {
             res?.data || [];
 
           this.applyFilter();
-        },
 
-        error: (err) => {
-
-          console.error(
-            'Load topics failed',
-            err
-          );
         }
+
       });
+
   }
 
-  // =========================
+  
+  // ======================================================
   // FILTER
-  // =========================
+  // ======================================================
+
   applyFilter(): void {
 
     let data = [...this.exams];
 
-    // =========================
     // SEARCH
-    // =========================
+
     if (this.searchText.trim()) {
 
       const keyword =
+
         this.searchText
-          .toLowerCase();
+
+          .toLowerCase()
+
+          .trim();
 
       data = data.filter(
+
         exam =>
+
           (exam.title || '')
+
             .toLowerCase()
+
             .includes(keyword)
+
       );
+
     }
 
-    // =========================
     // SUBJECT
-    // =========================
+
     if (this.selectedSubject) {
 
       data = data.filter(
+
         exam =>
+
           String(exam.subject_id)
-          === this.selectedSubject
+
+          ===
+
+          this.selectedSubject
+
       );
+
     }
 
-    // =========================
     // TOPIC
-    // =========================
+
     if (this.selectedTopic) {
 
       data = data.filter(
+
         exam =>
+
           String(exam.topic_id)
-          === this.selectedTopic
+
+          ===
+
+          this.selectedTopic
+
       );
+
     }
 
-    // =========================
     // SORT
-    // =========================
+
     switch (this.sortBy) {
 
       case 'oldest':
 
         data.sort(
+
           (a, b) =>
-            new Date(a.created_at)
-              .getTime()
+
+            new Date(a.created_at).getTime()
+
             -
-            new Date(b.created_at)
-              .getTime()
+
+            new Date(b.created_at).getTime()
+
         );
 
         break;
@@ -263,10 +437,15 @@ export class ExamList implements OnInit {
       case 'question_desc':
 
         data.sort(
+
           (a, b) =>
+
             this.getQuestionCount(b)
+
             -
+
             this.getQuestionCount(a)
+
         );
 
         break;
@@ -274,7 +453,9 @@ export class ExamList implements OnInit {
       case 'random':
 
         data = data.filter(
+
           exam => exam.is_random
+
         );
 
         break;
@@ -282,123 +463,206 @@ export class ExamList implements OnInit {
       default:
 
         data.sort(
+
           (a, b) =>
-            new Date(b.created_at)
-              .getTime()
+
+            new Date(b.created_at).getTime()
+
             -
-            new Date(a.created_at)
-              .getTime()
+
+            new Date(a.created_at).getTime()
+
         );
 
-        break;
     }
 
     this.filteredExams = data;
 
-    // RESET CHECKBOX
     this.selectedExamIds.clear();
 
     this.selectAll = false;
 
-    this.resetPagination();
-  }
-
-  // =========================
-  // PAGINATION
-  // =========================
-  resetPagination(): void {
-
-    this.totalPages = Math.max(
-      1,
-      Math.ceil(
-        this.filteredExams.length
-        / this.itemsPerPage
-      )
-    );
-
     this.currentPage = 1;
 
     this.updatePagination();
+
   }
+
+  // ======================================================
+  // PAGINATION
+  // ======================================================
 
   updatePagination(): void {
 
+    this.totalPages =
+
+      Math.ceil(
+
+        this.filteredExams.length
+
+        /
+
+        this.itemsPerPage
+
+      ) || 1;
+
+    this.pages = Array.from(
+
+      {
+
+        length: this.totalPages
+
+      },
+
+      (_, i) => i + 1
+
+    );
+
     const start =
+
       (this.currentPage - 1)
+
       * this.itemsPerPage;
 
-    const end =
-      start + this.itemsPerPage;
-
     this.paginatedExams =
+
       this.filteredExams.slice(
+
         start,
-        end
+
+        start + this.itemsPerPage
+
       );
+
+  }
+
+  previousPage(): void {
+
+    if (this.currentPage > 1) {
+
+      this.currentPage--;
+
+      this.updatePagination();
+
+    }
+
+  }
+
+  nextPage(): void {
+
+    if (this.currentPage < this.totalPages) {
+
+      this.currentPage++;
+
+      this.updatePagination();
+
+    }
+
   }
 
   goToPage(page: number): void {
 
-    if (
-      page < 1
-      ||
-      page > this.totalPages
-    ) {
-      return;
-    }
-
     this.currentPage = page;
 
     this.updatePagination();
+
   }
 
-  // =========================
+    // ======================================================
   // CHECKBOX
-  // =========================
+  // ======================================================
+
   toggleSelectAll(): void {
 
     if (this.selectAll) {
 
-      this.paginatedExams.forEach(
-        exam => {
+      this.paginatedExams.forEach(exam => {
 
-          this.selectedExamIds.add(
-            exam.exam_id
-          );
-        }
-      );
+        this.selectedExamIds.add(
+          exam.exam_id
+        );
 
-    } else {
+      });
+
+    }
+
+    else {
 
       this.selectedExamIds.clear();
+
     }
+
   }
 
   toggleExam(id: number): void {
 
-    if (
-      this.selectedExamIds.has(id)
-    ) {
+    if (this.selectedExamIds.has(id)) {
 
       this.selectedExamIds.delete(id);
 
-    } else {
+    }
+
+    else {
 
       this.selectedExamIds.add(id);
+
     }
+
   }
 
-  // =========================
-  // DELETE ONE
-  // =========================
+  // ======================================================
+  // ACTION
+  // ======================================================
+
+  createExam(): void {
+
+    this.router.navigate([
+      '/dashboard/exams/create'
+    ]);
+
+  }
+
+  viewExam(id: number): void {
+
+    this.router.navigate([
+      '/dashboard/exams',
+      id,
+      'view'
+    ]);
+
+  }
+
+  detailExam(id: number): void {
+
+    this.router.navigate([
+      '/dashboard/exams',
+      id,
+      'detail'
+    ]);
+
+  }
+
+
+  editExam(id: number): void {
+
+    this.router.navigate([
+      '/dashboard/exams',
+      id,
+      'edit'
+    ]);
+
+  }
+
   deleteExam(id: number): void {
 
     if (
       !confirm(
-        'Xoá đề thi này?'
+        'Bạn có chắc muốn xóa đề thi này?'
       )
     ) {
+
       return;
+
     }
 
     this.examService
@@ -409,103 +673,95 @@ export class ExamList implements OnInit {
 
           this.exams =
             this.exams.filter(
+
               exam =>
+
                 exam.exam_id !== id
+
             );
 
           this.applyFilter();
+
         },
 
-        error: (err) => {
-
-          console.error(
-            'Delete exam failed',
-            err
-          );
+        error: err => {
 
           alert(
-            'Xóa đề thất bại'
+
+            err.error?.message ||
+
+            'Không thể xóa đề thi.'
+
           );
+
         }
+
       });
+
   }
 
-  // =========================
-  // DELETE SELECTED
-  // =========================
   deleteSelected(): void {
 
     if (
-      this.selectedExamIds.size
-      === 0
+
+      this.selectedExamIds.size === 0
+
     ) {
 
       alert(
-        'Vui lòng chọn đề thi'
+
+        'Vui lòng chọn đề.'
+
       );
 
       return;
+
     }
 
     if (
+
       !confirm(
-        'Xoá các đề đã chọn?'
+
+        'Bạn có chắc muốn xóa?'
+
       )
+
     ) {
+
       return;
+
     }
 
-    const ids =
-      Array.from(
-        this.selectedExamIds
-      );
-
     this.examService
-      .deleteManyExams(ids)
+
+      .deleteManyExams(
+
+        Array.from(
+
+          this.selectedExamIds
+
+        )
+
+      )
+
       .subscribe({
 
         next: () => {
 
-          this.exams =
-            this.exams.filter(
-              exam =>
-                !this.selectedExamIds.has(
-                  exam.exam_id
-                )
-            );
+          this.loadExams();
 
-          this.selectedExamIds.clear();
-
-          this.selectAll = false;
-
-          this.applyFilter();
-        },
-
-        error: (err) => {
-
-          console.error(
-            'Delete selected failed',
-            err
-          );
-
-          alert(
-            'Xóa danh sách thất bại'
-          );
         }
+
       });
+
   }
 
-  // =========================
-  // DELETE ALL
-  // =========================
   deleteAll(): void {
 
-    if (
-      !confirm(
-        'Xoá toàn bộ đề thi?'
-      )
-    ) {
+    if (!confirm('Xóa toàn bộ đề thi?')) {
+
       return;
+
     }
 
     this.examService
@@ -514,170 +770,384 @@ export class ExamList implements OnInit {
 
         next: () => {
 
-          this.exams = [];
+          this.loadExams();
 
-          this.selectedExamIds.clear();
+        }
 
-          this.selectAll = false;
+      });
 
-          this.applyFilter();
-        },
+  }
 
-        error: (err) => {
+  // ======================================================
+  // INTEGRATE
+  // ======================================================
 
-          console.error(
-            'Delete all failed',
-            err
-          );
+  requestIntegrate(exam: Exam): void {
+
+    this.examService
+
+      .integrateExam(
+
+        exam.exam_id
+
+      )
+
+      .subscribe({
+
+        next: () => {
 
           alert(
-            'Xóa toàn bộ thất bại'
+
+            'Đã gửi yêu cầu tích hợp.'
+
           );
+
+          this.loadExams();
+
+        },
+
+        error: err => {
+
+          alert(
+
+            err.error?.message ||
+
+            'Không thể gửi yêu cầu.'
+
+          );
+
         }
+
       });
+
   }
 
-  // =========================
-  // EMPTY
-  // =========================
-  get isEmpty(): boolean {
+  cancelIntegrate(exam: Exam): void {
 
-    return (
-      this.filteredExams.length
-      === 0
-    );
+    this.examService
+    .cancelIntegrateExam(
+        exam.exam_id
+    )
+
+      .subscribe({
+
+        next: () => {
+
+          alert(
+
+            'Đã hủy yêu cầu.'
+
+          );
+
+          this.loadExams();
+
+        },
+
+        error: err => {
+
+          alert(
+
+            err.error?.message ||
+
+            'Không thể hủy.'
+
+          );
+
+        }
+
+      });
+
   }
 
-  // =========================
-  // LABELS
-  // =========================
-  getSubjectLabel(
-    exam: any
-  ): string {
-
-    return (
-      exam?.subject
-        ?.subject_name
-      || 'Chưa phân loại'
-    );
-  }
-
-  getTopicLabel(
-    exam: any
-  ): string {
-
-    return (
-      exam?.topic
-        ?.topic_name
-      || 'Không có'
-    );
-  }
-
-  // =========================
-  // STATUS
-  // =========================
-  getStatusLabel(
-    status: string
-  ): string {
-
-    switch (status) {
-
-      case 'PUBLISHED':
-        return 'Đã xuất bản';
-
-      case 'ARCHIVED':
-        return 'Đã lưu trữ';
-
-      default:
-        return 'Nháp';
-    }
-  }
-
-  // =========================
-  // RANDOM LABEL
-  // =========================
-  getRandomLabel(
-    exam: any
-  ): string {
-
-    if (!exam?.is_random) {
-
-      return 'Đề cố định';
-    }
-
-    return `Random ${exam.random_question_count} câu`;
-  }
-
-  // =========================
-  // SHUFFLE LABEL
-  // =========================
-  getShuffleLabel(
-    exam: any
-  ): string {
-
-    const labels = [];
-
-    if (
-      exam?.shuffle_questions
-    ) {
-
-      labels.push(
-        'Đảo câu'
-      );
-    }
-
-    if (
-      exam?.shuffle_answers
-    ) {
-
-      labels.push(
-        'Đảo đáp án'
-      );
-    }
-
-    return labels.length
-      ? labels.join(', ')
-      : 'Không đảo';
-  }
-
-  // =========================
-  // QUESTION COUNT
-  // =========================
-  getQuestionCount(
-    exam: any
-  ): number {
-
-    return (
-      exam?._count
-        ?.exam_questions
-      ||
-      exam?.exam_questions
-        ?.length
-      ||
-      0
-    );
-  }
-
-  // =========================
-  // INTEGRATION
-  // =========================
-  getIntegrationLabel(
-    exam: any
-  ): string {
-
-    return exam
-      ?.allow_system_integration
-      ? 'Đã tích hợp'
-      : 'Chưa tích hợp';
-  }
-
-  // =========================
-  // WARNING
-  // =========================
   showIntegrationWarning(): void {
 
     alert(
-      'Khi tích hợp vào hệ thống, đề thi sẽ hiển thị cho tất cả người dùng.'
+      'Đề sẽ được gửi cho Admin xét duyệt.'
+    );
+
+  }
+
+  approveExam(id: number): void {
+
+    this.examService
+
+      .approveExam(
+
+        id,
+
+        {}
+
+      )
+
+      .subscribe({
+
+        next: () => {
+
+          alert(
+
+            'Đã duyệt.'
+
+          );
+
+          this.loadExams();
+
+        },
+
+        error: err => {
+
+          alert(
+
+            err.error?.message ||
+
+            'Không thể duyệt.'
+
+          );
+
+        }
+
+      });
+
+  }
+
+  rejectExam(id: number): void {
+
+    const reason = prompt(
+
+      'Lý do từ chối'
+
+    );
+
+    if (
+
+      reason === null
+
+    ) {
+
+      return;
+
+    }
+
+    this.examService
+
+      .rejectExam(
+
+        id,
+
+        {
+
+          reason
+
+        }
+
+      )
+
+      .subscribe({
+
+        next: () => {
+
+          alert(
+
+            'Đã từ chối.'
+
+          );
+
+          this.loadExams();
+
+        }
+
+      });
+
+  }
+
+  copyExam(id: number): void {
+
+  this.examService
+    .copyExam(id)
+    .subscribe({
+
+      next: () => {
+
+        alert('Sao chép đề thành công.');
+
+        this.loadExams();
+
+      },
+
+      error: (err: any) => {
+
+        alert(
+          err.error?.message ||
+          'Không thể sao chép đề.'
+        );
+
+      }
+
+    });
+
+}
+
+  // ======================================================
+  // HELPERS
+  // ======================================================
+
+  trackByExam(
+
+    index: number,
+
+    exam: Exam
+
+  ): number {
+
+    return exam.exam_id;
+
+  }
+
+  getQuestionCount(
+
+    exam: Exam
+
+  ): number {
+
+    return (
+
+      exam?._count?.exam_questions ||
+
+      0
+
+    );
+
+  }
+
+  getSubjectLabel(
+
+    exam: Exam
+
+  ): string {
+
+    return (
+
+      exam.subject?.subject_name ||
+
+      ''
+
+    );
+
+  }
+
+  getTopicLabel(
+
+    exam: Exam
+
+  ): string {
+
+    return (
+
+      exam.topic?.topic_name ||
+
+      ''
+
+    );
+
+  }
+
+  getSourceLabel(
+
+    source: string
+
+  ): string {
+
+    switch (source) {
+
+      case 'SYSTEM':
+
+        return 'Hệ thống';
+
+      case 'TEACHER':
+
+        return 'Giáo viên';
+
+      default:
+
+        return '';
+
+    }
+
+  }
+
+  getVisibilityLabel(
+
+    visibility: string
+
+  ): string {
+
+    switch (visibility) {
+
+      case 'PRIVATE':
+
+        return 'Riêng tư';
+
+      case 'PUBLIC':
+
+        return 'Công khai';
+
+      case 'SYSTEM_BANK':
+
+        return 'Ngân hàng hệ thống';
+
+      default:
+
+        return visibility;
+
+    }
+
+  }
+
+  getStatusLabel(status: string): string {
+
+    switch (status) {
+
+      case 'DRAFT':
+        return 'Riêng tư';
+
+      case 'PENDING':
+        return 'Chờ duyệt';
+
+      case 'APPROVED':
+        return 'Đã duyệt';
+
+      case 'REJECTED':
+        return 'Từ chối';
+
+      default:
+        return status;
+
+    }
+
+  }
+
+  get isEmpty(): boolean {
+
+    return (
+
+      this.filteredExams.length === 0
+
     );
   }
+
+  showRejectReason(reason: string): void {
+
+  this.rejectReason = reason;
+
+  this.showRejectModal = true;
+
+}
+
+closeRejectModal(): void {
+
+  this.showRejectModal = false;
+
+  this.rejectReason = '';
+
+}
+
 }

@@ -1,6 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit
+} from '@angular/core';
 
-import { CommonModule } from '@angular/common';
+import {
+  CommonModule
+} from '@angular/common';
 
 import {
   ActivatedRoute,
@@ -9,59 +14,113 @@ import {
 } from '@angular/router';
 
 import {
+  AuthService
+} from '../../../../services/auth.service';
+
+import {
   ExamService
 } from '../../../../services/exam.service';
 
+import {
+  Exam
+} from '../../../../models/exam.model';
+import { FormsModule } from '@angular/forms';
+
 @Component({
+
   selector: 'app-exam-detail',
 
   standalone: true,
 
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+    FormsModule
   ],
 
   templateUrl: './exam-detail.html',
 
-  styleUrl: './exam-detail.css',
+  styleUrl: './exam-detail.css'
+
 })
+
 export class ExamDetail implements OnInit {
 
-  // =========================
+  // ======================================================
+  // USER
+  // ======================================================
+
+  role = '';
+
+  isTeacher = false;
+
+  isAdmin = false;
+
+  canEdit = false;
+
+  // ======================================================
   // DATA
-  // =========================
-  exam: any = null;
+  // ======================================================
+
+  exam!: Exam;
 
   questions: any[] = [];
 
-  // =========================
-  // UI
-  // =========================
-  loading = true;
-
   examId = 0;
 
-  // =========================
+  // ======================================================
+  // UI
+  // ======================================================
+
+  loading = true;
+  hasChanged = false;
+
+  markChanged(): void {
+    this.hasChanged = true;
+  }
+
+  private originalExam = '';
+
+  // ======================================================
   // CONSTRUCTOR
-  // =========================
+  // ======================================================
+
   constructor(
 
     private route: ActivatedRoute,
 
     private router: Router,
 
+    private authService: AuthService,
+
     private examService: ExamService
 
   ) {}
 
-  // =========================
+  // ======================================================
   // INIT
-  // =========================
+  // ======================================================
+
   ngOnInit(): void {
 
+    const user =
+      this.authService.getCurrentUser();
+
+    this.role = user?.role || '';
+
+    this.isTeacher =
+      this.role === 'teacher';
+
+    this.isAdmin =
+      this.role === 'admin';
+
+    this.canEdit =
+      this.isTeacher || this.isAdmin;
+
     this.examId = Number(
+
       this.route.snapshot.paramMap.get('id')
+
     );
 
     if (!this.examId) {
@@ -71,125 +130,284 @@ export class ExamDetail implements OnInit {
       ]);
 
       return;
+
     }
 
-    this.loadExamDetail();
+    this.loadExam();
+
   }
 
-  // =========================
-  // LOAD DETAIL
-  // =========================
-  loadExamDetail(): void {
+  // ======================================================
+  // LOAD EXAM
+  // ======================================================
 
-    this.loading = true;
+  loadExam(): void {
 
-    this.examService
-      .getExamById(this.examId)
-      .subscribe({
-
-        next: (res: any) => {
-
-          console.log(
-            'EXAM DETAIL:',
-            res
-          );
-
-          this.exam =
-            res?.data || res;
-
-          this.questions =
-            this.exam?.exam_questions || [];
-
-          this.loading = false;
-        },
-
-        error: (err: any) => {
-
-          console.error(
-            'Load exam detail failed',
-            err
-          );
-
-          this.loading = false;
-
-          alert(
-            err?.error?.message
-            || 'Không thể tải chi tiết đề thi'
-          );
-        }
-      });
-  }
-
-  // =========================
-// DELETE QUESTION
-// =========================
-removeQuestion(
-  examQuestionId: number,
-  questionId: number
-): void {
-
-  const confirmed = confirm(
-    'Xoá câu hỏi khỏi đề thi?'
-  );
-
-  if (!confirmed) {
-    return;
-  }
+  this.loading = true;
 
   this.examService
-    .removeQuestionFromExam(
-      this.examId,
-      questionId
-    )
+    .getExamById(this.examId)
     .subscribe({
 
-      next: () => {
+      next: (res: any) => {
 
-        this.questions =
-          this.questions.filter(
-            q =>
-              q.exam_question_id
-              !== examQuestionId
-          );
+        this.exam = res.data;
 
-        alert(
-          'Đã xoá câu hỏi'
-        );
+        this.questions = (this.exam.exam_questions || []).map((eq: any) => {
+
+          const answers = eq.question?.answers || [];
+
+          return {
+
+            question_id: eq.question.question_id,
+
+            content: eq.question.content,
+
+            explanation: eq.question.explanation,
+
+            difficulty: eq.question.level,
+
+            answer_a: answers[0]?.answer_text || '',
+
+            answer_b: answers[1]?.answer_text || '',
+
+            answer_c: answers[2]?.answer_text || '',
+
+            answer_d: answers[3]?.answer_text || '',
+
+            correct_answer:
+              answers.find((a: any) => a.is_correct)?.answer_order === 1 ? 'A' :
+              answers.find((a: any) => a.is_correct)?.answer_order === 2 ? 'B' :
+              answers.find((a: any) => a.is_correct)?.answer_order === 3 ? 'C' :
+              answers.find((a: any) => a.is_correct)?.answer_order === 4 ? 'D' :
+              'A'
+
+          };
+
+        });
+
+        this.originalExam = JSON.stringify({
+
+          exam: this.exam,
+
+          questions: this.questions
+
+        });
+
+        console.log('EXAM:', this.exam);
+
+        console.log('QUESTION RAW:', this.exam.exam_questions);
+
+        console.log('QUESTION MAP:', this.questions);
+
+        this.loading = false;
+
       },
 
-      error: (err: any) => {
+      error: (err) => {
 
         console.error(err);
 
+        this.loading = false;
+
         alert(
-          err?.error?.message
-          || 'Xoá câu hỏi thất bại'
+
+          err.error?.message ||
+
+          'Không tải được đề thi.'
+
         );
+
       }
+
     });
+
 }
 
-  // =========================
-  // DELETE EXAM
-  // =========================
-  deleteExam(): void {
+  // ======================================================
+  // NAVIGATION
+  // ======================================================
 
-    const confirmed = confirm(
-      'Xác nhận xoá đề thi này?'
+  back(): void {
+
+    this.router.navigate([
+      '/dashboard/exams'
+    ]);
+
+  }
+
+  editExam(): void {
+
+    this.router.navigate([
+      '/dashboard/exams',
+      this.exam.exam_id,
+      'edit'
+    ]);
+
+  }
+
+  checkChanged(): void {
+
+    const current = JSON.stringify({
+      exam: this.exam,
+      questions: this.questions
+    });
+
+    this.hasChanged = current !== this.originalExam;
+
+  }
+
+  assignExam(): void {
+
+    this.router.navigate([
+      '/dashboard/assignments/create',
+      this.exam.exam_id
+    ]);
+
+  }
+
+  addQuestion(): void {
+
+    this.router.navigate([
+      '/dashboard/questions/create'
+    ], {
+
+      queryParams: {
+
+        examId: this.exam.exam_id
+
+      }
+
+    });
+
+  }
+
+    // ======================================================
+  // EDIT QUESTION
+  // ======================================================
+
+  editQuestion(question: any): void {
+
+    this.router.navigate([
+      '/dashboard/questions/edit',
+      question.question_id
+    ]);
+
+  }
+
+  // ======================================================
+  // REMOVE QUESTION
+  // ======================================================
+
+  removeQuestion(index: number): void {
+
+    const q = this.questions[index];
+
+    const questionId =
+      q.question?.question_id ??
+      q.question_id;
+
+    if (!questionId) {
+
+      this.questions.splice(index, 1);
+
+      return;
+
+    }
+
+    const ok = confirm(
+      'Bạn có chắc muốn xoá câu hỏi khỏi đề thi?'
     );
 
-    if (!confirmed) {
+    if (!ok) {
       return;
     }
 
     this.examService
-      .deleteExam(this.examId)
+      .removeQuestionFromExam(
+        this.examId,
+        questionId
+      )
+      .subscribe({
+
+        next: () => {
+
+          this.questions.splice(
+            index,
+            1
+          );
+
+          alert(
+            'Đã xoá câu hỏi.'
+          );
+
+        },
+
+        error: (err: any) => {
+
+          console.error(err);
+
+          alert(
+            err.error?.message ||
+            'Không thể xoá câu hỏi.'
+          );
+
+        }
+
+      });
+
+  }
+
+  updateExam(){
+
+   this.examService
+       .updateExam(this.examId,{
+           ...this.exam,
+           questions:this.questions
+       })
+       .subscribe({
+
+          next:()=>{
+
+              alert("Cập nhật thành công");
+
+              this.originalExam = JSON.stringify({
+                  exam:this.exam,
+                  questions:this.questions
+              });
+
+              this.hasChanged=false;
+
+          }
+
+       });
+
+}
+
+  // ======================================================
+  // DELETE EXAM
+  // ======================================================
+
+  deleteExam(): void {
+
+    const ok = confirm(
+      'Bạn có chắc muốn xoá đề thi này?'
+    );
+
+    if (!ok) {
+      return;
+    }
+
+    this.examService
+      .deleteExam(
+        this.exam.exam_id
+      )
       .subscribe({
 
         next: () => {
 
           alert(
-            'Đã xoá đề thi'
+            'Đã xoá đề thi.'
           );
 
           this.router.navigate([
@@ -202,34 +420,43 @@ removeQuestion(
           console.error(err);
 
           alert(
-            err?.error?.message
-            || 'Xoá đề thi thất bại'
+            err.error?.message ||
+            'Không thể xoá đề thi.'
           );
+
         }
+
       });
+
   }
 
-  // =========================
-  // LABELS
-  // =========================
-  getQuestionTypeLabel(
-    type: string
+  // ======================================================
+  // LABEL
+  // ======================================================
+
+  getStatusLabel(
+    status: string
   ): string {
 
-    switch (type) {
+    switch (status) {
 
-      case 'MULTIPLE_CHOICE':
-        return 'Nhiều đáp án';
+      case 'DRAFT':
+        return 'Nháp';
 
-      case 'TRUE_FALSE':
-        return 'Đúng / Sai';
+      case 'PENDING':
+        return 'Chờ duyệt';
 
-      case 'ESSAY':
-        return 'Tự luận';
+      case 'APPROVED':
+        return 'Đã duyệt';
+
+      case 'REJECTED':
+        return 'Bị từ chối';
 
       default:
-        return 'Một đáp án';
+        return status;
+
     }
+
   }
 
   getLevelLabel(
@@ -248,41 +475,57 @@ removeQuestion(
         return 'Khó';
 
       default:
-        return '---';
+        return level;
+
     }
+
   }
 
-  getStatusLabel(
-    status: string
+  getQuestionTypeLabel(
+    type: string
   ): string {
 
-    switch (status) {
+    switch (type) {
 
-      case 'PUBLISHED':
-        return 'Đã xuất bản';
+      case 'SINGLE_CHOICE':
+        return 'Một đáp án';
 
-      case 'ARCHIVED':
-        return 'Đã lưu trữ';
+      case 'MULTIPLE_CHOICE':
+        return 'Nhiều đáp án';
+
+      case 'TRUE_FALSE':
+        return 'Đúng / Sai';
+
+      case 'ESSAY':
+        return 'Tự luận';
 
       default:
-        return 'Nháp';
+        return type;
+
     }
+
   }
 
-  // =========================
-  // COUNTS
-  // =========================
+  // ======================================================
+  // GETTERS
+  // ======================================================
+
   get totalQuestions(): number {
 
     return this.questions.length;
+
   }
 
   get randomInfo(): string {
 
     if (!this.exam?.is_random) {
+
       return 'Đề cố định';
+
     }
 
-    return `Random ${this.exam.random_question_count} câu / học sinh`;
+    return `Random ${this.exam.random_question_count} câu`;
+
   }
+
 }

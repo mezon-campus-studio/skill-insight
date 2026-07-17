@@ -1,12 +1,17 @@
 import { Injectable } from '@angular/core';
 
 import {
-  HttpClient
+  HttpClient,
+  HttpParams
 } from '@angular/common/http';
 
 import {
   Observable
 } from 'rxjs';
+
+import {
+  environment
+} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -14,25 +19,141 @@ import {
 
 export class QuestionBatchService {
 
-  private apiUrl =
-  'http://localhost:3000/api/question-batches';
+  private apiUrl = environment.api.questionBatches;
 
-  private apiQuestionUrl =
-  'http://localhost:3000/api/questions';
+  private apiQuestionUrl = environment.api.questions;
 
   constructor(
     private http: HttpClient
   ) {}
 
   // ======================================================
-  // GET ALL BATCHES
+  // GET ALL BATCHES (ADMIN)
   // ======================================================
 
-  getQuestionBatches():
-    Observable<any> {
+  getAllBatches(): Observable<any> {
 
     return this.http.get(
-      this.apiUrl
+
+      `${this.apiUrl}/all`,
+
+      {
+        withCredentials: true
+      }
+
+    );
+
+  }
+
+  // ======================================================
+  // GET MY BATCHES (TEACHER)
+  // ======================================================
+
+  getMyBatches(): Observable<any> {
+
+    return this.http.get(
+
+      `${this.apiUrl}/my`,
+
+      {
+        withCredentials: true
+      }
+
+    );
+
+  }
+
+  // ======================================================
+  // GET SYSTEM BATCHES
+  // ======================================================
+
+  getSystemBatches(): Observable<any> {
+
+    return this.http.get(
+
+      `${this.apiUrl}/system`,
+
+      {
+        withCredentials: true
+      }
+
+    );
+
+  }
+
+  // ======================================================
+  // GET PUBLIC TEACHER BATCHES
+  // ======================================================
+
+  getTeacherPublicBatches(): Observable<any> {
+
+    return this.http.get(
+
+      `${this.apiUrl}/teacher-public`,
+
+      {
+        withCredentials: true
+      }
+
+    );
+
+  }
+
+  // ======================================================
+  // FILTER BATCHES
+  // ======================================================
+
+  getQuestionBatchesByFilter(
+
+    keyword: string = '',
+
+    subjectId?: number,
+
+    source?: string
+
+  ): Observable<any> {
+
+    let params = new HttpParams();
+
+    if (keyword) {
+
+      params = params.set(
+        'keyword',
+        keyword
+      );
+
+    }
+
+    if (subjectId) {
+
+      params = params.set(
+        'subjectId',
+        subjectId
+      );
+
+    }
+
+    if (source) {
+
+      params = params.set(
+        'source',
+        source
+      );
+
+    }
+
+    return this.http.get(
+
+      this.apiUrl,
+
+      {
+
+        params,
+
+        withCredentials: true
+
+      }
+
     );
 
   }
@@ -46,7 +167,13 @@ export class QuestionBatchService {
   ): Observable<any> {
 
     return this.http.get(
-      `${this.apiUrl}/${id}`
+
+      `${this.apiUrl}/${id}`,
+
+      {
+        withCredentials: true
+      }
+
     );
 
   }
@@ -60,27 +187,56 @@ export class QuestionBatchService {
   ): Observable<any> {
 
     return this.http.post(
+
       this.apiUrl,
-      data
+
+      data,
+
+      {
+        withCredentials: true
+      }
+
     );
 
   }
 
   // ======================================================
-  // ADD QUESTIONS TO BATCH
+  // UPDATE BATCH
   // ======================================================
 
-  addQuestionsToBatch(
-    id: number,
-    question_ids: number[]
+  updateQuestionBatch(
+    batchId: number,
+    data: any
   ): Observable<any> {
 
-    return this.http.post(
+    return this.http.put(
 
-      `${this.apiUrl}/${id}/questions`,
+      `${this.apiUrl}/${batchId}`,
+
+      data,
 
       {
-        question_ids
+        withCredentials: true
+      }
+
+    );
+
+  }
+
+  // ======================================================
+  // DELETE BATCH
+  // ======================================================
+
+  deleteQuestionBatch(
+    id: number
+  ): Observable<any> {
+
+    return this.http.delete(
+
+      `${this.apiUrl}/${id}`,
+
+      {
+        withCredentials: true
       }
 
     );
@@ -97,22 +253,143 @@ export class QuestionBatchService {
   ): Observable<any> {
 
     return this.http.patch(
+
       `${this.apiUrl}/${id}/approve`,
-      data
+
+      data,
+
+      {
+        withCredentials: true
+      }
+
     );
 
   }
 
   // ======================================================
-  // DELETE BATCH
+  // INTEGRATE TO SYSTEM
   // ======================================================
 
-  deleteQuestionBatch(
+  integrateBatch(
     id: number
   ): Observable<any> {
 
-    return this.http.delete(
-      `${this.apiUrl}/${id}`
+    return this.http.patch(
+
+      `${this.apiUrl}/${id}/integrate`,
+
+      {},
+
+      {
+        withCredentials: true
+      }
+
+    );
+
+  }
+
+  // ======================================================
+  // PUBLIC / PRIVATE
+  // ======================================================
+
+  updateVisibility(
+
+    batchId: number,
+
+    visibility: 'PUBLIC' | 'PRIVATE'
+
+  ): Observable<any> {
+
+    return this.http.patch(
+
+      `${this.apiUrl}/${batchId}/visibility`,
+
+      {
+
+        visibility
+
+      },
+
+      {
+
+        withCredentials: true
+
+      }
+
+    );
+
+  }
+
+  // ======================================================
+  // COPY BATCH
+  // ======================================================
+
+  copyBatch(
+    batchId: number
+  ): Observable<any> {
+
+    return this.http.post(
+
+      `${this.apiUrl}/${batchId}/copy`,
+
+      {},
+
+      {
+        withCredentials: true
+      }
+
+    );
+
+  }
+
+  // ======================================================
+  // GET QUESTIONS OF BATCH
+  // ======================================================
+
+  getBatchQuestions(
+    batchId: number
+  ): Observable<any> {
+
+    return this.http.get(
+
+      `${this.apiUrl}/${batchId}/questions`,
+
+      {
+        withCredentials: true
+      }
+
+    );
+
+  }
+
+  // ======================================================
+  // ADD QUESTIONS
+  // ======================================================
+
+  addQuestionsToBatch(
+
+    batchId: number,
+
+    questionIds: number[]
+
+  ): Observable<any> {
+
+    return this.http.post(
+
+      `${this.apiUrl}/${batchId}/questions`,
+
+      {
+
+        question_ids: questionIds
+
+      },
+
+      {
+
+        withCredentials: true
+
+      }
+
     );
 
   }
@@ -122,13 +399,82 @@ export class QuestionBatchService {
   // ======================================================
 
   removeQuestionFromBatch(
+
     batchId: number,
+
     questionId: number
+
   ): Observable<any> {
 
     return this.http.delete(
 
-      `${this.apiUrl}/${batchId}/questions/${questionId}`
+      `${this.apiUrl}/${batchId}/questions/${questionId}`,
+
+      {
+
+        withCredentials: true
+
+      }
+
+    );
+
+  }
+
+  // ======================================================
+  // UPDATE ALL QUESTIONS
+  // ======================================================
+
+  updateBatchQuestions(
+
+    batchId: number,
+
+    questions: any[]
+
+  ): Observable<any> {
+
+    return this.http.put(
+
+      `${this.apiUrl}/${batchId}/questions`,
+
+      {
+
+        questions
+
+      },
+
+      {
+
+        withCredentials: true
+
+      }
+
+    );
+
+  }
+
+  // ======================================================
+  // UPDATE ONE QUESTION
+  // ======================================================
+
+  updateQuestion(
+
+    questionId: number,
+
+    data: any
+
+  ): Observable<any> {
+
+    return this.http.put(
+
+      `${this.apiQuestionUrl}/${questionId}`,
+
+      data,
+
+      {
+
+        withCredentials: true
+
+      }
 
     );
 
@@ -138,46 +484,44 @@ export class QuestionBatchService {
   // IMPORT EXCEL
   // ======================================================
 
-  importExcel(
-    file: File
+  importQuestionsExcel(
+    formData: FormData
   ): Observable<any> {
-
-    const formData =
-      new FormData();
-
-    formData.append(
-      'file',
-      file
-    );
 
     return this.http.post(
 
       `${this.apiUrl}/import`,
-      formData
+
+      formData,
+
+      {
+
+        withCredentials: true
+
+      }
 
     );
 
   }
 
-  importQuestionsExcel(formData: FormData) {
-  return this.http.post(
-    '/api/question-batches/import',
-    formData
-  );
-}
+  cancelIntegrate(
+      id: number
+    ): Observable<any> {
 
- updateQuestion(questionId: number, data: any) {
-  return this.http.put(
-    `${this.apiQuestionUrl}/${questionId}`,
-    data
-  );
-}
+      return this.http.patch(
 
-updateBatchQuestions(batchId: number, questions: any[]) {
-  return this.http.put(
-    `${this.apiUrl}/${batchId}/questions`,
-    { questions }
-  );
-}
+        `${this.apiUrl}/${id}/cancel-integrate`,
+
+        {},
+
+        {
+
+          withCredentials: true
+
+        }
+
+      );
+
+    }
 
 }

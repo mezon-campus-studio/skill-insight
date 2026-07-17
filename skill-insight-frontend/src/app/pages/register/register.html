@@ -48,21 +48,58 @@
           <input
             [type]="showPassword ? 'text' : 'password'"
             formControlName="password"
-            class="input pr-10"
+            class="input pr-14"
+            placeholder="••••••••"
           />
 
-          <span class="eye" (click)="togglePassword()">
-            <svg *ngIf="!showPassword" viewBox="0 0 24 24" class="icon">
-              <path d="M3 3L21 21" stroke-width="2" stroke-linecap="round"/>
+          <button
+            type="button"
+            (click)="togglePassword()"
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
+          >
+            <svg
+              *ngIf="!showPassword"
+              viewBox="0 0 24 24"
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path
+                d="M3 3L21 21M10.58 10.58A2 2 0 0013.42 13.42M9.88 5.09A9.77 9.77 0 0112 5c5 0 9.27 3.11 11 7a11.94 11.94 0 01-4.53 4.02M6.71 6.72A11.94 11.94 0 012 12c1.73 3.89 6 7 10 7 1.61 0 3.14-.35 4.53-.98"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
-            <svg *ngIf="showPassword" viewBox="0 0 24 24" class="icon">
-              <circle cx="12" cy="12" r="3" stroke-width="2"></circle>
+
+            <svg
+              *ngIf="showPassword"
+              viewBox="0 0 24 24"
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path
+                d="M2 12S5.5 5 12 5s10 7 10 7-3.5 7-10 7S2 12 2 12z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <circle
+                cx="12"
+                cy="12"
+                r="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
-          </span>
+          </button>
         </div>
 
-        <div *ngIf="f.password.touched && f.password.errors"
-             class="text-red-500 text-sm mt-1">
+        <div
+          *ngIf="f.password.touched && f.password.errors"
+          class="text-red-500 text-sm mt-1"
+        >
           {{ getPasswordError() }}
         </div>
       </div>
@@ -74,21 +111,58 @@
           <input
             [type]="showConfirmPassword ? 'text' : 'password'"
             formControlName="confirmPassword"
-            class="input pr-10"
+            class="input pr-14"
+            placeholder="••••••••"
           />
 
-          <span class="eye" (click)="toggleConfirmPassword()">
-            <svg *ngIf="!showConfirmPassword" viewBox="0 0 24 24" class="icon">
-              <path d="M3 3L21 21" stroke-width="2"/>
+          <button
+            type="button"
+            (click)="toggleConfirmPassword()"
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
+          >
+            <svg
+              *ngIf="!showConfirmPassword"
+              viewBox="0 0 24 24"
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path
+                d="M3 3L21 21M10.58 10.58A2 2 0 0013.42 13.42M9.88 5.09A9.77 9.77 0 0112 5c5 0 9.27 3.11 11 7a11.94 11.94 0 01-4.53 4.02M6.71 6.72A11.94 11.94 0 012 12c1.73 3.89 6 7 10 7 1.61 0 3.14-.35 4.53-.98"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
-            <svg *ngIf="showConfirmPassword" viewBox="0 0 24 24" class="icon">
-              <circle cx="12" cy="12" r="3"></circle>
+
+            <svg
+              *ngIf="showConfirmPassword"
+              viewBox="0 0 24 24"
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path
+                d="M2 12S5.5 5 12 5s10 7 10 7-3.5 7-10 7S2 12 2 12z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <circle
+                cx="12"
+                cy="12"
+                r="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
-          </span>
+          </button>
         </div>
 
-        <div *ngIf="f.confirmPassword.touched && f.confirmPassword.value !== f.password.value"
-             class="text-red-500 text-sm mt-1">
+        <div
+          *ngIf="f.confirmPassword.touched && f.confirmPassword.value !== f.password.value"
+          class="text-red-500 text-sm mt-1"
+        >
           Mật khẩu nhập lại không khớp
         </div>
       </div>

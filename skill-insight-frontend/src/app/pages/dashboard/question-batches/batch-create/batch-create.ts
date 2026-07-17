@@ -900,10 +900,7 @@ implements OnInit {
           this.formData.topic_id
         ),
 
-      visibility:
-        this.formData.contribute_system
-          ? 'SYSTEM_BANK'
-          : 'PRIVATE',
+      visibility: this.formData.visibility,
 
       questions:
         this.questions
@@ -935,7 +932,7 @@ implements OnInit {
           );
 
           this.router.navigate([
-            '/dashboard/question-batches'
+            '/dashboard/question-bank'
           ]);
 
         },

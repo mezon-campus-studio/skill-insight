@@ -1,17 +1,34 @@
+import * as dotenv from 'dotenv';
 
-import dotenv from 'dotenv';
-import fs from 'fs';
-dotenv.config({ path: './.env' });
+import * as fs from 'fs';
 
-const envConfigFile = `export const environment = {
-  BACKEND_API_URL: '${process.env['BACKEND_API_URL']}',
+dotenv.config({
+  path: './.env'
+});
+
+const envConfigFile = `
+export const environment = {
+
   production: false,
-  apiUrl: '${process.env['apiUrl']}',
-  clientId: '${process.env['clientId']}',
-  redirectUri: '${process.env['redirectUri']}',
-  Oauth2_URL: '${process.env['Oauth2_URL']}',
-  Auth_Mezon: '${process.env['Auth_Mezon']}',
-  API_SUBJECT:'${process.env['apiSubject']}'
-};`;
-fs.writeFileSync('src/environments/environment.ts', envConfigFile);
 
+  BACKEND_API_URL:
+    '${process.env['BACKEND_API_URL']}',
+
+  apiUrl:
+    '${process.env['apiUrl']}',
+
+  clientId:
+    '${process.env['clientId']}',
+
+  redirectUri:
+    '${process.env['redirectUri']}',
+
+  Oauth2_URL:
+    '${process.env['Oauth2_URL']}'
+};
+`;
+
+fs.writeFileSync(
+  'src/environments/environment.ts',
+  envConfigFile
+);

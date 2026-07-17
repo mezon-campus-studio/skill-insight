@@ -1,4 +1,3 @@
-
 import { Routes } from '@angular/router';
 
 export const dashboardRoutes: Routes = [
@@ -75,26 +74,26 @@ export const dashboardRoutes: Routes = [
   {
     path: 'classes',
     loadComponent: () =>
-      import('./classes/classes')
-        .then(m => m.ClassesComponent)
+      import('./classes/class-list/class-list')
+        .then(m => m.ClassList)
   },
 
   {
     path: 'classes/create',
     loadComponent: () =>
-      import('./classes/create-class')
-        .then(m => m.CreateClassComponent)
+      import('./classes/class-create/class-create')
+        .then(m => m.ClassCreate)
   },
 
   {
-    path: 'classes/:id',
+    path: 'classes/detail/:id',
     loadComponent: () =>
-      import('./classes/class-detail')
-        .then(m => m.ClassDetailComponent)
+      import('./classes/class-detail/class-detail')
+        .then(m => m.ClassDetail)
   },
 
   {
-    path: 'classes/:id/students',
+    path: 'classes/students/:id',
     loadComponent: () =>
       import('./classes/class-students/class-students')
         .then(m => m.ClassStudents)
@@ -103,8 +102,22 @@ export const dashboardRoutes: Routes = [
   {
     path: 'join-class',
     loadComponent: () =>
-      import('./classes/join-class')
+      import('./classes/join-class/join-class')
         .then(m => m.JoinClassComponent)
+  },
+
+  {
+    path: 'student/assignments/:id',
+    loadComponent: () =>
+      import('./student/assignment-detail/assignment-detail')
+        .then(m => m.AssignmentDetail)
+  },
+
+  {
+  path: 'my-classes/:id',
+    loadComponent: () =>
+      import('./student/my-class-detail/my-class-detail')
+        .then(m => m.MyClassDetailComponent)
   },
 
   {
@@ -157,11 +170,11 @@ export const dashboardRoutes: Routes = [
   // },
   
   {
-  path: 'question-batches',
-  loadComponent: () =>
-    import('./question-batches/batch-list/batch-list')
-      .then(m => m.BatchList)
-},
+    path: 'question-bank',
+    loadComponent: () =>
+      import('./question-batches/question-bank/question-bank')
+        .then(m => m.QuestionBank)
+  },
 
 {
   path: 'question-batches/create',
@@ -170,15 +183,16 @@ export const dashboardRoutes: Routes = [
       .then(m => m.BatchCreate)
 },
 
+
 {
-  path: 'question-batches/review/:id',
+  path: 'question-batches/:id/view',
   loadComponent: () =>
-    import('./question-batches/batch-review/batch-review')
-      .then(m => m.BatchReview)
+    import('./question-batches/question-batch-view/question-batch-view')
+      .then(m => m.QuestionBatchView)
 },
 
 {
-  path: 'question-batches/:id',
+  path: 'question-batches/:id/edit',
   loadComponent: () =>
     import('./question-batches/batch-detail/batch-detail')
       .then(m => m.BatchDetail)
@@ -203,7 +217,14 @@ export const dashboardRoutes: Routes = [
 },
 
 {
-  path: 'exams/:id',
+  path: 'exams/:id/view',
+  loadComponent: () =>
+    import('./exams/exam-view/exam-view')
+      .then(m => m.ExamView)
+},
+
+{
+  path: 'exams/:id/detail',
   loadComponent: () =>
     import('./exams/exam-detail/exam-detail')
       .then(m => m.ExamDetail)
@@ -219,8 +240,8 @@ export const dashboardRoutes: Routes = [
   {
     path: 'assignments',
     loadComponent: () =>
-      import('./assignments/assign-exam')
-        .then(m => m.AssignExamComponent)
+      import('./assignments/assignment-create/assignment-create')
+        .then(m => m.AssignmentCreate)
   },
 
   {
@@ -310,7 +331,7 @@ export const dashboardRoutes: Routes = [
   {
     path: 'my-classes',
     loadComponent: () =>
-      import('./student/my-classes')
+      import('./student/my-classes/my-classes')
         .then(m => m.MyClassesComponent)
   },
 
@@ -319,6 +340,13 @@ export const dashboardRoutes: Routes = [
     loadComponent: () =>
       import('./student/my-exams/my-exams')
         .then(m => m.MyExams)
+  },
+
+  {
+    path: 'my-exams/take/:id',
+    loadComponent: () =>
+      import('./student/take-exam/take-exam')
+        .then(m => m.TakeExam)
   },
 
   {

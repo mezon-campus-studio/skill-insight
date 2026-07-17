@@ -17,8 +17,7 @@ import {
 })
 export class StudentExamService {
 
-  private API =
-    environment.apiUrl;
+  private API = environment.apiUrl;
 
   constructor(
     private http: HttpClient

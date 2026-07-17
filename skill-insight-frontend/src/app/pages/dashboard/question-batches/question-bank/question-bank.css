@@ -1,0 +1,319 @@
+/* ======================================================
+   PAGE
+====================================================== */
+
+:host {
+
+    display: block;
+
+    width: 100%;
+
+}
+
+.p-6{
+
+    background:#f8fafc;
+
+    min-height:100vh;
+
+}
+
+/* ======================================================
+   HEADER
+====================================================== */
+
+h1{
+
+    letter-spacing:.3px;
+
+}
+
+/* ======================================================
+   TAB
+====================================================== */
+
+.border-b button{
+
+    transition:.25s;
+
+    font-weight:600;
+
+}
+
+.border-b button:hover{
+
+    color:#2563eb;
+
+}
+
+.border-blue-600{
+
+    border-color:#2563eb !important;
+
+}
+
+.text-blue-600{
+
+    color:#2563eb !important;
+
+}
+
+/* ======================================================
+   TOOLBAR
+====================================================== */
+
+input{
+
+    background:#fff;
+
+    transition:.25s;
+
+}
+
+input:focus{
+
+    border-color:#3b82f6 !important;
+
+    box-shadow:0 0 0 3px rgba(59,130,246,.15);
+
+}
+
+/* ======================================================
+   BUTTON
+====================================================== */
+
+button{
+
+    transition:.2s;
+
+}
+
+button:hover{
+
+    transform:translateY(-1px);
+
+}
+
+button:disabled{
+
+    cursor:not-allowed;
+
+    opacity:.45;
+
+    transform:none;
+
+}
+
+/* ======================================================
+   TABLE
+====================================================== */
+
+table{
+
+    background:#fff;
+
+}
+
+thead{
+
+    background:#f1f5f9 !important;
+
+}
+
+thead th{
+
+    font-size:14px;
+
+    color:#475569;
+
+    font-weight:700;
+
+}
+
+tbody td{
+
+    vertical-align:middle;
+
+}
+
+tbody tr{
+
+    transition:.2s;
+
+}
+
+tbody tr:hover{
+
+    background:#f8fafc;
+
+}
+
+/* ======================================================
+   TITLE
+====================================================== */
+
+tbody td:first-child .font-semibold{
+
+    color:#0f172a;
+
+    font-size:15px;
+
+}
+
+tbody td:first-child .text-sm{
+
+    margin-top:4px;
+
+    color:#64748b;
+
+}
+
+/* ======================================================
+   BADGE
+====================================================== */
+
+td span{
+
+    display:inline-block;
+
+    padding:5px 12px;
+
+    border-radius:999px;
+
+    font-size:12px;
+
+    font-weight:600;
+
+}
+
+/* ======================================================
+   ACTION
+====================================================== */
+
+td button{
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+td button:hover{
+
+    text-decoration:underline;
+
+}
+
+/* ======================================================
+   LOADING
+====================================================== */
+
+.animate-pulse{
+
+    border-radius:12px;
+
+}
+
+/* ======================================================
+   EMPTY
+====================================================== */
+
+.text-6xl{
+
+    animation:float 2s infinite ease-in-out;
+
+}
+
+@keyframes float{
+
+    0%{
+
+        transform:translateY(0);
+
+    }
+
+    50%{
+
+        transform:translateY(-8px);
+
+    }
+
+    100%{
+
+        transform:translateY(0);
+
+    }
+
+}
+
+/* ======================================================
+   PAGINATION
+====================================================== */
+
+.mt-6 button{
+
+    min-width:38px;
+
+    transition:.2s;
+
+}
+
+.mt-6 button:hover:not(:disabled){
+
+    background:#2563eb;
+
+    color:#fff;
+
+}
+
+/* ======================================================
+   CARD
+====================================================== */
+
+.overflow-x-auto{
+
+    border-radius:14px;
+
+    overflow:hidden;
+
+    background:#fff;
+
+    box-shadow:
+
+    0 6px 24px rgba(0,0,0,.05);
+
+}
+
+/* ======================================================
+   RESPONSIVE
+====================================================== */
+
+@media(max-width:900px){
+
+    .flex.items-center.justify-between{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:16px;
+
+    }
+
+    .flex.flex-wrap{
+
+        flex-direction:column;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    table{
+
+        min-width:900px;
+
+    }
+
+}

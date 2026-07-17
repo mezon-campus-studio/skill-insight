@@ -1,163 +1,182 @@
 import { Injectable } from '@angular/core';
-
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExamService {
 
-  private apiUrl =
-    'http://localhost:3000/api/exams';
+  private apiUrl = environment.api.exams;
 
   constructor(
     private http: HttpClient
   ) {}
 
-  // =========================
-  // GET ALL EXAMS
-  // =========================
-  getExams() {
+  // =====================================================
+  // EXAM LIST
+  // =====================================================
 
+  // Đề của tôi
+  getMyExams() {
     return this.http.get(
-      `${this.apiUrl}`
+      `${this.apiUrl}/my`
     );
   }
 
-  // =========================
-  // GET EXAM BY ID
-  // =========================
-  getExamById(id: number) {
+  // Kho đề hệ thống
+  getSystemExams() {
+    return this.http.get(
+      `${this.apiUrl}/system`
+    );
+  }
 
+  // Kho đề giáo viên
+  getTeacherExams() {
+    return this.http.get(
+      `${this.apiUrl}/teacher`
+    );
+  }
+
+  // Admin xem tất cả
+  getAllExams() {
+    return this.http.get(
+      `${this.apiUrl}/admin`
+    );
+  }
+
+  // =====================================================
+  // DETAIL
+  // =====================================================
+
+  getExamById(
+    id: number
+  ) {
     return this.http.get(
       `${this.apiUrl}/${id}`
     );
   }
 
-  // =========================
-  // CREATE EXAM
-  // =========================
-  createExam(data: any) {
+  // =====================================================
+  // CREATE
+  // =====================================================
 
+  createExam(
+    data: any
+  ) {
     return this.http.post(
       `${this.apiUrl}`,
       data
     );
   }
 
-  // =========================
-  // DELETE ONE
-  // =========================
-  deleteExam(id: number) {
+  // =====================================================
+  // UPDATE
+  // =====================================================
 
+  updateExam(
+    examId: number,
+    data: any
+  ) {
+    return this.http.put(
+      `${this.apiUrl}/${examId}`,
+      data
+    );
+  }
+
+  // =====================================================
+  // DELETE
+  // =====================================================
+
+  deleteExam(
+    id: number
+  ) {
     return this.http.delete(
       `${this.apiUrl}/${id}`
     );
   }
 
-  // =========================
-  // DELETE MANY
-  // =========================
-  deleteManyExams(ids: number[]) {
-
+  deleteManyExams(
+    ids: number[]
+  ) {
     return this.http.post(
       `${this.apiUrl}/delete-many`,
       { ids }
     );
   }
 
-  // =========================
-  // DELETE ALL
-  // =========================
   deleteAllExams() {
-
     return this.http.delete(
       `${this.apiUrl}`
     );
   }
 
-  // =========================
-  // GET SUBJECTS
-  // =========================
-  getSubjects() {
+  // =====================================================
+  // SUBJECT
+  // =====================================================
 
+  getSubjects() {
     return this.http.get(
       `${this.apiUrl}/subjects/all`
     );
   }
 
-  // =========================
-  // GET TOPICS
-  // =========================
-  getTopics(subjectId: number) {
+  createSubject(
+    data: any
+  ) {
+    return this.http.post(
+      `${this.apiUrl}/subjects`,
+      data
+    );
+  }
 
+  // =====================================================
+  // TOPIC
+  // =====================================================
+
+  getTopics(
+    subjectId: number
+  ) {
     return this.http.get(
       `${this.apiUrl}/topics/all?subjectId=${subjectId}`
     );
   }
 
-  // =========================
-// CREATE SUBJECT
-// =========================
-createSubject(data: any) {
-
-  return this.http.post(
-    `${this.apiUrl}/subjects`,
-    data
-  );
-}
-
-// =========================
-// CREATE TOPIC
-// =========================
-createTopic(data: any) {
-
-  return this.http.post(
-    `${this.apiUrl}/topics`,
-    data
-  );
-}
-
-  updateExam(
-  examId: number,
-  data: any
-) {
-  return this.http.put(
-    `${this.apiUrl}/${examId}`,
-    data
-  );
-}
-
-removeQuestionFromExam(
-  examId: number,
-  questionId: number
-) {
-  return this.http.delete(
-    `${this.apiUrl}/${examId}/questions/${questionId}`
-  );
-}
-
-  // =========================
-  // IMPORT EXCEL / CSV
-  // =========================
-  importExamExcel(
-    formData: FormData
+  createTopic(
+    data: any
   ) {
-
     return this.http.post(
-      `${this.apiUrl}/import`,
-      formData
+      `${this.apiUrl}/topics`,
+      data
     );
   }
 
-  // =========================
-  // SHUFFLE QUESTIONS
-  // =========================
+  // =====================================================
+  // QUESTION
+  // =====================================================
+  getMyQuestions() {
+
+    return this.http.get(
+
+      `${this.apiUrl}/questions/my`
+
+    );
+
+  }
+
+  removeQuestionFromExam(
+    examId: number,
+    questionId: number
+  ) {
+    return this.http.delete(
+      `${this.apiUrl}/${examId}/questions/${questionId}`
+    );
+  }
+
   shuffleExamQuestions(
     examId: number,
     questionCount: number
   ) {
-
     return this.http.post(
       `${this.apiUrl}/${examId}/shuffle`,
       {
@@ -165,4 +184,110 @@ removeQuestionFromExam(
       }
     );
   }
+
+  // =====================================================
+  // IMPORT
+  // =====================================================
+
+  importExamExcel(
+    formData: FormData
+  ) {
+    return this.http.post(
+      `${this.apiUrl}/import`,
+      formData
+    );
+  }
+
+  // =====================================================
+  // COPY EXAM
+  // =====================================================
+
+  copyExam(
+    examId: number
+  ) {
+    return this.http.post(
+      `${this.apiUrl}/${examId}/copy`,
+      {}
+    );
+  }
+
+  // =====================================================
+  // SYSTEM INTEGRATION
+  // =====================================================
+
+  integrateExam(
+    examId: number
+  ) {
+    return this.http.put(
+      `${this.apiUrl}/${examId}/integrate`,
+      {}
+    );
+  }
+
+  cancelIntegrateExam(id: number) {
+    return this.http.put(
+      `${this.apiUrl}/${id}/cancel-integrate`,
+      {}
+    );
+  }
+
+  approveExam(
+    examId: number,
+    data: any
+  ) {
+    return this.http.put(
+      `${this.apiUrl}/${examId}/approve`,
+      data
+    );
+  }
+
+  rejectExam(
+    examId: number,
+    data: any
+  ) {
+    return this.http.put(
+      `${this.apiUrl}/${examId}/reject`,
+      data
+    );
+  }
+
+}
+
+
+export interface ExamDetail {
+  success: boolean;
+  data: {
+    exam_id: number;
+    title: string;
+    description: string;
+    duration: number;
+    pass_score: number;
+    status_exam: string;
+    visibility: string;
+
+    subject: {
+      subject_name: string;
+    };
+
+    teacher: {
+      full_name: string;
+    };
+
+    exam_questions: ExamQuestion[];
+  };
+}
+
+export interface ExamQuestion {
+  question_order: number;
+
+  question: {
+    question_id: number;
+    content: string;
+    level: string;
+
+    answers: {
+      answer_id: number;
+      answer_text: string;
+    }[];
+  };
 }

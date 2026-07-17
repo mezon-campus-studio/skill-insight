@@ -66,6 +66,10 @@ export class DashboardComponent implements OnInit {
 
   showLogoutPopup = signal(false);
 
+  sidebarWidth = 280;
+  readonly collapsedWidth = 90;
+  private resizing = false;
+
   // =========================
   // MENU ROLE
   // =========================
@@ -113,8 +117,13 @@ export class DashboardComponent implements OnInit {
       },
 
       {
-        path: 'question-batches',
+        path: 'question-bank',
         label: 'Ngân hàng câu hỏi'
+      },
+
+      {
+        path: 'exams',
+        label: 'Kho đề'
       },
 
       {
@@ -151,9 +160,14 @@ export class DashboardComponent implements OnInit {
         label: 'Lớp học'
       },
 
+      // {
+      //   path: 'materials',
+      //   label: 'Tài liệu giảng dạy'
+      // },
+      
       {
-        path: 'materials',
-        label: 'Tài liệu giảng dạy'
+        path: 'question-bank',
+        label: 'Ngân hàng câu hỏi'
       },
 
       {
@@ -171,10 +185,10 @@ export class DashboardComponent implements OnInit {
         label: 'Kết quả học sinh'
       },
 
-      {
-        path: 'student-analysis',
-        label: 'Phân tích học sinh'
-      },
+      // {
+      //   path: 'student-analysis',
+      //   label: 'Phân tích học sinh'
+      // },
 
       {
         path: 'teacher-ai',
@@ -217,7 +231,7 @@ export class DashboardComponent implements OnInit {
 
       {
         path: 'practice',
-        label: 'Luyện tập AI'
+        label: 'AI Chat'
       },
 
       {
@@ -346,6 +360,57 @@ export class DashboardComponent implements OnInit {
       });
   }
 
+  startResize(event: MouseEvent) {
+
+    if (this.isCollapsed()) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const startX = event.clientX;
+    const startWidth = this.sidebarWidth;
+
+    const move = (e: MouseEvent) => {
+      this.sidebarWidth = Math.min(
+        500,
+        Math.max(
+          220,
+          startWidth + e.clientX - startX
+        )
+      );
+    };
+
+    const up = () => {
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', up);
+    };
+
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+    onMouseMove(event: MouseEvent): void {
+
+      if (!this.resizing) {
+        return;
+      }
+
+      this.sidebarWidth = Math.min(
+        500,
+        Math.max(220, event.clientX)
+      );
+
+    }
+
+  @HostListener('document:mouseup')
+    stopResize(): void {
+
+      this.resizing = false;
+
+    }
+
   // =========================
   // SYNC USER
   // =========================
@@ -437,8 +502,23 @@ export class DashboardComponent implements OnInit {
 
   skipSetPassword(): void {
 
-    this.showSetPasswordPopup.set(false);
-  }
+  this.auth.skipSetPassword().subscribe({
+
+    next: () => {
+
+      this.showSetPasswordPopup.set(false);
+
+    },
+
+    error: (err: any) => {
+
+      console.error(err);
+
+    }
+
+  });
+
+}
 
   // =========================
   // PROFILE

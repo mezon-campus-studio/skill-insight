@@ -13,8 +13,10 @@ import {
   deleteUser,
   restoreUser,
   permanentlyDelete,
-  toggleUserStatus
+  toggleUserStatus,
+  skipSetPassword
 } from "../controllers/auth.controller";
+
 
 const router = express.Router();
 console.log("AUTH ROUTES LOADED");
@@ -28,6 +30,7 @@ router.get("/users", getUsers);
 
 router.put("/users/:id/role", updateRole); 
 router.post("/set-password", setPassword);
+router.post("/skip-set-password", skipSetPassword);
 router.get("/mezon", getMezonUrl);
 router.get("/mezon/callback", mezonCallback);
 router.get("/users/:id", getUserDetail);

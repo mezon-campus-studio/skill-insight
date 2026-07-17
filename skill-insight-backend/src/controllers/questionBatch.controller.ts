@@ -135,37 +135,37 @@ export const createQuestionBatch = async (
       Number(subject_id) || 0;
 
     const subjectText =
-  String(
-    manualSubject ||
-    subject_name ||
-    ''
-  ).trim();
+      String(
+        manualSubject ||
+        subject_name ||
+        ''
+      ).trim();
 
-if (
-  !finalSubjectId &&
-  subjectText
-) {
+    if (
+      !finalSubjectId &&
+      subjectText
+    ) {
 
-      let subject =
-        await prisma.subject.findFirst({
+          let subject =
+            await prisma.subject.findFirst({
 
-          where: {
+              where: {
 
-            subject_name: subjectText
+                subject_name: subjectText
 
-          }
+              }
 
-        });
+            });
 
-      if (!subject) {
+          if (!subject) {
 
-        subject = await prisma.subject.create({
-  data: {
-    subject_name:
-  subjectText,
-    created_by: teacher_id
-  }
-});
+            subject = await prisma.subject.create({
+      data: {
+        subject_name:
+      subjectText,
+        created_by: teacher_id
+      }
+    });
 
       }
 
@@ -252,55 +252,75 @@ if (
     }
 
     // ======================================================
-// CREATE BATCH
-// ======================================================
+    // CREATE BATCH
+    // ======================================================
 
-const user =
-  (req as any).user;
+    const user = (req as any).user;
 
-const isAdmin =
-  String(
-    user?.role || ''
-  ).toLowerCase() === 'admin';
+    const isAdmin =
+      String(user?.role || '').toLowerCase() === 'admin';
 
-const batch =
-  await prisma.questionBatch.create({
+    const batch = await prisma.questionBatch.create({
 
-    data: {
+      data: {
 
-      batch_code:
-        `BATCH-${Date.now()}`,
+        batch_code: `BATCH-${Date.now()}`,
 
-      batch_name,
+        batch_name,
 
-      description,
+        description,
 
-      teacher_id,
+        teacher_id,
 
-      subject_id:
-        finalSubjectId,
+        subject_id: finalSubjectId,
 
-      topic_id:
-        finalTopicId,
+        topic_id: finalTopicId,
 
-      status:
-        isAdmin
-          ? 'APPROVED'
-          : 'PENDING',
+        // ==================================================
+        // NGUỒN
+        // ==================================================
 
-      approved_by:
-        isAdmin
+        source: isAdmin
+          ? "SYSTEM"
+          : "TEACHER",
+
+        // ==================================================
+        // ADMIN tạo
+        // ==================================================
+
+        visibility: isAdmin
+          ? "SYSTEM_BANK"
+          : "PRIVATE",
+
+        status: isAdmin
+          ? "APPROVED"
+          : "PRIVATE",
+
+        // ==================================================
+        // Chưa xin tích hợp
+        // ==================================================
+
+        allow_integrate: false,
+
+        // Không phải bản copy
+        is_copied: false,
+
+        // ==================================================
+        // APPROVE INFO
+        // ==================================================
+
+        approved_by: isAdmin
           ? teacher_id
           : null,
 
-      approved_at:
-        isAdmin
+        approved_at: isAdmin
           ? new Date()
           : null
 
-    }
+      }
 
-  });
+    });
+
     // ======================================================
     // CREATE QUESTIONS
     // ======================================================
@@ -954,11 +974,61 @@ export const approveBatch = async (
 
   try {
 
-    const id =
-      Number(req.params.id);
+    const id = Number(req.params.id);
 
-    const { user_id } =
-      req.body;
+    const userId =
+      Number((req as any).user?.userId);
+
+    const currentBatch =
+      await prisma.questionBatch.findUnique({
+
+        where: {
+          batch_id: id
+        }
+
+      });
+
+    if (!currentBatch) {
+
+      return res.status(404).json({
+
+        success: false,
+
+        message: "Không tìm thấy bộ câu hỏi"
+
+      });
+
+    }
+
+    // ======================================================
+    // KIỂM TRA ĐIỀU KIỆN DUYỆT
+    // ======================================================
+
+    if (
+
+      !currentBatch.allow_integrate ||
+
+      currentBatch.is_copied ||
+
+      currentBatch.visibility !== "PUBLIC" ||
+
+      currentBatch.status !== "PENDING"
+
+    ) {
+
+      return res.status(400).json({
+
+        success: false,
+
+        message: "Bộ câu hỏi không đủ điều kiện để duyệt"
+
+      });
+
+    }
+
+    // ======================================================
+    // DUYỆT BỘ CÂU HỎI
+    // ======================================================
 
     const batch =
       await prisma.questionBatch.update({
@@ -971,69 +1041,92 @@ export const approveBatch = async (
 
           status: "APPROVED",
 
-          approved_by:
-            user_id,
+          visibility: "SYSTEM_BANK",
 
-          approved_at:
-            new Date()
+          allow_integrate: true,
+
+          // KHÔNG cập nhật source
+          // source vẫn giữ:
+          // - SYSTEM nếu admin tạo
+          // - TEACHER nếu giáo viên tạo
+
+          approved_by: userId,
+
+          approved_at: new Date()
 
         }
 
       });
-    
-      // ======================================================
-      // UPDATE QUESTIONS VISIBILITY
-      // ======================================================
 
-      const batchQuestions =
-        await prisma.questionBatchQuestion.findMany({
+    // ======================================================
+    // CẬP NHẬT VISIBILITY CHO CÂU HỎI
+    // ======================================================
 
-          where: {
-            batch_id: id
-          }
+    const batchQuestions =
+      await prisma.questionBatchQuestion.findMany({
 
-        });
+        where: {
+          batch_id: id
+        },
 
-      const questionIds =
-        batchQuestions
-          .map(q => q.question_id)
-          .filter(
-            (id): id is number =>
-              id !== null
-          );
+        select: {
+          question_id: true
+        }
+
+      });
+
+    const questionIds =
+      batchQuestions
+        .map(q => q.question_id)
+        .filter(
+          (id): id is number => id !== null
+        );
+
+    if (questionIds.length > 0) {
 
       await prisma.question.updateMany({
 
         where: {
 
           question_id: {
+
             in: questionIds
+
           }
 
         },
 
         data: {
 
-          visibility:
-            'SYSTEM_BANK'
+          visibility: "SYSTEM_BANK"
 
         }
 
       });
 
+    }
+
     return res.json({
 
       success: true,
+
+      message: "Duyệt bộ câu hỏi thành công",
+
       data: batch
 
     });
 
-  } catch (error: any) {
+  }
+
+  catch (error: any) {
+
+    console.error(error);
 
     return res.status(500).json({
 
       success: false,
-      message: error.message
+
+      message: error.message || "Lỗi server"
 
     });
 
@@ -1406,15 +1499,16 @@ export const updateQuestion = async (
         level: level ?? existing.level,
 
         answers: {
-          deleteMany: {},
-          create: (Array.isArray(answers) ? answers : [])
-            .filter((a: any) => a?.answer_text)
-            .map((a: any) => ({
-              answer_text: String(a.answer_text).trim(),
-              answer_hash: generateHash(String(a.answer_text).trim()),
-              is_correct: !!a.is_correct
-            }))
-        }
+        deleteMany: {},
+        create: (Array.isArray(answers) ? answers : [])
+          .filter((a: any) => a?.answer_text)
+          .map((a: any) => ({
+            answer_text: String(a.answer_text).trim(),
+            answer_hash: generateHash(String(a.answer_text).trim()),
+            answer_order: a.answer_order,
+            is_correct: !!a.is_correct
+          }))
+      }
       },
       include: {
         answers: true,
@@ -1717,4 +1811,554 @@ export const updateBatchQuestions = async (req: Request, res: Response) => {
       message: error.message
     });
   }
+};
+
+export const getAllQuestionBatches = async (
+  req: Request,
+  res: Response
+) => {
+
+  const batches = await prisma.questionBatch.findMany({
+
+    where: {
+
+      deleted_at: null,
+
+      OR: [
+
+        // Hệ thống
+        {
+          source: "SYSTEM"
+        },
+
+        // Giáo viên đã gửi hoặc đã duyệt
+        {
+          source: "TEACHER",
+
+          status: {
+
+            in: [
+              "PENDING",
+              "APPROVED",
+              "REJECTED"
+            ]
+
+          }
+
+        }
+
+      ]
+
+    },
+
+    include: {
+      subject: true,
+      teacher: true
+    },
+
+    orderBy: [
+
+      {
+        created_at: "desc"
+      }
+
+    ]
+
+  });
+
+  return res.json({
+
+    success: true,
+
+    data: batches
+
+  });
+
+};
+
+export const getMyQuestionBatches = async (
+  req: any,
+  res: Response
+) => {
+
+  const userId = req.user.userId;
+
+  const batches = await prisma.questionBatch.findMany({
+
+    where: {
+
+      teacher_id: userId,
+
+      deleted_at: null
+
+    },
+
+    include: {
+
+      subject: true,
+
+      teacher: true
+
+    },
+
+    orderBy: {
+
+      created_at: "desc"
+
+    }
+
+  });
+
+  return res.json({
+
+    success: true,
+
+    data: batches
+
+  });
+
+};
+
+export const getSystemQuestionBatches = async (
+  req: Request,
+  res: Response
+) => {
+
+  const batches = await prisma.questionBatch.findMany({
+
+    where: {
+
+      deleted_at: null,
+
+      source: "SYSTEM",
+
+      status: "APPROVED"
+
+    },
+
+    include: {
+      subject: true,
+      teacher: true
+    },
+
+    orderBy: {
+      created_at: "desc"
+    }
+
+  });
+
+  return res.json({
+
+    success: true,
+    data: batches
+
+  });
+
+};
+
+export const getTeacherPublicQuestionBatches = async (
+  req: Request,
+  res: Response
+) => {
+
+  const batches = await prisma.questionBatch.findMany({
+
+    where: {
+
+      deleted_at: null,
+
+      source: "TEACHER",
+
+      OR: [
+
+        { status: "PENDING" },
+
+        { status: "APPROVED" }
+
+      ]
+
+    },
+
+    include: {
+      subject: true,
+      teacher: true
+    },
+
+    orderBy: {
+      created_at: "desc"
+    }
+
+  });
+
+  return res.json({
+
+    success: true,
+    data: batches
+
+  });
+
+};
+
+export const integrateQuestionBatch = async (
+  req: any,
+  res: Response
+) => {
+
+  try {
+
+    const id =
+      Number(req.params.id);
+
+    const userId =
+      Number(req.user.userId);
+
+    const batch =
+      await prisma.questionBatch.findUnique({
+
+        where: {
+          batch_id: id
+        }
+
+      });
+
+    if (!batch) {
+
+      return res.status(404).json({
+
+        success: false,
+
+        message: "Không tìm thấy bộ câu hỏi"
+
+      });
+
+    }
+
+    // ======================================================
+    // CHỈ CHỦ SỞ HỮU MỚI ĐƯỢC GỬI YÊU CẦU
+    // ======================================================
+
+    if (batch.teacher_id !== userId) {
+
+      return res.status(403).json({
+
+        success: false,
+
+        message: "Bạn không có quyền thực hiện."
+
+      });
+
+    }
+
+    // ======================================================
+    // KHÔNG CHO PHÉP BẢN COPY
+    // ======================================================
+
+    if (batch.is_copied) {
+
+      return res.status(400).json({
+
+        success: false,
+
+        message: "Bản sao không được phép tích hợp."
+
+      });
+
+    }
+
+    // ======================================================
+    // ĐÃ GỬI YÊU CẦU
+    // ======================================================
+
+    if (
+
+      batch.allow_integrate ||
+
+      batch.status === "PENDING"
+
+    ) {
+
+      return res.status(400).json({
+
+        success: false,
+
+        message: "Bộ câu hỏi đã gửi yêu cầu tích hợp."
+
+      });
+
+    }
+
+    // ======================================================
+    // ĐÃ ĐƯỢC DUYỆT
+    // ======================================================
+
+    if (
+
+      batch.status === "APPROVED" ||
+
+      batch.visibility === "SYSTEM_BANK"
+
+    ) {
+
+      return res.status(400).json({
+
+        success: false,
+
+        message: "Bộ câu hỏi đã được tích hợp."
+
+      });
+
+    }
+
+    // ======================================================
+    // GỬI YÊU CẦU TÍCH HỢP
+    // ======================================================
+
+    const updated =
+      await prisma.questionBatch.update({
+
+        where: {
+          batch_id: id
+        },
+
+        data: {
+
+          allow_integrate: true,
+
+          visibility: "PUBLIC",
+
+          status: "PENDING"
+
+        }
+
+      });
+
+    return res.json({
+
+      success: true,
+
+      message: "Đã gửi yêu cầu tích hợp.",
+
+      data: updated
+
+    });
+
+  }
+
+  catch (error: any) {
+
+    console.error(error);
+
+    return res.status(500).json({
+
+      success: false,
+
+      message: error.message || "Lỗi server"
+
+    });
+
+  }
+
+};
+
+export const copyQuestionBatch = async (req: any, res: any) => {
+
+  try {
+
+    const batchId = Number(req.params.id);
+
+    const userId = req.user.userId;
+
+    const batch = await prisma.questionBatch.findUnique({
+
+      where: {
+        batch_id: batchId
+      },
+
+      include: {
+        questions: {
+          orderBy: {
+            question_order: "asc"
+          }
+        }
+      }
+
+    });
+
+    if (!batch) {
+
+      return res.status(404).json({
+        success: false,
+        message: "Không tìm thấy bộ câu hỏi"
+      });
+
+    }
+
+    //-----------------------------------
+    // Tạo batch mới
+    //-----------------------------------
+
+    const newBatch = await prisma.questionBatch.create({
+
+      data: {
+
+        batch_code:
+          "QB-" + Date.now(),
+
+        batch_name:
+          batch.batch_name + " (Copy)",
+
+        description:
+          batch.description,
+
+        subject_id:
+          batch.subject_id,
+
+        topic_id:
+          batch.topic_id,
+
+        teacher_id:
+          userId,
+
+        source: "TEACHER",
+
+        visibility:
+          "PRIVATE",
+
+        status:
+          "PRIVATE",
+
+        allow_integrate:
+          false,
+
+        is_copied:
+          true,
+
+        total_questions:
+          batch.total_questions,
+
+        easy_count:
+          batch.easy_count,
+
+        medium_count:
+          batch.medium_count,
+
+        hard_count:
+          batch.hard_count
+
+      }
+
+    });
+
+    //-----------------------------------
+    // Copy mapping
+    //-----------------------------------
+
+    if (batch.questions.length > 0) {
+
+      await prisma.questionBatchQuestion.createMany({
+
+        data:
+
+          batch.questions.map(q => ({
+
+            batch_id:
+              newBatch.batch_id,
+
+            question_id:
+              q.question_id,
+
+            question_order:
+              q.question_order,
+
+            question_snapshot:
+              q.question_snapshot
+                ? JSON.parse(JSON.stringify(q.question_snapshot))
+                : undefined
+
+          }))
+
+      });
+
+    }
+
+    return res.json({
+
+      success: true,
+
+      message:
+        "Sao chép thành công",
+
+      data: newBatch
+
+    });
+
+  }
+
+  catch (err) {
+
+    console.error(err);
+
+    return res.status(500).json({
+
+      success: false,
+
+      message:
+        "Lỗi server"
+
+    });
+
+  }
+
+};
+
+
+export const cancelIntegrateQuestionBatch = async (
+  req: any,
+  res: Response
+) => {
+
+  try {
+
+    const id = Number(req.params.id);
+
+    const batch = await prisma.questionBatch.update({
+
+      where: {
+        batch_id: id
+      },
+
+      data: {
+
+        allow_integrate: false,
+
+        visibility: "PRIVATE",
+
+        status: "PRIVATE"
+
+      }
+
+    });
+
+    return res.json({
+
+      success: true,
+
+      data: batch
+
+    });
+
+  }
+
+  catch (error: any) {
+
+    return res.status(500).json({
+
+      success: false,
+
+      message: error.message
+
+    });
+
+  }
+
 };

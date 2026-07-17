@@ -1,122 +1,292 @@
-// import { Request, Response } from "express";
-// import * as classService from "../services/class.service";
 
-// export const createClassController = async (
-//   req: Request,
-//   res: Response
-// ) => {
-//   try {
+import { Request, Response } from "express";
+import * as classService from "../services/class.service";
+import { AuthRequest } from "../middlewares/auth.middleware";
 
-//     const result =
-//       await classService.createClass(req.body);
+// =========================
+// GET ALL CLASSES
+// =========================
+export const getClassesController = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+    const result = await classService.getClasses(
+      req.user!.userId
+    );
 
-//     res.json(result);
+    res.json(result);
 
-//   } catch (error: any) {
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
-//     res.status(500).json({
-//       message: error.message
-//     });
+// =========================
+// GET CLASS BY ID
+// =========================
+export const getClassByIdController = async (
+  req: Request,
+  res: Response
+) => {
+     console.log("PARAMS =", req.params);
 
-//   }
-// };
+  try {
+    const result = await classService.getClassById(
+      req.params.id
+    );
 
-// export const addStudentController = async (
-//   req: Request,
-//   res: Response
-// ) => {
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
-//   try {
+// =========================
+// CREATE CLASS
+// =========================
+export const createClassController = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+    const result = await classService.createClass({
+      ...req.body,
+      teacher_id: req.user!.userId,
+    });
 
-//     const result =
-//       await classService.addStudent(
-//         req.params.id,
-//         req.body.studentId
-//       );
+    res.status(201).json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
-//     res.json(result);
+// =========================
+// UPDATE CLASS
+// =========================
+export const updateClassController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const result = await classService.updateClass(
+      req.params.id,
+      req.body
+    );
 
-//   } catch (error: any) {
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
-//     res.status(500).json({
-//       message: error.message
-//     });
+// =========================
+// DELETE CLASS
+// =========================
+export const deleteClassController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const result = await classService.deleteClass(
+      req.params.id
+    );
 
-//   }
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
-// };
+// =========================
+// DELETE MANY CLASSES
+// =========================
+export const deleteManyClassesController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const result =
+      await classService.deleteManyClasses(
+        req.body.ids
+      );
 
-// export const removeStudentController = async (
-//   req: Request,
-//   res: Response
-// ) => {
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
-//   try {
+// =========================
+// ADD STUDENT
+// =========================
+export const addStudentController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const result = await classService.addStudent(
+      req.params.id,
+      req.body.studentId
+    );
 
-//     await classService.removeStudent(
-//       req.params.id,
-//       req.params.studentId
-//     );
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
-//     res.json({
-//       message: "Removed successfully"
-//     });
+// =========================
+// REMOVE STUDENT
+// =========================
+export const removeStudentController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const result =
+      await classService.removeStudent(
+        req.params.id,
+        req.params.studentId
+      );
 
-//   } catch (error: any) {
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
-//     res.status(500).json({
-//       message: error.message
-//     });
+// =========================
+// GET STUDENTS
+// =========================
+export const getStudentsController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const result =
+      await classService.getStudents(
+        req.params.id
+      );
 
-//   }
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
-// };
+// =========================
+// ASSIGN EXAM
+// =========================
+export const assignExamController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const result =
+      await classService.assignExam(
+        req.params.id,
+        req.body
+      );
 
-// export const getStudentsController = async (
-//   req: Request,
-//   res: Response
-// ) => {
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
-//   try {
+// =========================
+// JOIN CLASS
+// =========================
+export const joinClassController = async (
+  req: AuthRequest,
+  res: Response
+) => {
 
-//     const result =
-//       await classService.getStudents(
-//         req.params.id
-//       );
+  try {
 
-//     res.json(result);
+    const result =
+      await classService.joinClass(
+        req.user!.userId,
+        req.body.class_code
+      );
 
-//   } catch (error: any) {
+    res.status(201).json({
 
-//     res.status(500).json({
-//       message: error.message
-//     });
+      success: true,
 
-//   }
+      message: "Tham gia lớp thành công",
 
-// };
+      data: result
 
-// export const assignExamController = async (
-//   req: Request,
-//   res: Response
-// ) => {
+    });
 
-//   try {
+  } catch (error: any) {
 
-//     const result =
-//       await classService.assignExam(
-//         req.params.id,
-//         req.body
-//       );
+    res.status(400).json({
 
-//     res.json(result);
+      success: false,
 
-//   } catch (error: any) {
+      message: error.message
 
-//     res.status(500).json({
-//       message: error.message
-//     });
+    });
 
-//   }
+  }
 
-// };
+};
+
+export const getMyClassesController = async (
+  req: AuthRequest,
+  res: Response
+) => {
+
+  try {
+
+    const result =
+      await classService.getMyClasses(
+
+        req.user!.userId,
+
+        req.user!.role
+
+      );
+
+    res.json({
+
+      success: true,
+
+      data: result
+
+    });
+
+  } catch (error: any) {
+
+    res.status(500).json({
+
+      message: error.message
+
+    });
+
+  }
+
+};

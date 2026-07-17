@@ -7,8 +7,7 @@ import {
 
 import { Observable } from 'rxjs';
 
-import { environment }
-from '../../environments/environment';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +15,7 @@ from '../../environments/environment';
 
 export class QuestionService {
 
-  private apiUrl =
-    `${environment.apiUrl}/questions`;
+  private apiUrl = environment.api.questions;
 
   constructor(
     private http: HttpClient

@@ -14,6 +14,7 @@ import {
   permanentlyDeleteUserService,
   toggleUserStatusService
 } from "../services/user.service";
+import { AuthRequest } from "../middlewares/auth.middleware";
 
 const cookieOptions = {
   httpOnly: true,
@@ -69,7 +70,7 @@ export const mezonCallback = async (req: Request, res: Response, next: NextFunct
 
     const { user, needSetPassword } = await authService.handleMezonLogin(code as string, state as string);
 
-    const token = generateAccessToken({ 
+    const token = generateToken({ 
       userId: user.user_id, 
       role: (user.role as string) || 'student' 
     });
@@ -91,7 +92,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   try {
     const { email, password } = req.body;
     const result = await authService.login(email, password);
-    const token = generateAccessToken({ userId: result.user_id, role: (result.role as string) || 'student' });
+    const token = generateToken({ userId: result.user_id, role: (result.role as string) || 'student' });
     return res.json({ success: true, user: result, token });
   } catch (error) { next(error); }
 };
@@ -100,7 +101,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = await userService.register(req.body);
-    const token = generateAccessToken({ userId: user.user_id, role: (user.role as string) || 'student' });
+    const token = generateToken({ userId: user.user_id, role: (user.role as string) || 'student' });
     return res.status(201).json({ success: true, message: "Đăng ký thành công", user, token });
   } catch (error) { next(error); }
 };
@@ -136,18 +137,48 @@ export const getMe = async (req: Request, res: Response, next: NextFunction) => 
     const token = extractToken(req);
     if (!token) throw new AppError("Bạn chưa đăng nhập", 401);
     
-    const decoded: any = verifyAccessToken(token);
+    const decoded: any = verifyToken(token);
     const result = await authService.validateUserSession(decoded.userId);
 
-    return res.json({ 
-      success: true, 
+    return res.json({
+      success: true,
       user: {
         ...result.user,
-        hasPassword: result.hasPassword 
+        hasPassword: result.hasPassword
       },
-      needSetPassword: !result.hasPassword 
+      needSetPassword:
+        !result.hasPassword &&
+        !result.user.skip_set_password
     });
   } catch (error) { next(error); }
+};
+
+export const skipSetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+
+  try {
+
+    const token = extractToken(req);
+
+    if (!token) {
+      throw new AppError("Bạn chưa đăng nhập", 401);
+    }
+
+    const decoded: any = verifyToken(token);
+
+    await authService.skipSetPassword(decoded.userId);
+
+    return res.json({
+      success: true
+    });
+
+  } catch (error) {
+    next(error);
+  }
+
 };
 
 /**
@@ -159,7 +190,7 @@ export const getUsers = async (req: Request, res: Response, next: NextFunction) 
     const token = extractToken(req);
     if (!token) throw new AppError("Bạn chưa đăng nhập", 401);
 
-    const decoded: any = verifyAccessToken(token);
+    const decoded: any = verifyToken(token);
     
     if (decoded.role?.toLowerCase() !== 'admin') {
       throw new AppError("Bạn không có quyền xem danh sách này", 403);
@@ -187,7 +218,7 @@ export const setPassword = async (req: Request, res: Response, next: NextFunctio
   try {
     const token = extractToken(req);
     if (!token) throw new AppError("Bạn chưa đăng nhập", 401);
-    const decoded: any = verifyAccessToken(token);
+    const decoded: any = verifyToken(token);
     await authService.updateUserPassword(decoded.userId, req.body.password);
     return res.json({ success: true, message: "Đặt mật khẩu thành công" });
   } catch (error) { next(error); }

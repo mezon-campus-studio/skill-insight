@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 
 import { HttpClient } from '@angular/common/http';
 
+
+import { environment }
+from '../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
@@ -10,8 +13,7 @@ export class ClassService {
   // =========================
   // API URL
   // =========================
-  private apiUrl =
-    'http://localhost:3000/api/classes';
+  private apiUrl = environment.api.classes;
 
   constructor(
     private http: HttpClient
@@ -84,4 +86,25 @@ export class ClassService {
       { ids }
     );
   }
+
+  joinClass(classCode: string) {
+
+    return this.http.post(
+      `${this.apiUrl}/join`,
+      {
+        class_code: classCode
+      }
+    );
+
+  }
+
+  getMyClasses() {
+
+    return this.http.get(
+      `${this.apiUrl}/my`
+    );
+
+  }
+
 }
+

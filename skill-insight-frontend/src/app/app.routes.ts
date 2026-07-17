@@ -5,6 +5,7 @@ import { LoginComponent } from './pages/login/login';
 import { RegisterComponent } from './pages/register/register';
 import { SelectRoleComponent } from './pages/select-role/select-role';
 import { CallbackComponent } from './pages/callback/callback';
+import { Home } from './pages/home/home'
 
 import { DashboardComponent } from './layouts/dashboard/dashboard';
 
@@ -14,10 +15,15 @@ export const routes: Routes = [
 
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: '',
     pathMatch: 'full'
   },
 
+  {
+    path: '',
+    component: Home
+  },
+  
   {
     path: 'login',
     component: LoginComponent

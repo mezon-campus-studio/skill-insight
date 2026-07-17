@@ -11,7 +11,15 @@ import {
   importQuestionBatchExcel,
   updateQuestion,
   createQuestionInBatch,
-  updateBatchQuestions
+  updateBatchQuestions,
+  getAllQuestionBatches,
+  getMyQuestionBatches,
+  getSystemQuestionBatches,
+  getTeacherPublicQuestionBatches,
+  copyQuestionBatch,
+  integrateQuestionBatch,
+  cancelIntegrateQuestionBatch
+
 } from "../controllers/questionBatch.controller";
 
 import upload from "../middlewares/upload.middleware";
@@ -47,13 +55,28 @@ router.get(
   getQuestionBatches
 );
 
-// ======================================================
-// GET DETAIL
-// ======================================================
 router.get(
-  "/:id",
+  "/all",
   verifyToken,
-  getQuestionBatchById
+  getAllQuestionBatches
+);
+
+router.get(
+  "/my",
+  verifyToken,
+  getMyQuestionBatches
+);
+
+router.get(
+  "/system",
+  verifyToken,
+  getSystemQuestionBatches
+);
+
+router.get(
+  "/teacher-public",
+  verifyToken,
+  getTeacherPublicQuestionBatches
 );
 
 // ======================================================
@@ -117,6 +140,35 @@ router.put(
   "/questions/:id",
   verifyToken,
   updateQuestion
+);
+
+
+
+router.post(
+  "/:id/copy",
+  verifyToken,
+  copyQuestionBatch
+);
+
+router.patch(
+  "/:id/integrate",
+  verifyToken,
+  integrateQuestionBatch
+);
+
+router.patch(
+  '/:id/cancel-integrate',
+  verifyToken,
+  cancelIntegrateQuestionBatch
+);
+
+// ======================================================
+// GET DETAIL
+// ======================================================
+router.get(
+  "/:id",
+  verifyToken,
+  getQuestionBatchById
 );
 
 export default router;
